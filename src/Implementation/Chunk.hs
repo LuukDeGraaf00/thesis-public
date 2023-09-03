@@ -2,7 +2,9 @@ module Implementation.Chunk where
 
 import Data.Array.Accelerate as A
 
-{- 
+import qualified Data.Map.Lazy as Map
+
+{-  
 
 Chunk
     1. singular array of one or more types (segment descriptors)
@@ -15,16 +17,20 @@ Collection
     1. map/dictionary with all chunks
     2. query represents a collection of chunks
 
-Type Protections
+Constraints
     1. Datatype
         - one chunk for each atomic datatype
         - equal length enforced
         - all elements remain equidistant/parallel
-        - structural changes must be collective
-        - optional array with indices (constant key)
+        - structural changes must be defined on the top-level
         - optional array with tags (ungrouped)
     2. Nominal
         - restrict structural changes to predetermined set of types
+        - restrict structural changes to top level functions
+    3. Indexed
+        - optional array with indices (constant key)
+    4. ?
+        - functions also operate on 'subsets' that contain a datatype
 
 
 Challenges:
@@ -34,24 +40,40 @@ Challenges:
     - introduce branching for when tags are used
 -}
 
+
+
 -- | Internal key that represents a type.
--- | All types have an associated index array (maybe possible to omit)
--- | Composite datatypes are constrained to (parallel) equidistance
--- | A collection of composite datatypes must be of a single chunk for each 'primitive' type.
--- | Elements of 'declared' types are constrained to type preserving operations. 
--- | Type synonyms (?)
+--newtype Type = Type Int
+--    deriving (Prelude.Eq, Prelude.Ord)
 
-data Type = Structural      -- independent structural changes  
-          | Nominal         -- structural changes restricted to top-level with a fixed-set of types
+--data Chunk = Chunk [Segment] (A.Acc (A.Array DIM1 a))
 
+data Chunk a = Array (A.Acc (A.Array DIM1 a)) 
+             | Segments 
 
--- | Chunk
-newtype Chunk = Chunk [Segment] (DIM1 Int)
-type Segment  = (Type, Int, Int)
+              
 
+--type Segment = (Type, Int, Int)
 
+{-
 
 
+
+data GenericChunk = Float (Chunk Float)
+                  | Int   (Chunk Int)
+
+example :: Acc (Vector Float) -> Acc (Vector Float)  -> Collection
+example xs ys = Map.fromList 
+    [
+        (Type 0, Float (Chunk [] xs)),
+        (Type 1, Float (Chunk [] ys))
+    ]
+
+dotp7 :: Collection -> Acc (Scalar Float)
+dotp7 c = A.fold (+) 0 (A.zipWith (*) xs ys)
+    where (Just (Float (Chunk [] xs))) = Map.lookup (Type 0) c
+          (Just (Float (Chunk [] ys))) = Map.lookup (Type 1) c
+-}
 
 
 

@@ -1,8 +1,7 @@
 {-# language GADTs #-}
-{-# language DeriveGeneric #-}
-{-# language DeriveAnyClass #-}
-{-# language TemplateHaskell #-}
-{-# language StandaloneDeriving #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE InstanceSigs #-}
+{-# LANGUAGE TypeFamilies #-}
 
 module Implementation.Chunk where
 
@@ -47,31 +46,53 @@ Challenges:
 -}
 
 
--- | any scalar value is queryable (and storable)
-class (T.IsScalar a) => Queryable a where 
+-- | any elt variable is queryable
+class (T.IsScalar value) => Queryable value where
 
--- | map from primitive type to all arrays with that type
-data Chunk a where
+-- | meta data
+class Meta meta where
 
-    -- each type a chunk
-    Single :: Queryable a => [A.Acc (A.Array DIM1 a)] -> Chunk a
+-- | storage of chunks
+class Collection meta where
 
-    --Multiple :: (Queryable a, Queryable b) => 
+    -- | definition function
+    data Col meta :: * -> *
 
-    --Two :: Queryable a => 
+    -- | find all chunks through a meta constraint
+    lookup :: (Queryable value) => Col meta value -> [Chunk value]
+
+    -- | insert chunk
+    insert :: (Queryable value) => [Chunk value] -> Col meta value  -> Col meta value
 
 
 
+data Example = Tree
+
+instance Collection Example where
+
+  lookup :: Queryable value => Col Example value -> [Chunk value]
+  lookup = undefined
+
+  insert :: Queryable value => [Chunk value] -> Col Example value -> Col Example value
+  insert = undefined
+
+instance Meta Example where
 
 
-    -- | represents an array with a single unique type
-    --Single :: T.IsScalar a => Queryable [A.Acc (A.Array DIM1 a)]
 
-    -- | represents an array with several functionally distinct types (enforce equal size)
-    --Multiple :: T.IsScalar a => Segment a -> Chunk (A.Acc (A.Array DIM1 a))
+-- | underlying data structure
+data Chunk value where
+
+    -- | a singular array of a scalar value
+    Chunk :: Queryable value => A.Acc (A.Array DIM1 value) -> Chunk value
+
+
 
 -- | segment within array
 type Segment a = (a, Int, Int)
+
+
+
 
 {-
 

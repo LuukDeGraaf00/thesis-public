@@ -5,7 +5,9 @@ import Data.Array.Accelerate as A
 
 import Implementation.Chunk
 
-import qualified Data.Map.Lazy as Map
+import qualified Data.Dependent.Map as Map
+import Data.Functor.Identity (Identity(..))
+import Data.Array.Accelerate.Type as T
 import Data.Array.Accelerate.Sugar.Elt
 
 {-
@@ -14,6 +16,15 @@ import Data.Array.Accelerate.Sugar.Elt
     type-indexed map implementation
 -}
 
+xs :: Acc (Vector Float)
+xs = use (fromList (Z:.10) [0..] :: Vector Float)
+
+
+-- | type-indexed map of chunks
+--type Collection = Map.DMap Chunk Identity
+
+
+{-
 class Datatype a where
 
     -- | collection of datatype
@@ -38,3 +49,10 @@ modify = undefined
 -- | merges all chunks into a singular array for use
 merge :: Elt a => [Chunk a] -> Acc (Array DIM1 a)
 merge = undefined
+-}
+
+--create :: T.IsScalar a => Acc (Vector a) -> Collection
+--create vs = Map.singleton Single (Identity [vs])
+
+--insert ::  T.IsScalar a => Acc (Vector a) -> Collection -> Collection
+--insert vs = Map.insert Single (Identity [vs])

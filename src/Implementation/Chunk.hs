@@ -1,8 +1,14 @@
+{-# language GADTs #-}
+{-# language DeriveGeneric #-}
+{-# language DeriveAnyClass #-}
+{-# language TemplateHaskell #-}
+{-# language StandaloneDeriving #-}
+
 module Implementation.Chunk where
 
 import Data.Array.Accelerate as A
+import Data.Array.Accelerate.Type as T
 
-import qualified Data.Map.Lazy as Map
 
 {-  
 
@@ -41,19 +47,31 @@ Challenges:
 -}
 
 
+-- | any scalar value is queryable (and storable)
+class (T.IsScalar a) => Queryable a where 
 
--- | Internal key that represents a type.
---newtype Type = Type Int
---    deriving (Prelude.Eq, Prelude.Ord)
+-- | map from primitive type to all arrays with that type
+data Chunk a where
 
---data Chunk = Chunk [Segment] (A.Acc (A.Array DIM1 a))
+    -- each type a chunk
+    Single :: Queryable a => [A.Acc (A.Array DIM1 a)] -> Chunk a
 
-data Chunk a = Array (A.Acc (A.Array DIM1 a)) 
-             | Segments 
+    --Multiple :: (Queryable a, Queryable b) => 
 
-              
+    --Two :: Queryable a => 
 
---type Segment = (Type, Int, Int)
+
+
+
+
+    -- | represents an array with a single unique type
+    --Single :: T.IsScalar a => Queryable [A.Acc (A.Array DIM1 a)]
+
+    -- | represents an array with several functionally distinct types (enforce equal size)
+    --Multiple :: T.IsScalar a => Segment a -> Chunk (A.Acc (A.Array DIM1 a))
+
+-- | segment within array
+type Segment a = (a, Int, Int)
 
 {-
 
@@ -74,9 +92,3 @@ dotp7 c = A.fold (+) 0 (A.zipWith (*) xs ys)
     where (Just (Float (Chunk [] xs))) = Map.lookup (Type 0) c
           (Just (Float (Chunk [] ys))) = Map.lookup (Type 1) c
 -}
-
-
-
-
-
-

@@ -49,47 +49,44 @@ Challenges:
 -- | any elt variable is queryable
 class (T.IsScalar value) => Queryable value where
 
--- | meta data
-class Meta meta where
+-- | meta information that is used to define a chunk
+class Info info where
 
--- | storage of chunks
-class Collection meta where
+-- | storage of data with meta information
+data Chunk info value where
 
-    -- | definition function
-    data Col meta :: * -> *
+    -- | an array
+    Array :: (Info info, Queryable value) => info -> A.Acc (A.Array DIM1 value) -> Chunk info value
 
-    -- | find all chunks through a meta constraint
-    lookup :: (Queryable value) => Col meta value -> [Chunk value]
+    -- | segmented collection
+    Segmented :: (Info info, Queryable value) => [Segment info] -> A.Acc (A.Array DIM1 value) -> Chunk info value
 
-    -- | insert chunk
-    insert :: (Queryable value) => [Chunk value] -> Col meta value  -> Col meta value
-
-
-
-data Example = Tree
-
-instance Collection Example where
-
-  lookup :: Queryable value => Col Example value -> [Chunk value]
-  lookup = undefined
-
-  insert :: Queryable value => [Chunk value] -> Col Example value -> Col Example value
-  insert = undefined
-
-instance Meta Example where
+    -- | tagged collection
+    Tagged :: (Info info) => Chunk info Int 
 
 
+data Test = Test
 
--- | underlying data structure
-data Chunk value where
 
-    -- | a singular array of a scalar value
-    Chunk :: Queryable value => A.Acc (A.Array DIM1 value) -> Chunk value
+-- | collection with certain categorization
+class (Info info) => Storage info where
 
+    -- | collection instance for each meta information
+    data Collection info :: * -> *
+
+
+    -- 
+    --chunks :: Queryable value => Collection meta -> Chunk meta value
+
+-- | query decides which chunks are relevant to be returned
+class Query query where
+
+    -- | return all relevant chunks
+    valid :: (Info info) => query -> info -> Bool
 
 
 -- | segment within array
-type Segment a = (a, Int, Int)
+type Segment meta = (meta, Int, Int)
 
 
 

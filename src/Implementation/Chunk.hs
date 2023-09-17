@@ -1,12 +1,16 @@
 {-# language GADTs #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE InstanceSigs #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE InstanceSigs #-}
 
 module Implementation.Chunk where
 
 import Data.Array.Accelerate as A
 import Data.Array.Accelerate.Type as T
+import Data.Array.Accelerate.Interpreter
+import qualified GHC.Generics
 
 
 {-  
@@ -46,67 +50,75 @@ Challenges:
 -}
 
 
--- | any elt variable is queryable
-class (T.IsScalar value) => Queryable value where
+-- generalized data type
+class (Elt a, Elt b) => Product a b where
 
--- | meta information that is used to define a chunk
-class Info info where
-
--- | storage of data with meta information
-data Chunk info value where
-
-    -- | an array
-    Array :: (Info info, Queryable value) => info -> A.Acc (A.Array DIM1 value) -> Chunk info value
-
-    -- | segmented collection
-    Segmented :: (Info info, Queryable value) => [Segment info] -> A.Acc (A.Array DIM1 value) -> Chunk info value
-
-    -- | tagged collection
-    Tagged :: (Info info) => Chunk info Int 
+    --construct :: Int -> Array DIM1 a
 
 
-data Test = Test
+-- | example
+data Chunk value where
+
+    -- | single
+    Array :: (T.IsScalar value) => Chunk value
+
+    -- | segmented
+    Segmented :: (T.IsScalar value) => value || segment -> Chunk (value || segment)
 
 
--- | collection with certain categorization
-class (Info info) => Storage info where
+-- | segmented
+infixr 3 ||
+infixr 3 :+:
+infixr 3 :*:
 
-    -- | collection instance for each meta information
-    data Collection info :: * -> *
+data value || segment where
 
+    -- | segment
+    (:+:) :: (T.IsScalar value, T.IsScalar other, BitSizeEq value other) => Int -> other || segment -> value || (other || segment)
 
-    -- 
-    --chunks :: Queryable value => Collection meta -> Chunk meta value
+    -- | final
+    (:*:) :: (T.IsScalar value, T.IsScalar segment, BitSizeEq value segment) => Int -> Int -> value || segment
+    
 
--- | query decides which chunks are relevant to be returned
-class Query query where
-
-    -- | return all relevant chunks
-    valid :: (Info info) => query -> info -> Bool
-
-
--- | segment within array
-type Segment meta = (meta, Int, Int)
+-- | tagged 
 
 
+--data Test = Collection (value || segment) [Bool]
 
 
-{-
+--huh :: Chunk (Float || Int32)
+--huh = Segmented 10
+
+example :: Float || Float || Int32
+example = 5 :+: 10 :*: 100
 
 
 
-data GenericChunk = Float (Chunk Float)
-                  | Int   (Chunk Int)
 
-example :: Acc (Vector Float) -> Acc (Vector Float)  -> Collection
-example xs ys = Map.fromList 
-    [
-        (Type 0, Float (Chunk [] xs)),
-        (Type 1, Float (Chunk [] ys))
-    ]
+test :: Acc (Array (Z :. Int) Int)
+test = use (fromList (Z :. 100000) [0..100000])
 
-dotp7 :: Collection -> Acc (Scalar Float)
-dotp7 c = A.fold (+) 0 (A.zipWith (*) xs ys)
-    where (Just (Float (Chunk [] xs))) = Map.lookup (Type 0) c
-          (Just (Float (Chunk [] ys))) = Map.lookup (Type 1) c
--}
+tester :: Acc (Array (Z :. Int) Int)
+tester = A.slit (constant 0) (constant 100) test
+
+
+type Values value = A.Acc (A.Array (DIM0 :. Int) value) 
+
+
+-- | wrapper around an array of data
+class Storage storage where
+
+    -- | collection that stores in a particular way
+    data Collection storage :: * -> *
+
+    -- | iterates over the collection on a certain value
+    map :: (Elt a, Elt b) => (a -> b) -> Collection storage c -> Collection storage d
+
+
+instance Storage Int where
+
+    data Collection Int v = Test
+
+    map :: (Elt a, Elt b) => (a -> b) -> Collection Int c -> Collection Int d
+    map f xs = undefined
+

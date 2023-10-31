@@ -726,6 +726,24 @@ The representation/interface for nominal types has also not yet been completed\c
 
 \newpage
 
+\section{Interface}
+
+As Accelerate is a domain-specific-language within Haskell...
+
+The \type{Elt} type-class (Extract, Load, Transform) defines a mapping between the Haskell and the Accelerate datatype.
+This process has been streamlined through a {\it generic} default implementation, which utilizes a standardized mapping.
+Functions do not use this process, and instead operate directly on the corresponding datatype.
+
+
+
+
+
+
+\newpage
+
+
+
+
 \section{Planning}
 
 \begin{itemize}

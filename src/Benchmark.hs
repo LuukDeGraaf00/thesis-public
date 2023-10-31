@@ -14,13 +14,14 @@ module Benchmark where
 
 import qualified Prelude as P
 import Data.Array.Accelerate as A
---import Data.Array.Accelerate.LLVM.PTX as GPU
+import Data.Array.Accelerate.LLVM.PTX as GPU
 import Data.Array.Accelerate.Linear as L
 import Data.Array.Accelerate.Data.Maybe as M
 import Data.Array.Accelerate.Data.Bits as B
 import Criterion.Main
 
 import Implementation.Chunk
+import Types
 
 
 -- | entry point for benchmarking
@@ -66,3 +67,18 @@ dotp5 xs ys = A.fold (+) 0 (A.zipWith (*) xs (A.map (fromMaybe (constant 1)) ys)
 
 dotp6 :: Acc (Vector Float) -> Acc (Vector Float) -> Acc (Scalar Float)
 dotp6 xs ys = A.fold (+) 0 (A.zipWith (\x y -> x A.== y ? (y * x + 0.1, x * y)) xs ys)
+
+
+-- | branching
+branch :: Benchmark
+branch = bgroup "compare numbers"
+    [
+        bench "conditional  " (whnf run (A.zipWith (\a b -> cond   (a A.<= b) (a + 5) (a * 10)) ps ls)),
+        bench "unconditional" (whnf run (A.zipWith (\a b -> uncond (a A.<= b) (a + 5) (a * 10)) ps ls))
+    ]
+
+ps :: Acc (Array DIM1 Int)
+ps = use (fromList (Z :. 10000) [0..10000])
+
+ls :: Acc (Array DIM1 Int)
+ls = use (fromList (Z :. 10000) [10000,9999..0])

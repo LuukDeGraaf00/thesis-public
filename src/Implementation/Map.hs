@@ -1,11 +1,14 @@
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE FlexibleContexts #-}
 module Implementation.Map where
 
 import Data.Array.Accelerate as A
 
 import Implementation.Chunk
+import Implementation.Type
 
-import qualified Data.Dependent.Map as Map
+import Implementation.Conversion
+
 import Data.Functor.Identity (Identity(..))
 import Data.Array.Accelerate.Type as T
 import Data.Array.Accelerate.Sugar.Elt
@@ -18,6 +21,11 @@ import Data.Array.Accelerate.Sugar.Elt
 
 xs :: Acc (Vector Float)
 xs = use (fromList (Z:.10) [0..] :: Vector Float)
+
+
+class (Elt value) => Map value where
+    
+    map :: (Map a, Map b) => (value -> result) -> a -> b
 
 
 -- | type-indexed map of chunks

@@ -30,4 +30,5 @@
 \contentsline {subsection}{\numberline {4.1}Implementation}{17}{subsection.4.1}%
 \contentsline {subsection}{\numberline {4.2}Comparison}{18}{subsection.4.2}%
 \contentsline {subsection}{\numberline {4.3}Interface}{18}{subsection.4.3}%
-\contentsline {section}{\numberline {5}Planning}{19}{section.5}%
+\contentsline {section}{\numberline {5}Interface}{19}{section.5}%
+\contentsline {section}{\numberline {6}Planning}{20}{section.6}%

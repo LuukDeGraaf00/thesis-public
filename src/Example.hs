@@ -10,7 +10,7 @@
 module Example where
 
 import Data.Array.Accelerate as A
-import Data.Array.Accelerate.LLVM.PTX as GPU
+--import Data.Array.Accelerate.LLVM.PTX as GPU
 import Data.Array.Accelerate.Linear as L
 import Data.Array.Accelerate.Data.Maybe as M
 

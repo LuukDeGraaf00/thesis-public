@@ -49,13 +49,6 @@ Challenges:
     - introduce branching for when tags are used
 -}
 
-
--- generalized data type
-class (Elt a, Elt b) => Product a b where
-
-    --construct :: Int -> Array DIM1 a
-
-
 -- | example
 data Chunk value where
 
@@ -65,6 +58,10 @@ data Chunk value where
     -- | segmented
     Segmented :: (T.IsScalar value) => value || segment -> Chunk (value || segment)
 
+
+-- | 
+
+data a |: b where
 
 -- | segmented
 infixr 3 ||
@@ -78,29 +75,23 @@ data value || segment where
 
     -- | final
     (:*:) :: (T.IsScalar value, T.IsScalar segment, BitSizeEq value segment) => Int -> Int -> value || segment
+
+
     
 
 -- | tagged 
 
-
---data Test = Collection (value || segment) [Bool]
-
-
---huh :: Chunk (Float || Int32)
---huh = Segmented 10
-
 example :: Float || Float || Int32
 example = 5 :+: 10 :*: 100
 
+test :: Acc (Array (Z :. Int) Int32)
+test = use (fromList (Z :. 1000) [0..100000])
 
-
-
-test :: Acc (Array (Z :. Int) Int)
-test = use (fromList (Z :. 100000) [0..100000])
-
-tester :: Acc (Array (Z :. Int) Int)
+tester :: Acc (Array (Z :. Int) Int32)
 tester = A.slit (constant 0) (constant 100) test
 
+adf :: Acc (Array (Z :. Int) Word32)
+adf = A.map bitcast test
 
 type Values value = A.Acc (A.Array (DIM0 :. Int) value) 
 

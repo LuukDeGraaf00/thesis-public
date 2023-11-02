@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2023.4.18)  26 SEP 2023 12:05
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2023.4.18)  2 NOV 2023 03:19
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -332,122 +332,122 @@ LaTeX Font Info:    External font `cmex10' loaded for size
  [1
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}] [2]
-<./Images//memoryhierarchy.png, id=140, 1184.425pt x 481.8pt>
+<./Images//memoryhierarchy.png, id=105, 1184.425pt x 481.8pt>
 File: ./Images//memoryhierarchy.png Graphic file (type png)
 <use ./Images//memoryhierarchy.png>
 Package pdftex.def Info: ./Images//memoryhierarchy.png  used on input line 106.
 (pdftex.def)             Requested size: 236.8808pt x 96.35829pt.
-<./Images//vectorization.png, id=146, 1214.5375pt x 506.89375pt>
+<./Images//vectorization.png, id=111, 1214.5375pt x 506.89375pt>
 File: ./Images//vectorization.png Graphic file (type png)
 <use ./Images//vectorization.png>
 Package pdftex.def Info: ./Images//vectorization.png  used on input line 129.
 (pdftex.def)             Requested size: 242.9032pt x 101.37695pt.
  [3 <./Images//memoryhierarchy.png>] [4 <./Images//vectorization.png>]
-<./Images//cache.png, id=177, 1008.76875pt x 271.0125pt>
+<./Images//cache.png, id=141, 1008.76875pt x 271.0125pt>
 File: ./Images//cache.png Graphic file (type png)
 <use ./Images//cache.png>
 Package pdftex.def Info: ./Images//cache.png  used on input line 189.
 (pdftex.def)             Requested size: 302.63297pt x 81.30437pt.
-<./Images//prefetch.png, id=179, 1018.80624pt x 260.975pt>
+<./Images//prefetch.png, id=143, 1018.80624pt x 260.975pt>
 File: ./Images//prefetch.png Graphic file (type png)
 <use ./Images//prefetch.png>
 Package pdftex.def Info: ./Images//prefetch.png  used on input line 199.
 (pdftex.def)             Requested size: 305.64423pt x 78.29309pt.
  [5 <./Images//cache.png> <./Images//prefetch.png>]
-<./Images//instructionlevelparallelism.png, id=193, 1079.03125pt x 587.19376pt>
+<./Images//instructionlevelparallelism.png, id=157, 1079.03125pt x 587.19376pt>
 File: ./Images//instructionlevelparallelism.png Graphic file (type png)
 <use ./Images//instructionlevelparallelism.png>
 Package pdftex.def Info: ./Images//instructionlevelparallelism.png  used on input line 218.
 (pdftex.def)             Requested size: 215.80243pt x 117.43666pt.
-<./Images//vectorvsthreads.png, id=194, 1460.45625pt x 607.26875pt>
+<./Images//vectorvsthreads.png, id=158, 1460.45625pt x 607.26875pt>
 File: ./Images//vectorvsthreads.png Graphic file (type png)
 <use ./Images//vectorvsthreads.png>
 Package pdftex.def Info: ./Images//vectorvsthreads.png  used on input line 228.
 (pdftex.def)             Requested size: 292.08607pt x 121.4516pt.
  [6 <./Images//instructionlevelparallelism.png> <./Images//vectorvsthreads.png>]
-<./Images//parallelarray.png, id=208, 1360.08125pt x 205.76875pt>
+<./Images//parallelarray.png, id=173, 1360.08125pt x 205.76875pt>
 File: ./Images//parallelarray.png Graphic file (type png)
 <use ./Images//parallelarray.png>
 Package pdftex.def Info: ./Images//parallelarray.png  used on input line 258.
 (pdftex.def)             Requested size: 272.01143pt x 41.15302pt.
-<./Images//locality.png, id=210, 1013.7875pt x 401.5pt>
+<./Images//locality.png, id=175, 1013.7875pt x 401.5pt>
 File: ./Images//locality.png Graphic file (type png)
 <use ./Images//locality.png>
 Package pdftex.def Info: ./Images//locality.png  used on input line 275.
 (pdftex.def)             Requested size: 253.44626pt x 100.37474pt.
  [7 <./Images//parallelarray.png> <./Images//locality.png>]
-<./Images//branchcost.png, id=228, 1400.23125pt x 717.68124pt>
+<./Images//branchcost.png, id=193, 1400.23125pt x 717.68124pt>
 File: ./Images//branchcost.png Graphic file (type png)
 <use ./Images//branchcost.png>
 Package pdftex.def Info: ./Images//branchcost.png  used on input line 297.
 (pdftex.def)             Requested size: 210.02562pt x 107.64754pt.
  [8 <./Images//branchcost.png>]
-<./Images//taggedunion.png, id=246, 644.4075pt x 201.75375pt>
+<./Images//taggedunion.png, id=211, 644.4075pt x 201.75375pt>
 File: ./Images//taggedunion.png Graphic file (type png)
 <use ./Images//taggedunion.png>
 Package pdftex.def Info: ./Images//taggedunion.png  used on input line 348.
 (pdftex.def)             Requested size: 257.75844pt x 80.70006pt.
  [9 <./Images//taggedunion.png>]
-<./Images//taggedpointer.png, id=254, 644.4075pt x 282.05376pt>
+<./Images//taggedpointer.png, id=219, 644.4075pt x 282.05376pt>
 File: ./Images//taggedpointer.png Graphic file (type png)
 <use ./Images//taggedpointer.png>
 Package pdftex.def Info: ./Images//taggedpointer.png  used on input line 364.
 (pdftex.def)             Requested size: 257.75844pt x 112.81949pt.
  [10 <./Images//taggedpointer.png>]
-<./Images//hashtable.png, id=262, 1611.01875pt x 893.3375pt>
+<./Images//hashtable.png, id=227, 1611.01875pt x 893.3375pt>
 File: ./Images//hashtable.png Graphic file (type png)
 <use ./Images//hashtable.png>
 Package pdftex.def Info: ./Images//hashtable.png  used on input line 382.
 (pdftex.def)             Requested size: 161.11131pt x 89.33897pt.
-<./Images//stable1.png, id=264, 644.4075pt x 201.75375pt>
+<./Images//stable1.png, id=229, 644.4075pt x 201.75375pt>
 File: ./Images//stable1.png Graphic file (type png)
 <use ./Images//stable1.png>
 Package pdftex.def Info: ./Images//stable1.png  used on input line 399.
 (pdftex.def)             Requested size: 193.32373pt x 60.52658pt.
-<./Images//stable2.png, id=265, 644.4075pt x 202.7575pt>
+<./Images//stable2.png, id=230, 644.4075pt x 202.7575pt>
 File: ./Images//stable2.png Graphic file (type png)
 <use ./Images//stable2.png>
 Package pdftex.def Info: ./Images//stable2.png  used on input line 400.
 (pdftex.def)             Requested size: 193.32373pt x 60.82771pt.
  [11 <./Images//hashtable.png> <./Images//stable1.png> <./Images//stable2.png>]
-<./Images//variant1.png, id=280, 684.5575pt x 122.4575pt>
+<./Images//variant1.png, id=245, 684.5575pt x 122.4575pt>
 File: ./Images//variant1.png Graphic file (type png)
 <use ./Images//variant1.png>
 Package pdftex.def Info: ./Images//variant1.png  used on input line 451.
 (pdftex.def)             Requested size: 205.36882pt x 36.73752pt.
-<./Images//variant2.png, id=281, 644.4075pt x 122.4575pt>
+<./Images//variant2.png, id=246, 644.4075pt x 122.4575pt>
 File: ./Images//variant2.png Graphic file (type png)
 <use ./Images//variant2.png>
 Package pdftex.def Info: ./Images//variant2.png  used on input line 453.
 (pdftex.def)             Requested size: 193.32373pt x 36.73752pt.
-<./Images//variant3.png, id=282, 684.5575pt x 122.4575pt>
+<./Images//variant3.png, id=247, 684.5575pt x 122.4575pt>
 File: ./Images//variant3.png Graphic file (type png)
 <use ./Images//variant3.png>
 Package pdftex.def Info: ./Images//variant3.png  used on input line 459.
 (pdftex.def)             Requested size: 205.36882pt x 36.73752pt.
  [12 <./Images/Variant1.png> <./Images/Variant2.png> <./Images/Variant3.png>]
-<./Images//ecs.png, id=296, 1234.6125pt x 707.64375pt>
+<./Images//ecs.png, id=261, 1234.6125pt x 707.64375pt>
 File: ./Images//ecs.png Graphic file (type png)
 <use ./Images//ecs.png>
 Package pdftex.def Info: ./Images//ecs.png  used on input line 482.
 (pdftex.def)             Requested size: 246.91812pt x 141.52625pt.
- [13 <./Images/ECS.png>] [14] [15] [16] [17] [18] [19] [20] (./proposal.bbl [21]) [22] (./proposal.aux)
+ [13 <./Images/ECS.png>] [14] [15] [16] [17] [18] (./proposal.bbl [19]) [20] (./proposal.aux)
 Package rerunfilecheck Info: File `proposal.out' has not changed.
-(rerunfilecheck)             Checksum: 93D36CAB7CA14F1AD4B192B4182F5365;2463.
+(rerunfilecheck)             Checksum: C0205C1F356FA85D548E4395F80EF07A;1731.
  ) 
 Here is how much of TeX's memory you used:
- 10978 strings out of 480247
- 171378 string characters out of 5896151
+ 10950 strings out of 480247
+ 171136 string characters out of 5896151
  649891 words of memory out of 5000000
- 28666 multiletter control sequences out of 15000+600000
- 474548 words of font info for 46 fonts, out of 8000000 for 9000
+ 28661 multiletter control sequences out of 15000+600000
+ 474883 words of font info for 47 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  60i,8n,63p,450b,443s stack positions out of 5000i,500n,10000p,200000b,80000s
-</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb>
-Output written on proposal.pdf (22 pages, 515926 bytes).
+ </home/luukdegraaf00/.texlive2021/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1000.600pk></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb>
+Output written on proposal.pdf (20 pages, 510328 bytes).
 PDF statistics:
- 487 PDF objects out of 1000 (max. 8388607)
- 399 compressed objects within 4 object streams
- 133 named destinations out of 1000 (max. 500000)
- 275 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 427 PDF objects out of 1000 (max. 8388607)
+ 340 compressed objects within 4 object streams
+ 109 named destinations out of 1000 (max. 500000)
+ 219 words of extra memory for PDF output out of 10000 (max. 10000000)
 

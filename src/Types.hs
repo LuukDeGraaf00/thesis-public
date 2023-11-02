@@ -4,17 +4,13 @@
 {-# LANGUAGE ScopedTypeVariables   #-}
 {-# LANGUAGE TypeApplications      #-}
 {-# LANGUAGE TypeFamilies          #-}
-{-# LANGUAGE ExistentialQuantification #-}
 {-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE InstanceSigs #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE RoleAnnotations #-}
-{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE ExistentialQuantification #-}
 
 module Types where
 
-import qualified GHC.Show as Prelude
 import Data.Array.Accelerate as A
 import Data.Array.Accelerate.Interpreter as I
 import Data.Array.Accelerate.Type
@@ -139,7 +135,6 @@ fl FloatingDict = undefined
 
 -- HELPERS
 
-
 mat :: ScalarType t -> AST.PrimFun (t -> t)
 mat (SingleScalarType (NumSingleType v)) = AST.PrimNeg v
 mat _ = error "unexpected"
@@ -151,61 +146,3 @@ add _ = error "unexpected"
 and :: ScalarType t -> AST.PrimFun ((t, t) -> t)
 and (SingleScalarType (NumSingleType (IntegralNumType v))) = AST.PrimBAnd v
 and _ = error "unexpected"
-
-as :: Acc (Array DIM1 (Int, Int))
-as = A.map (unaryF mat) list
-  where list = use (fromList (Z :. 2) [(4, 0), (-1, 10)])
-
-bs :: Acc (Array DIM1 Element)
-bs = A.map (unaryF mat) list
-  where list = use (fromList (Z :. 2) [Fire 5, None 1])
-
-
-example :: Exp (Word, Int)
-example = nullaryF (scalarF (singleF (numF (integralF allB) undefined)) undefined)
-
-example2 :: Exp (Int, Int)
-example2 = unaryF mat (T2 5 5 :: Exp (Int, Int))
-
-example3 :: Exp (Int, Int)
-example3 = binaryF Types.and (T2 5 5 :: Exp (Int, Int)) (T2 3 2)
-
-example4 :: Exp Element
-example4 = unaryF mat (constant (Fire 5))
-
-data Element = Oil !Int8 | Fire !Int8 | Water !Int8 | None !Int8
-  deriving (Show, Generic)
-
-
-instance Elt Element where
-
-  type EltR Element = Int8
-
-  eltR :: TypeR (EltR Element)
-  eltR = TupRsingle scalarType
-  
-  tagsR :: [TagR (EltR Element)]
-  tagsR = [TagRsingle scalarType]
-  
-  toElt :: EltR Element -> Element
-  toElt n | n Prelude.< 4  = Oil n
-          | n Prelude.< 16 = Fire n
-          | n Prelude.< 32 = Water n
-          | otherwise      = None n
-  
-  fromElt :: Element -> EltR Element
-  fromElt (Oil n)   = n
-  fromElt (Fire n)  = n 
-  fromElt (Water n) = n
-  fromElt (None n)  = n
-
-
-
-data V (types :: [*]) where
-
-    Variant :: (Elt e) => Exp e -> V types
-
-
-
-test :: V [Int, Int] -> Int
-test (Variant x) = undefined

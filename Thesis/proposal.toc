@@ -20,15 +20,16 @@
 \contentsline {subsection}{\numberline {2.3}Types}{13}{subsection.2.3}%
 \contentsline {subsubsection}{\numberline {2.3.1}Entity}{13}{subsubsection.2.3.1}%
 \contentsline {subsubsection}{\numberline {2.3.2}Algebraic Data Type}{14}{subsubsection.2.3.2}%
-\contentsline {section}{\numberline {3}Related Work}{15}{section.3}%
+\contentsline {section}{\numberline {3}WIP}{15}{section.3}%
 \contentsline {subsection}{\numberline {3.1}Accelerate}{15}{subsection.3.1}%
-\contentsline {subsection}{\numberline {3.2}Futhark}{16}{subsection.3.2}%
-\contentsline {subsection}{\numberline {3.3}Apecs}{16}{subsection.3.3}%
-\contentsline {subsection}{\numberline {3.4}Specs}{16}{subsection.3.4}%
-\contentsline {subsection}{\numberline {3.5}Unity}{16}{subsection.3.5}%
-\contentsline {section}{\numberline {4}Methodology}{17}{section.4}%
-\contentsline {subsection}{\numberline {4.1}Implementation}{17}{subsection.4.1}%
-\contentsline {subsection}{\numberline {4.2}Comparison}{18}{subsection.4.2}%
-\contentsline {subsection}{\numberline {4.3}Interface}{18}{subsection.4.3}%
-\contentsline {section}{\numberline {5}Interface}{19}{section.5}%
-\contentsline {section}{\numberline {6}Planning}{20}{section.6}%
+\contentsline {section}{\numberline {4}Related Work}{16}{section.4}%
+\contentsline {paragraph}{C/C++}{16}{section*.13}%
+\contentsline {paragraph}{Rust}{16}{section*.14}%
+\contentsline {paragraph}{Accelerate}{16}{section*.15}%
+\contentsline {paragraph}{Futhark}{16}{section*.16}%
+\contentsline {paragraph}{Dynamic programming languages}{16}{section*.17}%
+\contentsline {subsection}{\numberline {4.1}ECS}{16}{subsection.4.1}%
+\contentsline {paragraph}{Apecs}{16}{section*.18}%
+\contentsline {paragraph}{Specs}{16}{section*.19}%
+\contentsline {paragraph}{Unity}{17}{section*.20}%
+\contentsline {section}{\numberline {5}Interface}{18}{section.5}%

@@ -2,21 +2,35 @@
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE PolyKinds #-}
+{-# LANGUAGE ConstraintKinds #-}
+{-# LANGUAGE InstanceSigs #-}
+{-# LANGUAGE PatternSynonyms #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE ViewPatterns #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
 
 module Store where
 
 
 import Data.Array.Accelerate as A
 import qualified Data.Array.Accelerate.Interpreter as I
-import Data.Array.Accelerate.Representation.Type
 import Data.Array.Accelerate.Sugar.Elt
 import Data.Array.Accelerate.Smart
 import Data.Array.Accelerate.Representation.Elt
 import Data.Array.Accelerate.AST.Idx
-import Data.Array.Accelerate.Unsafe
+import Data.Array.Accelerate.Representation.Type
+import Data.Array.Accelerate.Type
+import Data.Array.Accelerate.Representation.Tag
+import GHC.Base (Constraint)
+import Data.Array.Accelerate.Unsafe (coerce)
 
 {-
 
@@ -29,17 +43,6 @@ A possible solution is to make an explicit 'store' operation (?).
 
 -}
 
-newtype Example = Example Float
-    deriving (Show, Generic)
-
-instance Elt Example
-
-data Element = Oil !Int8 | Fire !Int8 | Water !Int8 | None !Int8
-  deriving (Show, Generic)
-
-instance Elt Element 
-
-
 -- | generic store operation
 store :: forall a. (Elt a) => Acc (Array DIM1 a) -> Acc (Array DIM1 a)
 store = error (show x Prelude.++ show b)
@@ -48,91 +51,135 @@ store = error (show x Prelude.++ show b)
           --c = identity (eltR @a) undef
 
 
-identity :: (Elt e) => Exp e -> Exp e
-identity (Exp (SmartExp Nil))                     = Exp (SmartExp Nil)
---identity (Exp (SmartExp (Pair (SmartExp Nil) b))) = error "Newtype"
-identity (Exp (SmartExp (Pair a b)))              = Exp (SmartExp (Pair a b))
-identity (Exp (SmartExp (Tag t l)))               = error (show t)
-identity _                                        = error "WIP"
+data Point = Point_ Float Float
+  deriving (Generic, Elt)
 
 
--- retrieves
-apply :: Exp Example -> Exp Float
-apply = coerce
+class (Elt container, Elt variant) => Container container variant where
+
+  -- | constructs a container through a variant
+  construct :: Exp variant -> Exp container
+
+  -- | deconstruct container and transform into variant
+  destruct :: Exp container -> Exp variant
+
+  -- | tag of variant within the container instance
+  tag :: TagR (EltR container)
+
+-- | generic pattern that creates a pattern synonym for sum types
+pattern Sum :: forall v c. (Container c v) => Exp v -> Exp c
+pattern Sum vars <- (destruct . (matching @c) (tag @c @v) -> vars)
+  where Sum = construct
+
+pattern Justy :: Exp Int -> Exp (Maybe Int)
+pattern Justy x = Just_ x
 
 
-applyy :: forall a b. Coerce (EltR a) (EltR b) => Exp a -> Exp b
-applyy = coerce
-
---elter :: forall e. (Elt e) => Exp e -> Exp (EltR e)
---elter (Exp e) = Exp (structural (eltR @e) e)
+huh :: Exp Tuple -> Exp Int
+huh (JustInt    a) = a
+huh (NothingInt b) = 0
 
 
---un :: Exp Element -> Exp (EltR Element)
---un = coerce
+{-# COMPLETE Justy, Nothing_ #-}
 
---una :: (Elt e) => Exp e -> Exp (EltR e)
---una = coerce
+hud :: Exp (Maybe Int) -> Exp Int
+hud (Just_  a) = a
+hud Nothing_   = 0
 
-elter :: forall a b. (Elt a) => SmartExp a -> SmartExp (EltR a)
-elter e = case (eltR @a, e) of
-  (TupRunit,          a) -> undefined
-  (TupRsingle st,     a) -> undefined
-  (TupRpair tr tr',   a) -> undefined
+hus :: Exp (Maybe Int) -> Exp Int
+hus (Justy  a) = a
+hus Nothing_   = 0
 
-
-
--- | empty instance
-empty :: SmartExp () -> SmartExp (EltR ())
-empty e = SmartExp Nil
-
--- | single instance
-single :: forall a. (Elt a) => SmartExp a -> SmartExp (EltR a)
-single = elter
-
--- | tuple instance
-tuple :: forall a b. (Elt a, Elt b) => SmartExp (a, b) -> SmartExp (EltR a, EltR b)
-tuple e = SmartExp $ Pair (elter $ SmartExp $ Prj PairIdxLeft e) (elter $ SmartExp $ Prj PairIdxRight e)
+hul :: Exp (Maybe Int) -> Exp Int
+hul (Exp (SmartExp (Match (TagRtag 1 (TagRpair TagRunit (TagRsingle (SingleScalarType (NumSingleType (IntegralNumType TypeInt)))))) e))) = Exp (SmartExp (Prj PairIdxRight (SmartExp (Prj PairIdxRight e))))
+hul (Nothing_) = 0
 
 
-structural :: (Elt a) => TypeR a -> b
-structural TupRunit              = undefined
-structural (TupRsingle value)    = undefined
-structural (TupRpair left right) = undefined
-    
 
---ma :: Exp ((), Float)
---ma = structural undefined (constant (Example 5))
+f :: Exp (Maybe Int) -> Exp Int
+f (Exp (SmartExp (Match htag e))) = Exp (SmartExp (Prj PairIdxRight (SmartExp (Prj PairIdxRight e))))
+f _                               = error "Oh no"
 
+tags = tagsR @(Maybe Int)
 
--- | mirror representation
---mirror :: (Elt a) => TypeR a -> PreSmartExp acc exp a -> PreSmartExp acc exp a
---mirror TupRunit       Nil      = Nil
---mirror (TupRsingle v) _        = undefined -- Exp t
---mirror (TupRpair a b) _        = undefined -- Exp (SmartExp (Pair (Store.mirror (Exp t) a) (Store.mirror (Exp t) b)))
---mirror _ _ = undefined
+htag :: TagR (TAG, ((), Int))
+htag = TagRtag 1 (TagRpair TagRunit (TagRsingle (SingleScalarType (NumSingleType (IntegralNumType TypeInt)))))
 
-ta :: Exp Float -> Exp (Float, Float)
-ta (Exp float) = Exp (SmartExp (Pair (SmartExp (Pair (SmartExp Nil) float)) float))
+pattern JustInt :: Exp Int -> Exp Tuple
+pattern JustInt x = Sum x
 
-tb :: Exp (Float, Float) -> Exp Float
-tb (Exp (SmartExp (Pair (SmartExp (Pair (SmartExp Nil) a)) b))) = Exp b
+pattern NothingInt :: Exp () -> Exp Tuple
+pattern NothingInt x = Sum x
 
-test :: Exp Float
-test = tb ((\(T2 a b) -> T2 b a) (constant (1,2)))
+matching :: forall e. TagR (EltR e) -> Exp e -> Exp e
+matching tag e = Exp (SmartExp (Match tag (unExp e)))
 
 
--- | just general mapping to store
-storeA :: Acc (Array DIM1 Float) -> Acc (Array DIM1 Float)
-storeA = A.map (A.- 1) . A.compute . A.map (A.+ 1)
+data Tuple = Tuple
+
+instance Elt Tuple where
+
+  type EltR Tuple = (TAG, Int)
+
+  eltR :: TypeR (EltR Tuple)
+  eltR = TupRpair (eltR @TAG) (eltR @Int)
+
+  tagsR :: [TagR (EltR Tuple)]
+  tagsR = [TagRtag 0 (TagRsingle int), TagRtag 1 (TagRsingle int)]
+    where int = SingleScalarType (NumSingleType (IntegralNumType TypeInt))
+
+  toElt n = undefined
+
+  fromElt n = undefined
+
+instance Container Tuple Int where
+
+  construct :: Exp Int -> Exp Tuple
+  construct e = coerce (T2 (0 :: Exp TAG) e)
+
+  destruct :: Exp Tuple -> Exp Int
+  destruct (Exp e) = Exp (SmartExp (Prj PairIdxRight e))
+
+  tag :: TagR (EltR Tuple)
+  tag = TagRtag 0 (TagRsingle (SingleScalarType (NumSingleType (IntegralNumType TypeInt))))
+
+instance Container Tuple () where
+
+  construct :: Exp () -> Exp Tuple
+  construct e = coerce (T2 (1 :: Exp TAG) (undef :: Exp Int))
+
+  destruct :: Exp Tuple -> Exp ()
+  destruct (Exp e) = Exp (SmartExp Nil)
+
+  tag :: TagR (EltR Tuple)
+  tag = TagRtag 1 (TagRsingle (SingleScalarType (NumSingleType (IntegralNumType TypeInt))))
 
 
-xs :: Vector Float
-xs = fromList (Z:.10) [0..] :: Vector Float
 
-ys :: Vector ()
-ys = fromList (Z:.10) [(),(),(),(),(),(),(),(),(),()] :: Vector ()
+data layout > (types :: [*]) where
 
 
-try :: Arrays a => Acc a -> a
-try = I.run
+instance (Elt x) => Elt (x > '[]) where
+
+  type EltR (x > '[]) = (TAG, EltR x)
+
+  eltR :: Elt x => TypeR (EltR (x > '[]))
+  eltR = undefined
+
+  tagsR = undefined
+
+  toElt n = undefined
+
+  fromElt n = undefined
+
+instance (Elt x, Elt (x > ys)) => Elt (x > (y : ys)) where
+
+  type EltR (x > (y : ys)) = EltR (x > ys)
+
+  eltR = eltR @(x > ys)
+
+  tagsR = undefined
+
+  toElt n = undefined
+
+  fromElt n = undefined

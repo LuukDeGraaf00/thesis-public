@@ -542,12 +542,7 @@ This flexibility aligns with the intention to create a modular system that is ag
 
 \newpage
 
-
-\section{Related Work}
-
-Within this chapter Accelerate, the implementation language, will be discussed in the context of iterating on non-uniform data.
-This is extended by looking at integration of non-uniform data within other functional data-parallel array languages.   
-It will be concluded by comparing existing ECS libraries and their interpretation of the underlying data structure and structural changes. 
+\section{WIP}
 
 \subsection{Accelerate}
 
@@ -596,27 +591,66 @@ It has been partly implemented in Accelerate, and has not yet been benchmarked.
 
 \newpage
 
-\subsection{Futhark}
+\section{Related Work}
+
+\begin{itemize}
+    \item Haskell/C/C++/Rust/F (unboxed packed union)
+    \item Haskell/Ocaml/Julia/F/Erlang/Dynamic/OOP (boxed in some way)
+    \item Accelerate/Futhark (AoS tuple mapping)
+    \item SQL/Apecs/Unity/Specs/Query Languages (collective)
+\end{itemize}
+
+
+Pattern matching : make dependent on context (?)
+
+\paragraph{C/C++}
+
+An union in C/C++ is a structure identical to the largest member of the union.
+Accessing a member of the union extracts the raw value out of union, independent of the last assigned variant.
+This makes it inherently not type-safe, which is solved by the variant class template.
+A tag is used to throw an runtime error when accessing an unassigned variant.
+
+\paragraph{Rust}
+
+Enumerated types in Rust allow for an additional payload, which is implemented as a compact tagged union. 
+An unsafe union can be constructed, which functions similar to the C/C++ union.
+
+\paragraph{Accelerate}
+
+Accelerate is a data-parallel array language deeply embedded within Haskell.
+Accelerate internally uses tuples to represent types, which are stored in an struct-of-array fashion.
+Sum types are currently represented as a non-compact tagged union.
+Research has been done on a compact tagged union representation for parallel arrays, which has been named a {\it Recursive Tagged Union}\cite{accelerate-sum-types}.
+The representation uses a unified tag for nested sum types, which optimizes memory usage at the cost of tag (de-)construction.  
+It has not yet been implemented in Accelerate.
+
+\paragraph{Futhark}
 
 Futhark is a functional structurally typed data-parallel array language.
-Research has been done on including sum types to the Futhark compiler\cite{futhark-sum-types}, which has been implemented.
-A non-compact representation is used, but references the potential to overlap only fields of the same {\it type}.  
-While not the most compact, it avoids re-interpretation of undefined data. 
+Research has been done on including structural sum types to the Futhark compiler\cite{futhark-sum-types}, which has been implemented.
+A sum type is flattened to a tuple, which is stored as a struct-of-arrays. 
+Identical primitive types are {\it deduplicated} and share the same tuple slot.
 
-\subsection{Apecs}
+\paragraph{Dynamic programming languages}
+
+In general, dynamic programming languages inherently classify types as variants.
+
+\subsection{ECS}
+
+\paragraph{Apecs}
 
 Apecs\cite{ecs-apecs} is an ECS library in Haskell, with experimental support for concurrency through the Software Transactional Memory (STM) monad\cite{STM-monad}.
 The STM monad utilizes atomic instructions to achieve concurrency within a monadic context.
 Entities are stored with an integer dictionary, but can be explicitly stored in a sparse fixed size {\it cache} which allows for constant access time. 
 
-\subsection{Specs}
+\paragraph{Specs}
 
 Specs is an ECS library in Rust\cite{ecs-specs}, with native support for parallelism.
 It supports several storages such as: a tree data structure, dense vector, sparse vector and an hashmap.
 Iteration on entities is done by specifying the relation between the components: join, optional and excluded.
 An entity can be {\it flagged} (tag) to denote events such as the destruction of the entity.
 
-\subsection{Unity}
+\paragraph{Unity}
 
 Unity is a game-engine which released their production ready Data-Oriented-Tech-Stack (DOTS) in 2022, which centres around an ECS implementation which they have patented\cite{unity-ecs-patent}.
 It uses LLVM to optimize and vectorize C\# code (burst compiler) and has access to their internal c++ library for parallel and concurrent tasks (job system).
@@ -632,100 +666,6 @@ A notable observation is that delaying structural changes has side-effects as qu
 
 \newpage
 
-\section{Methodology}
-
-The premise is to efficiently iterate on non uniform data, which aligns with existing functionality of pure functional array languages.
-This can be separated into three distinct chapters.
-The first chapter investigates compatibility with existing collective array operators in Accelerate.
-The second chapter attempts to identify {\it run-time} performance considerations between the discussed data structures.
-This will be guiding in the third chapter, which aims to create an interface that is integrable within the type system of Haskell and provides sufficient type information for optimizations.
-
-The research on the {\it Recursive Tagged Union} in Accelerate has centered around memory usage\cite{accelerate-sum-types}.
-The Futhark paper goes in depth on type theory of structural sum types and minimal research on the performance implications\cite{futhark-sum-types}.
-Within this a wide-range of data structures will be explored from a performance standpoint, which sets it apart from previous research on this subject.  
-There also exist a lot of research on vectorization of non-array data structures, which employ a similar approach of directly operating on the internal data structure.
-While the ECS pattern is prevalent in many applications, to my knowledge there is limited (public) research on the optimizations done within these discussed libraries.
-The goal is not to implement ECS, but to use applicable optimizations from ECS within the context of sum types in functional data-parallel languages.
-
-\begin{enumerate}
-    \item Which collective array operations in Accelerate can be supported?
-    \item What are the performance considerations between the data structures?
-    \item What interface provides sufficient information to support optimizations on non-uniform data?
-\end{enumerate}
-
-
-
-\subsection{Implementation}
-
-As array languages operate on arrays, the functionality must be similar to remain compatible.
-In principle this means {\it delegating} the collective operation to the underlying data structure, based on the type of the function.
-This cannot be done when an index is explicitly used, such as the function \type{imap} as the index would be local to the underlying data structure.
-Internally \type{imap} is implemented using an array of generated indices through the \type{generate} function.
-In theory this means that it can be supported with minimal interference, by reimplementing these functions and replacing the way indices are provided for those functions.
-This is likely less trivial for element indexing, as it requires an array of pointers/indices to be maintained.
-An initial assumption is that this is unfeasible to do without sacrificing performance {\it or} it requires integration within Accelerate.
-An initial implementation should provide additional context to the feasibility of this.
-
-\newpage
-
-\subsection{Comparison}
-
-Preliminary benchmarks must be done on the {\it runtime} performance of the discussed data structures, for both LLVM backends.
-As these are all forms of arrays and regions within arrays, existing functionality in Accelerate allows for such benchmarks. 
-A non-exhaustive list of these data structures is:
-
-\begin{enumerate}
-    \item Element-wise
-    \begin{enumerate}
-    \item Naive tagged union
-    \item Recursive tagged union
-    \item Futhark suggested tagged union
-    \item Entity (without using the underlying data structure)
-    \end{enumerate}
-    \item Variant-wise
-    \begin{enumerate}
-    \item An array for each variant
-    \item An array for each distinct fields 
-    \item Grouping within a single array
-    \end{enumerate}
-\end{enumerate}
-
-Within these comparisons and benchmarks, the focus lies on identifying properties and overall performance.
-For this the optimizations discussed within the background will be used.
-A non-exhaustive list of these properties are:
-
-\begin{enumerate}
-    \item Vectorization (automatic)
-    \item Array fusion (memory bandwidth, register pressure)
-    \item Structural changes of variants (scan, sorting, grouping, allocation)
-    \item Sorted arrays (cache coherence, thread divergence, branch prediction)
-    \item Transform into persistent array (gather, scatter)
-    \item Suitability for destructive updates and task parallelism
-\end{enumerate}
-
-The results will be guiding in deciding the feasibility of the internal representations.
-This will also give an initial idea on what information is relevant for optimizations and the manual control required to create a performant program.
-
-\subsection{Interface}
-
-The main issue with sum types in Haskell (for this cause) is that structural changes to elements is not apparent.
-There are various ways to implement structural sum types in Haskell, many of which have been implemented in numerous libraries.
-A non-exhaustive list of used concepts:
-
-\begin{enumerate}
-    \item Type Families
-    \item Template Haskell
-    \item Generics
-    \item GADT's
-    \item Type Roles (GHC)
-\end{enumerate}
-
-Implementations will be based on the results of the previous section.
-In Accelerate the tag and union type has not yet been fully implemented\cite{accelerate-sum-types}, which I intend to continue on.
-The representation/interface for nominal types has also not yet been completed\cite{accelerate-sum-types}, which I do not intend to continue on.
-
-\newpage
-
 \section{Interface}
 
 As Accelerate is a domain-specific-language within Haskell...
@@ -734,49 +674,6 @@ The \type{Elt} type-class (Extract, Load, Transform) defines a mapping between t
 This process has been streamlined through a {\it generic} default implementation, which utilizes a standardized mapping.
 Functions do not use this process, and instead operate directly on the corresponding datatype.
 
-
-
-
-
-
-\newpage
-
-
-
-
-\section{Planning}
-
-\begin{itemize}
-    \item [01-08-2023] Official Start
-
-    \vspace{10pt}
-    \item [08-08-2023] Break (1 week)
-    \vspace{10pt}
-
-    \item [15-08-2023] Preliminary implementation (1 week)
-    \item [05-09-2023] Complete previous research / union (3 weeks)
-    \item [12-09-2023] Preliminary Benchmarks (1 week)
-    \item [26-09-2023] Draft Chapter 1 (2 weeks)
-    \item [10-10-2023] Draft Chapter 2 (2 weeks)
-    \item [24-10-2023] Reformulate background information (2 weeks)
-    \item [31-10-2023] Complete implementation (1 week + parallel to writing)
-    
-    \vspace{10pt}
-    \item [07-11-2023] Break (1 week)
-    \vspace{10pt}
-
-    \item [14-11-2023] Preliminary experimenting with interface (1 week)
-    \item [28-11-2023] Draft Chapter 3 (2 weeks)
-    \item [12-12-2023] Implementation optimizations (2 weeks)
-    \item [19-12-2023] Complete interface (1 weeks + parallel to writing)
-    
-    \vspace{10pt}
-    \item [02-01-2024] Break (2 weeks)
-    \vspace{10pt}
-    
-    \item [30-01-2024] Write Thesis (4 weeks)
-    \item [13-02-2024] Buffer (2 weeks)
-\end{itemize}
 
 \newpage
 

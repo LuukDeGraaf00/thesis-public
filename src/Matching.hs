@@ -36,135 +36,74 @@ import Data.Array.Accelerate.Type
 
 import GHC.Generics
 
-{-
-
-Embedded pattern matching involves transforming the Haskell AST to the Accelerate AST.
+import Data.Typeable
 
 
-'Simple Solution' -> generate new datatype
+-- | variant type
+type Variant = Int
 
+-- | abstract enumeration of all possible variations of a particular datatype
+class (Elt a) => Variants a where
 
+  -- | enumerates all variants of a datatype
+  variants :: [Variant]
 
+  -- | temporary solution to be able match the tag
+  temp :: Variant -> TagR (EltR a)
 
+-- | concrete storage and extraction of a variant 
+class (Variants a) => Storage a where
 
--}
+  -- | runtime extraction of a tag (lhs)
+  lhs :: Exp a -> Exp TAG
 
-class IsMaybe where
+  -- | corresponding tag of a variant (rhs)
+  rhs :: Variant -> TAG
 
-instance IsMaybe => Container a where
+class Match a where
 
-  construct = undefined
-  deconstruct = undefined
-
-class Container result where
-
-  construct :: e -> Exp result
-
-  deconstruct :: Exp result -> e
-
-
-
-class Helper a where
-
-  count :: Int
-
-  array :: [Prelude.String]
-
-instance Helper (a := '[]) where
-
-  count :: Int
-  count = 0
-
-  array :: [Prelude.String]
-  array = []
-
-instance (Elt x, Helper (a := xs)) => Helper (a := (x : xs)) where
-
-  count :: Int
-  count = 1 + count @(a := xs)
-
-  array :: [Prelude.String]
-  array = Prelude.show (eltR @x) : array @(a := xs)
+  match :: Exp a -> [Exp b] -> Exp a
 
 
 
+match2 :: Matching f => f -> f
+match2 f = mkFun (mkMatch f) Prelude.id
 
-oneC :: Exp x -> Exp (context := (x : xs))
-oneC a = undefined
+data Args f where
+  (:->)  :: Exp a -> Args b -> Args (Exp a -> b)
+  Result :: Args (Exp a)
 
-twoC :: Exp x -> Exp (context := (z : x : xs))
-twoC a = undefined
+class Matching a where
+  type ResultT a
+  mkMatch :: a -> Args a -> Exp (ResultT a)
+  mkFun   :: (Args f -> Exp (ResultT a))
+          -> (Args a -> Args f)
+          -> a
 
+instance (Elt a, Storage a) => Matching (Exp a) where
 
-ta :: Int
-ta = count @(Int := [Int, Int, Float])
+  type ResultT (Exp a) = a
 
-tb = eltR @(Bool := [Int, Int, Int])
+  mkFun :: (Args f -> Exp (ResultT (Exp a))) -> (Args (Exp a) -> Args f) -> Exp a
+  mkFun f k = f (k Result)
 
-tc = array @(Int := [Int, Int, Maybe Float])
+  mkMatch :: Exp a -> Args (Exp a) -> Exp (ResultT (Exp a))
+  mkMatch (Exp (SmartExp (Match _ x))) Result = Exp x
+  mkMatch (Exp e)                      Result = Exp e
 
+instance (Elt e, Storage e, Matching r) => Matching (Exp e -> r) where
+  type ResultT (Exp e -> r) = ResultT r
 
-data context := (types :: [*]) where
-
-class Reducible a b where
-    
-    type Reduce a b
-
-    create :: TypeR (EltR (Reduce a b))
-
-
-instance (Elt a) => Reducible a a where
-
-    type Reduce a a = a
-
-    create :: TypeR (EltR (Reduce a a))
-    create = eltR @a
-
-instance (Elt a) => Reducible a () where
-
-  type Reduce a () = a
-
-  create :: TypeR (EltR (Reduce a ()))
-  create = eltR @a
-
-instance (Elt a, Elt b) => Reducible a b where
-
-    type Reduce a b = a
-
-    create :: TypeR (EltR (Reduce a b))
-    create = eltR @a
-
-
-instance Elt (context := '[]) where
-
-  type EltR (context := '[]) = ()
-
-  eltR :: TypeR (EltR (context := '[]))
-  eltR = TupRunit
+  mkFun :: (Args f -> Exp (ResultT (Exp e -> r))) -> (Args (Exp e -> r) -> Args f) -> Exp e -> r
+  mkFun f k x = mkFun f (\xs -> k (x :-> xs))
   
-  tagsR :: [TagR (EltR (context := '[]))]
-  tagsR = []
-  
-  toElt n = undefined 
-  
-  fromElt n = undefined
-
-instance (Reducible (EltR x) (EltR (c := xs))) => Elt (c := (x : xs)) where
-
-  -- | generate tagged instance
-  type EltR (c := (x : xs)) = (TAG, Reduce (EltR x) (EltR (c := xs)))
-
-  --eltR :: TypeR (EltR (c := (x : xs)))
-  --eltR = TupRpair (TupRsingle (SingleScalarType (NumSingleType (IntegralNumType TypeWord8)))) (create @x @(c := xs))
-  
-  eltR = undefined
-
-  tagsR = undefined
-  
-  toElt n = undefined
-  
-  fromElt n = undefined
-
+  mkMatch :: (Exp e -> r) -> Args (Exp e -> r) -> Exp (ResultT (Exp e -> r))
+  mkMatch f (x@(Exp (SmartExp Match {})) :-> xs) = mkMatch (f x) xs -- nested call
+  mkMatch f (x@(Exp p)                   :-> xs) = case labels of
+             [(_,r)] -> Exp r
+             _       -> Exp (SmartExp (Case matchable labels))
+    where matchable = SmartExp (Pair (unExp (lhs x)) (SmartExp Nil))
+          labels    = Prelude.map (\variant -> (TagRtag ((rhs @e) variant) TagRunit, unExp (mkMatch (f (Exp (SmartExp (Match ((temp @e) variant) p)))) xs))) (variants @e)
 
 
 -- | generates all resulting functions from all possible patterns.
@@ -175,24 +114,36 @@ functions f = Prelude.map (\tag (Exp input) -> f (Exp $ SmartExp $ Match tag inp
 functionsT :: forall a b. (Elt a, Elt b) => (Exp a -> Exp b) -> [(TagR (EltR a), Exp a -> Exp b)]
 functionsT f = Prelude.map (\tag -> (tag, \(Exp input) -> f (Exp $ SmartExp $ Match tag input))) (tagsR @a)
 
--- | define equality
-instance (Elt a) => Prelude.Eq (TagR a) where
+-- | general switch statement
+switch :: forall a. (Elt a) => [(TAG, Exp a)] -> (Exp TAG -> Exp a)
+switch xs tag     = Exp (SmartExp (Case matchable labels))
+  where matchable = SmartExp (Pair (unExp tag) (SmartExp Nil))
+        labels    = Prelude.map (\(t, r) -> (TagRtag t TagRunit, unExp r)) xs
 
-  (==) :: Elt a => TagR a -> TagR a -> Bool
-  (==) TagRunit       TagRunit       = True
-  (==) (TagRsingle a) (TagRsingle b) = True
-  (==) _ _                           = False
+-- | generic switch expression
+switchT :: forall a b. (Elt a, Elt b) => (Exp a -> Exp TAG) -> [(TAG, Exp a -> Exp b)] -> (Exp a -> Exp b)
+switchT tag xs input = Exp (SmartExp (Case matchable labels))  
+  where matchable   = SmartExp (Pair (unExp (tag input)) (SmartExp Nil))
+        labels      = Prelude.map (\(t, f) -> (TagRtag t TagRunit, unExp (f input))) xs
 
+
+toTag :: Exp (Maybe Int) -> Exp TAG
+toTag (Exp e) = Exp (SmartExp (Prj PairIdxLeft e))
+
+example0 :: Exp (Maybe Int) -> Exp (Int, Int)
+example0 = switchT toTag (Prelude.zip [0..] (functions example2))
 
 example1 :: Exp (Maybe Int) -> Exp (Int, Int)
 example1 Nothing_       = constant (2, 5)
 example1 (Just_ n)      = T2 (5 + (n * 2)) n
 example1 _              = T2 (3 * 10) 3
 
-example4 :: Exp (Maybe Int) -> Exp (Int, Int)
-example4 (Exp (SmartExp (Match (TagRtag 0 v) e))) = T2 1 0 
-example4 (Exp (SmartExp (Match (TagRtag 1 v) e))) = T2 5 2 
-example4 (Exp (SmartExp a))                       = error (showPreExpOp a)
+example2 :: Exp (Maybe Int) -> Exp (Int, Int)
+--example2 (Variant 0 e)                = T2 3 3
+--example2 (Variant 1 e)                = T2 3 10
+--example2 (Exp (SmartExp (Match (TagRtag 0 v) e))) = T2 1 0 
+--example2 (Exp (SmartExp (Match (TagRtag 1 v) e))) = T2 5 2 
+example2 _                                        = T2 3 9
 
 
 example3 :: Exp (Maybe Bool) -> Exp (Int, Int)
@@ -200,11 +151,14 @@ example3 Nothing_       = constant (2, 5)
 example3 (Just_ True_)  = constant (5, 3)
 example3 _              = T2 (3 * 10) 3
 
+example4 :: Exp Int
+example4 = switch [(0, constant 1 :: Exp Int), (1, constant 20 :: Exp Int)] (constant 0)
+
 
 tags :: forall e. Elt e => Exp e -> [TagR (EltR e)]
 tags e = tagsR @e
 
 weird :: Exp (Maybe Int)
-weird = Exp (SmartExp (Pair (unExp (constant 1 :: Exp TAG)) (SmartExp (Pair (SmartExp Nil) (unExp (constant 5 :: Exp Int))))))
+weird = Exp (SmartExp (Pair (unExp (constant 50 :: Exp TAG)) (SmartExp (Pair (SmartExp Nil) (unExp (constant 5 :: Exp Int))))))
 
 

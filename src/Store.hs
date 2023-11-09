@@ -75,6 +75,25 @@ pattern Justy :: Exp Int -> Exp (Maybe Int)
 pattern Justy x = Just_ x
 
 
+--pattern Just2 :: (Elt a) => Exp a -> Exp (Maybe a)
+
+
+pattern Type abstract concrete <- Exp (SmartExp (Match abstract concrete))
+
+
+pattern MatchTag :: TAG -> TagR a
+pattern MatchTag value <- TagRtag value TagRunit
+
+pattern Nested :: Bool -> Bool
+pattern Nested bool <- bool
+
+hel (Nested True)  = False
+hel (Nested False) = True
+hel _              = error "False"
+
+dah = TagRtag 1 (TagRpair TagRunit (TagRsingle (SingleScalarType (NumSingleType (IntegralNumType TypeInt)))))
+
+
 huh :: Exp Tuple -> Exp Int
 huh (JustInt    a) = a
 huh (NothingInt b) = 0
@@ -94,6 +113,14 @@ hul :: Exp (Maybe Int) -> Exp Int
 hul (Exp (SmartExp (Match (TagRtag 1 (TagRpair TagRunit (TagRsingle (SingleScalarType (NumSingleType (IntegralNumType TypeInt)))))) e))) = Exp (SmartExp (Prj PairIdxRight (SmartExp (Prj PairIdxRight e))))
 hul (Nothing_) = 0
 
+
+huk :: Exp Word8 -> Exp Word8
+huk (Type (MatchTag 5) e) = Exp e
+huk (Type (MatchTag 4) e) = Exp e
+huk _                     = constant 9
+
+
+test (-1) = 5
 
 
 f :: Exp (Maybe Int) -> Exp Int

@@ -1,15 +1,15 @@
 # Fdb version 3
-["bibtex proposal"] 1698891564 "proposal.aux" "proposal.bbl" "proposal" 1698891566
+["bibtex proposal"] 1698940287 "proposal.aux" "proposal.bbl" "proposal" 1698940290
   "/usr/share/texlive/texmf-dist/bibtex/bst/base/plain.bst" 1292289607 20613 bd3fbfa9f64872b81ac57a0dd2ed855f ""
-  "proposal.aux" 1698891566 9092 ff98c1f75a4554bfb745989497db5202 "pdflatex"
+  "proposal.aux" 1698940289 9092 ff98c1f75a4554bfb745989497db5202 "pdflatex"
   "refs.bib" 1690726350 8239 99fecaaab4c36055eb3568e2d17e582e ""
   (generated)
   "proposal.bbl"
   "proposal.blg"
-["pdflatex"] 1698891565 "/home/luukdegraaf00/Haskell/ADT-of-Arrays/Thesis/proposal.tex" "proposal.pdf" "proposal" 1698891566
+["pdflatex"] 1698940289 "/home/luukdegraaf00/Haskell/ADT-of-Arrays/Thesis/proposal.tex" "proposal.pdf" "proposal" 1698940290
   "/etc/texmf/web2c/texmf.cnf" 1681814908 475 c0e671620eb5563b2130f56340a5fde8 ""
   "/home/luukdegraaf00/.texlive2021/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1000.600pk" 1686421914 11524 0e9dfc2738d8693f8cf277a6ef939195 ""
-  "/home/luukdegraaf00/Haskell/ADT-of-Arrays/Thesis/proposal.tex" 1698891566 43377 2b3b6db4bd2b4a89189630374c2164ae ""
+  "/home/luukdegraaf00/Haskell/ADT-of-Arrays/Thesis/proposal.tex" 1698940287 43587 45c0d680176ddb1fbe72cf89b3b71073 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/tcrm1000.tfm" 1136768653 1536 e07581a4bb3136ece9eeb4c3ffab8233 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmbx10.tfm" 1136768653 1328 c834bbb027764024c09d3d2bf908b5f0 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmbx12.tfm" 1136768653 1324 c910af8c371558dc20f2d7822f66fe64 ""
@@ -29,12 +29,15 @@
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmtt8.tfm" 1136768653 768 d7b9a2629a0c353102ad947dc9221d49 ""
   "/usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb" 1248133631 34811 78b52f49e893bcba91bd7581cdc144c0 ""
   "/usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb" 1248133631 32080 340ef9bf63678554ee606688e7b5339d ""
+  "/usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb" 1248133631 36299 5f9df58c2139e7edcf37c8fca4bd384d ""
+  "/usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb" 1248133631 36281 c355509802a035cadc5f15869451dcee ""
   "/usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb" 1248133631 35752 024fb6c41858982481f6968b5fc26508 ""
   "/usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb" 1248133631 32722 d7379af29a190c3f453aba36302ff5a9 ""
   "/usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb" 1248133631 32362 179c33bbf43f19adbb3825bb4e36e57a ""
   "/usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb" 1248133631 32734 69e00a6b65cedb993666e42eedb3d48f ""
   "/usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb" 1248133631 32762 224316ccc9ad3ca0423a14971cfa7fc1 ""
   "/usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb" 1248133631 32726 0a1aea6fcd6468ee2cf64d891f5c43c8 ""
+  "/usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb" 1248133631 32569 5e5ddc8df908dea60932f3c484a54c0d ""
   "/usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb" 1248133631 37944 359e864bd06cde3b1cf57bb20757fb06 ""
   "/usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti8.pfb" 1248133631 35660 fb24af7afbadb71801619f1415838111 ""
   "/usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb" 1248133631 31099 c85edf1dd5b9e826d67c9c7293b6786c ""
@@ -114,11 +117,11 @@
   "Images/Variant1.png" 1688219366 3755 2966b1a8202f2e812ca7f971e6865467 ""
   "Images/Variant2.png" 1688219380 3440 537b885959692b4615ee7abe51ecc8c1 ""
   "Images/Variant3.png" 1688219410 3965 5aeb921e1484917ef86694357bb8bd3a ""
-  "proposal.aux" 1698891566 9092 ff98c1f75a4554bfb745989497db5202 "pdflatex"
-  "proposal.bbl" 1698891564 5338 9f37fb057cd8ccd064cafd6557c68ea0 "bibtex proposal"
-  "proposal.out" 1698891566 1731 c0205c1f356fa85d548e4395f80ef07a "pdflatex"
-  "proposal.tex" 1698891566 43377 2b3b6db4bd2b4a89189630374c2164ae ""
-  "proposal.toc" 1698891566 2295 d0caf6c8f98eb1f18479a8a3676a89a4 "pdflatex"
+  "proposal.aux" 1698940289 9092 ff98c1f75a4554bfb745989497db5202 "pdflatex"
+  "proposal.bbl" 1698940287 5338 9f37fb057cd8ccd064cafd6557c68ea0 "bibtex proposal"
+  "proposal.out" 1698940289 1731 c0205c1f356fa85d548e4395f80ef07a "pdflatex"
+  "proposal.tex" 1698940287 43587 45c0d680176ddb1fbe72cf89b3b71073 ""
+  "proposal.toc" 1698940289 2295 d0caf6c8f98eb1f18479a8a3676a89a4 "pdflatex"
   (generated)
   "proposal.aux"
   "proposal.log"

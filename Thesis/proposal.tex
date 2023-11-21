@@ -45,7 +45,7 @@
 \graphicspath{ {./Images/} }
 
 
-\title{Proposal: Accelerating Structural Sum Types}
+\title{Accelerating Structural Sum Types}
 \author{Luuk de Graaf}
 \date{August 2023}
 
@@ -462,14 +462,40 @@ Both allow instructions to be vectorized, but there exist several other consider
 
 \newpage
 
-\subsection{Types}
+\section{Types (related work)}
+
+A conclusion of the previous section can be, that the most performant internal representation cannot be deducted from a theoretical framework.
+Algorithmic complexity can be used to get a general idea of the most performant solution, but not a definitive answer.
+Extensive profiling and defined parameters are required, due to the many factors that can impact the performance of a program.
+In a programming language, abstraction on the internal representation can be used to ergonomically change the foundation of the program.
+This can be used to determine the most performant solution, due to the ease of which multiple solutions can be profiled.
+Within this chapter related implementations that preserve their behavior are discussed in the context of user defined data types.
+
+
+\subsection{Alignment}
+
+\subsection{Packed/Unpacked}
+
+Remove/add form of indirection...
+
+\subsection{Strict/Laziness}
+
+\subsection{AoS/SoA}
+
+\subsection{Embedded/Framework}
+
+\subsection{WIP}
+
+User defined types are fundamental in many programming languages.
+There exist many distinct implementations that allow for defining your own custom composite datatypes.
+Within this section applicable implementations will be discussed in the context of variants, i.e. datatypes that have several representations.
 
 The ECS pattern is arguably a reaction to the prevalence of object-oriented languages within game engines.
 The premise is to organizes game-logic within systems rather than components, where the relation between components is flexible\cite{ecs-origin}.
 In contrast to inheritance, where relations are statically determined and game-logic is embedded within an hierarchy.
 In this chapter the type interpretation of entities is discussed, and linked to functional languages.
 
-\subsubsection{Entity}
+\subsection{Entity}
 
 An entity is fundamentally a composition of components, irrespective of which components can be combined.
 As many object-oriented languages are nominally typed, an entity is often implemented to only have one component of each.
@@ -490,7 +516,7 @@ Rather than emulating ECS, existing type systems can be used to handle the relat
 
 \newpage
 
-\subsubsection{Algebraic Data Type}
+\subsection{Algebraic Data Type}
 
 An algebraic data type is a composite datatype, which is used to compose new datatypes in many functional languages.
 A product type (x) is the combination of datatypes, while a sum type (+) is the alternation between datatypes.
@@ -542,8 +568,6 @@ This flexibility aligns with the intention to create a modular system that is ag
 
 \newpage
 
-\section{WIP}
-
 \subsection{Accelerate}
 
 Accelerate is a data-parallel array language deeply embedded within Haskell.
@@ -589,13 +613,6 @@ Research has been done on a compact tagged union representation for parallel arr
 The representation uses a unified tag for nested sum types, which optimizes memory usage at the cost of tag (de-)construction.  
 It has been partly implemented in Accelerate, and has not yet been benchmarked.
 
-\newpage
-
-\section{Related Work}
-
-User defined types are fundamental in many programming languages.
-There exist many distinct implementations that allow for defining your own custom composite datatypes.
-Within this section applicable implementations will be discussed in the context of variants, i.e. datatypes that have several representations.
 
 \subsection{*Mainstream languages temp name*}
 
@@ -629,7 +646,6 @@ User-defined types are thus restricted to product types and enumeration types, i
 \paragraph{Lava}
 
 Another domain-specific language for circuit design that is embedded within Haskell.
-
 
 https://www.haskell.org/haskell-symposium/1999/1999-28.pdf
 $https://www.researchgate.net/publication/221562984_Type-safe_observable_sharing_in_Haskell$

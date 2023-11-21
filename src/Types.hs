@@ -8,6 +8,7 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE RoleAnnotations #-}
 {-# LANGUAGE ExistentialQuantification #-}
+{-# LANGUAGE PatternSynonyms #-}
 
 module Types where
 
@@ -22,9 +23,35 @@ import qualified GHC.Num
 import Data.Bits
 import qualified Data.Array.Accelerate.AST as AST
 import Data.Array.Accelerate.AST.Idx
-import Data.Array.Accelerate.Representation.Tag (TagR (TagRsingle), TAG)
+import Data.Array.Accelerate.Representation.Tag
 
 
+-- helper expression
+type Insert value expression   = SmartExp value -> SmartExp expression -> SmartExp expression
+type Retrieve value expression = SmartExp expression -> SmartExp value
+
+-- | traverse expression
+traverse :: Monoid r => forall e. (forall a. ScalarType a -> Insert a e -> Retrieve a e -> r) -> TypeR e -> r
+traverse f t = loop t f Prelude.const Prelude.id
+  where
+    loop :: Monoid r => TypeR a -> (forall a. ScalarType a -> Insert a e -> Retrieve a e -> r) -> Insert a e -> Retrieve a e -> r
+    loop TupRunit       f insert retrieve = mempty
+    loop (TupRsingle v) f insert retrieve = f v insert retrieve
+    loop (TupRpair l r) f insert retrieve = loop l f (\a e -> insert (SmartExp (Pair a (SmartExp (Prj PairIdxRight (retrieve e))))) e) (SmartExp . Prj PairIdxLeft  . retrieve) 
+                                  `mappend` loop r f (\a e -> insert (SmartExp (Pair (SmartExp (Prj PairIdxLeft (retrieve e))) a)) e)  (SmartExp . Prj PairIdxRight . retrieve)
+
+-- | traverse over representation
+traverseRep :: Monoid a => (forall t. ScalarType t -> a) -> TypeR e -> a
+traverseRep f TupRunit       = mempty
+traverseRep f (TupRsingle v) = f v
+traverseRep f (TupRpair l r) = traverseRep f l `mappend` traverseRep f r
+
+-- | traverse over expression and representation
+traverseExp :: (Monoid r) => (forall a. ScalarType a -> SmartExp a -> r) -> SmartExp e -> TypeR e -> r
+traverseExp f a TupRunit       = mempty
+traverseExp f a (TupRsingle v) = f v a
+traverseExp f a (TupRpair l r) = traverseExp f (SmartExp (Prj PairIdxLeft a)) l `mappend` traverseExp f (SmartExp (Prj PairIdxRight a)) r
+ 
 -- | generate nullary function that creates a value on each location
 nullary :: forall a. (forall t. ScalarType t -> SmartExp t) -> TypeR a -> SmartExp a
 nullary f TupRunit       = SmartExp Nil
@@ -44,6 +71,12 @@ binary f a b (TupRsingle v) = f v a b
 binary f a b (TupRpair l r) = SmartExp (Pair (binary f (left a) (left b) l) (binary f (right a) (right b) r))
     where left t  = SmartExp (Prj PairIdxLeft t)
           right t = SmartExp (Prj PairIdxRight t)
+
+-- | undefined tag
+tagUndef :: TypeR a -> TagR a
+tagUndef TupRunit       = TagRunit
+tagUndef (TupRsingle v) = TagRundef v
+tagUndef (TupRpair l r) = TagRpair (tagUndef l) (tagUndef r)
 
 -- | apply nullary function
 nullaryF :: forall e. (Elt e) => (forall t. ScalarType t -> t) -> Exp e
@@ -87,7 +120,6 @@ onFalse (Exp mask) (Exp value) = Exp $ binary (\(SingleScalarType (NumSingleType
 
 example5 :: Exp (Int, Word)
 example5 = uncond False_ (T2 3 1) (T2 5 5)
-
 
 
 -- | construct a scalar
@@ -146,3 +178,57 @@ add _ = error "unexpected"
 and :: ScalarType t -> AST.PrimFun ((t, t) -> t)
 and (SingleScalarType (NumSingleType (IntegralNumType v))) = AST.PrimBAnd v
 and _ = error "unexpected"
+
+
+
+pattern TI :: () => (a ~ Int) => ScalarType a
+pattern TI <- SingleScalarType (NumSingleType (IntegralNumType TypeInt))
+  where TI = SingleScalarType (NumSingleType (IntegralNumType TypeInt))
+
+pattern TI8 :: () => (a ~ Int8) => ScalarType a
+pattern TI8 <- SingleScalarType (NumSingleType (IntegralNumType TypeInt8))
+  where TI8 = SingleScalarType (NumSingleType (IntegralNumType TypeInt8))
+
+pattern TI16 :: () => (a ~ Int16) => ScalarType a
+pattern TI16 <- SingleScalarType (NumSingleType (IntegralNumType TypeInt16))
+  where TI16 = SingleScalarType (NumSingleType (IntegralNumType TypeInt16))
+
+pattern TI32 :: () => (a ~ Int32) => ScalarType a
+pattern TI32 <- SingleScalarType (NumSingleType (IntegralNumType TypeInt32))
+  where TI32 = SingleScalarType (NumSingleType (IntegralNumType TypeInt32))
+
+pattern TI64 :: () => (a ~ Int64) => ScalarType a
+pattern TI64 <- SingleScalarType (NumSingleType (IntegralNumType TypeInt64))
+  where TI64 = SingleScalarType (NumSingleType (IntegralNumType TypeInt64))
+
+pattern TW :: () => (a ~ Word) => ScalarType a
+pattern TW <- SingleScalarType (NumSingleType (IntegralNumType TypeWord))
+  where TW = SingleScalarType (NumSingleType (IntegralNumType TypeWord))
+
+pattern TW8 :: () => (a ~ Word8) => ScalarType a
+pattern TW8 <- SingleScalarType (NumSingleType (IntegralNumType TypeWord8))
+  where TW8 = SingleScalarType (NumSingleType (IntegralNumType TypeWord8))
+
+pattern TW16 :: () => (a ~ Word16) => ScalarType a
+pattern TW16 <- SingleScalarType (NumSingleType (IntegralNumType TypeWord16))
+  where TW16 = SingleScalarType (NumSingleType (IntegralNumType TypeWord16))
+
+pattern TW32 :: () => (a ~ Word32) => ScalarType a
+pattern TW32 <- SingleScalarType (NumSingleType (IntegralNumType TypeWord32))
+  where TW32 = SingleScalarType (NumSingleType (IntegralNumType TypeWord32))
+
+pattern TW64 :: () => (a ~ Word64) => ScalarType a
+pattern TW64 <- SingleScalarType (NumSingleType (IntegralNumType TypeWord64))
+  where TW64 = SingleScalarType (NumSingleType (IntegralNumType TypeWord64))
+
+pattern TF16 :: () => (a ~ Half) => ScalarType a
+pattern TF16 <- SingleScalarType (NumSingleType (FloatingNumType TypeHalf))
+  where TF16 = SingleScalarType (NumSingleType (FloatingNumType TypeHalf))
+
+pattern TF32 :: () => (a ~ Float) => ScalarType a
+pattern TF32 <- SingleScalarType (NumSingleType (FloatingNumType TypeFloat))
+  where TF32 = SingleScalarType (NumSingleType (FloatingNumType TypeFloat))
+
+pattern TF64 :: () => (a ~ Double) => ScalarType a
+pattern TF64 <- SingleScalarType (NumSingleType (FloatingNumType TypeDouble))
+  where TF64 = SingleScalarType (NumSingleType (FloatingNumType TypeDouble))

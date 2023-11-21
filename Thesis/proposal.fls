@@ -613,7 +613,6 @@ INPUT ./Images/ECS.png
 INPUT ./Images/ECS.png
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmtt10.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmtt8.tfm
-INPUT /usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/tcrm1000.tfm
 INPUT ./proposal.bbl
 INPUT proposal.bbl
 INPUT ./proposal.bbl
@@ -621,7 +620,6 @@ INPUT proposal.bbl
 INPUT proposal.aux
 INPUT ./proposal.out
 INPUT ./proposal.out
-INPUT /home/luukdegraaf00/.texlive2021/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1000.600pk
 INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb
 INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb
 INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb

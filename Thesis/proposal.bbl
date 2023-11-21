@@ -13,6 +13,12 @@ Joachim~Christoph Ante and Tim Johansson.
 \newblock Method and system for improved performance of a video game engine,
   March 2020.
 
+\bibitem{clash}
+Christiaan Baaij, Matthijs Kooijman, Jan Kuper, Arjan Boeijink, and Marco
+  Gerards.
+\newblock Clash: Structural descriptions of synchronous hardware using haskell,
+  2010.
+
 \bibitem{cache-prefetching}
 J.~L. Baer and T.~F. Chen.
 \newblock An effictive on-chip preloading scheme to reduce data access penalty.

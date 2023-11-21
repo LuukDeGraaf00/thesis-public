@@ -1,16 +1,14 @@
 # Fdb version 3
-["bibtex proposal"] 1698940287 "proposal.aux" "proposal.bbl" "proposal" 1698940290
+["bibtex proposal"] 1700097085 "proposal.aux" "proposal.bbl" "proposal" 1700097764
   "/usr/share/texlive/texmf-dist/bibtex/bst/base/plain.bst" 1292289607 20613 bd3fbfa9f64872b81ac57a0dd2ed855f ""
-  "proposal.aux" 1698940289 9092 ff98c1f75a4554bfb745989497db5202 "pdflatex"
-  "refs.bib" 1690726350 8239 99fecaaab4c36055eb3568e2d17e582e ""
+  "proposal.aux" 1700097764 9496 cb27b5f32e80de2fc86df1f67922ac83 "pdflatex"
+  "refs.bib" 1700096960 8456 7d1bf1bace8c62affdbc7e6a201727ad ""
   (generated)
   "proposal.bbl"
   "proposal.blg"
-["pdflatex"] 1698940289 "/home/luukdegraaf00/Haskell/ADT-of-Arrays/Thesis/proposal.tex" "proposal.pdf" "proposal" 1698940290
+["pdflatex"] 1700097763 "/home/luukdegraaf00/Haskell/ADT-of-Arrays/Thesis/proposal.tex" "proposal.pdf" "proposal" 1700097764
   "/etc/texmf/web2c/texmf.cnf" 1681814908 475 c0e671620eb5563b2130f56340a5fde8 ""
-  "/home/luukdegraaf00/.texlive2021/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1000.600pk" 1686421914 11524 0e9dfc2738d8693f8cf277a6ef939195 ""
-  "/home/luukdegraaf00/Haskell/ADT-of-Arrays/Thesis/proposal.tex" 1698940287 43587 45c0d680176ddb1fbe72cf89b3b71073 ""
-  "/usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/tcrm1000.tfm" 1136768653 1536 e07581a4bb3136ece9eeb4c3ffab8233 ""
+  "/home/luukdegraaf00/Haskell/ADT-of-Arrays/Thesis/proposal.tex" 1700097763 44091 244f77777d3b03bee9bd1cd1de382a6d ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmbx10.tfm" 1136768653 1328 c834bbb027764024c09d3d2bf908b5f0 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmbx12.tfm" 1136768653 1324 c910af8c371558dc20f2d7822f66fe64 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmmi12.tfm" 1136768653 1524 4414a8315f39513458b80dfc63bff03a ""
@@ -117,11 +115,11 @@
   "Images/Variant1.png" 1688219366 3755 2966b1a8202f2e812ca7f971e6865467 ""
   "Images/Variant2.png" 1688219380 3440 537b885959692b4615ee7abe51ecc8c1 ""
   "Images/Variant3.png" 1688219410 3965 5aeb921e1484917ef86694357bb8bd3a ""
-  "proposal.aux" 1698940289 9092 ff98c1f75a4554bfb745989497db5202 "pdflatex"
-  "proposal.bbl" 1698940287 5338 9f37fb057cd8ccd064cafd6557c68ea0 "bibtex proposal"
-  "proposal.out" 1698940289 1731 c0205c1f356fa85d548e4395f80ef07a "pdflatex"
-  "proposal.tex" 1698940287 43587 45c0d680176ddb1fbe72cf89b3b71073 ""
-  "proposal.toc" 1698940289 2295 d0caf6c8f98eb1f18479a8a3676a89a4 "pdflatex"
+  "proposal.aux" 1700097764 9496 cb27b5f32e80de2fc86df1f67922ac83 "pdflatex"
+  "proposal.bbl" 1700097085 5528 d738661f8fa0dc204a08fb4d72d43e64 "bibtex proposal"
+  "proposal.out" 1700097764 2109 c811a419485216ccf6ea13fe7d773345 "pdflatex"
+  "proposal.tex" 1700097763 44091 244f77777d3b03bee9bd1cd1de382a6d ""
+  "proposal.toc" 1700097764 2539 2dbc7a2adcc900412ff6ea24b7548e7e "pdflatex"
   (generated)
   "proposal.aux"
   "proposal.log"

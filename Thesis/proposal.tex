@@ -593,30 +593,47 @@ It has been partly implemented in Accelerate, and has not yet been benchmarked.
 
 \section{Related Work}
 
-\begin{itemize}
-    \item Haskell/C/C++/Rust/F (unboxed packed union)
-    \item Haskell/Ocaml/Julia/F/Erlang/Dynamic/OOP (boxed in some way)
-    \item Accelerate/Futhark (AoS tuple mapping)
-    \item SQL/Apecs/Unity/Specs/Query Languages (collective)
-\end{itemize}
+User defined types are fundamental in many programming languages.
+There exist many distinct implementations that allow for defining your own custom composite datatypes.
+Within this section applicable implementations will be discussed in the context of variants, i.e. datatypes that have several representations.
 
-file:///C:/Users/Gebruiker/Downloads/c%C3%8E%C2%BBash.pdf
-https://www.haskell.org/haskell-symposium/1999/1999-28.pdf
-$https://www.researchgate.net/publication/221562984_Type-safe_observable_sharing_in_Haskell$
-
-Pattern matching : make dependent on context (?)
+\subsection{*Mainstream languages temp name*}
 
 \paragraph{C/C++}
 
-An union in C/C++ is a structure identical to the largest member of the union.
-Accessing a member of the union extracts the raw value out of union, independent of the last assigned variant.
-This makes it inherently not type-safe, which is solved by the variant class template.
-A tag is used to throw an runtime error when accessing an unassigned variant.
+An union is a structure identical to the largest member of the union.
+Accessing a member of the union extracts the raw value out of the union, independent of the last assigned variant.
+This makes using unions inherently not type-safe to use.
+The variant class template partly solves this by attaching a tag and throwing a runtime error when accessing a variant that was not assigned.
 
-\paragraph{Rust}
+\paragraph{Haskell}
 
-Enumerated types in Rust allow for an additional payload, which is implemented as a compact tagged union. 
-An unsafe union can be constructed, which functions similar to the C/C++ union.
+sum type / instances
+
+\paragraph{Dynamic programming languages}
+
+\subsection{Embedded Languages}
+
+An {\it embedded} language defines its terms and values in a {\it host language}.
+\\
+There are various degrees of embedding... shallow, deep, combinator, meta, compiler
+\\
+A problem is embedded pattern matching... as choice elements are evaluated in the host.
+
+\paragraph{C$\lambda$aSH}
+
+A domain-specific language for circuit design that is embedded within Haskell.
+Choice elements, such as algebraic data types, only exist as functions outside the syntactic elements of the language.
+User-defined types are thus restricted to product types and enumeration types, i.e. a sum type without any fields. \cite{clash}
+
+\paragraph{Lava}
+
+Another domain-specific language for circuit design that is embedded within Haskell.
+
+
+https://www.haskell.org/haskell-symposium/1999/1999-28.pdf
+$https://www.researchgate.net/publication/221562984_Type-safe_observable_sharing_in_Haskell$
+
 
 \paragraph{Accelerate}
 
@@ -627,16 +644,11 @@ Research has been done on a compact tagged union representation for parallel arr
 The representation uses a unified tag for nested sum types, which optimizes memory usage at the cost of tag (de-)construction.  
 It has not yet been implemented in Accelerate.
 
-\paragraph{Futhark}
-
 Futhark is a functional structurally typed data-parallel array language.
 Research has been done on including structural sum types to the Futhark compiler\cite{futhark-sum-types}, which has been implemented.
 A sum type is flattened to a tuple, which is stored as a struct-of-arrays. 
 Identical primitive types are {\it deduplicated} and share the same tuple slot.
 
-\paragraph{Dynamic programming languages}
-
-In general, dynamic programming languages inherently classify types as variants.
 
 \subsection{ECS}
 

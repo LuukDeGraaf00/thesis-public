@@ -17,26 +17,25 @@
 \contentsline {paragraph}{Tagged Pointer}{10}{section*.11}%
 \contentsline {paragraph}{Entity}{11}{section*.12}%
 \contentsline {subsubsection}{\numberline {2.2.2}Variant-wise}{12}{subsubsection.2.2.2}%
-\contentsline {section}{\numberline {3}Types (related work)}{13}{section.3}%
-\contentsline {subsection}{\numberline {3.1}Alignment}{13}{subsection.3.1}%
-\contentsline {subsection}{\numberline {3.2}Packed/Unpacked}{13}{subsection.3.2}%
-\contentsline {subsection}{\numberline {3.3}Strict/Laziness}{13}{subsection.3.3}%
-\contentsline {subsection}{\numberline {3.4}AoS/SoA}{13}{subsection.3.4}%
-\contentsline {subsection}{\numberline {3.5}Embedded/Framework}{13}{subsection.3.5}%
-\contentsline {subsection}{\numberline {3.6}WIP}{13}{subsection.3.6}%
-\contentsline {subsection}{\numberline {3.7}Entity}{13}{subsection.3.7}%
-\contentsline {subsection}{\numberline {3.8}Algebraic Data Type}{14}{subsection.3.8}%
-\contentsline {subsection}{\numberline {3.9}Accelerate}{16}{subsection.3.9}%
-\contentsline {subsection}{\numberline {3.10}*Mainstream languages temp name*}{16}{subsection.3.10}%
-\contentsline {paragraph}{C/C++}{16}{section*.13}%
-\contentsline {paragraph}{Haskell}{16}{section*.14}%
-\contentsline {paragraph}{Dynamic programming languages}{17}{section*.15}%
-\contentsline {subsection}{\numberline {3.11}Embedded Languages}{17}{subsection.3.11}%
-\contentsline {paragraph}{C$\lambda $aSH}{17}{section*.16}%
-\contentsline {paragraph}{Lava}{17}{section*.17}%
-\contentsline {paragraph}{Accelerate}{17}{section*.18}%
-\contentsline {subsection}{\numberline {3.12}ECS}{17}{subsection.3.12}%
-\contentsline {paragraph}{Apecs}{17}{section*.19}%
-\contentsline {paragraph}{Specs}{17}{section*.20}%
-\contentsline {paragraph}{Unity}{17}{section*.21}%
-\contentsline {section}{\numberline {4}Interface}{19}{section.4}%
+\contentsline {section}{\numberline {3}Related Work}{13}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Memory Representation}{13}{subsection.3.1}%
+\contentsline {paragraph}{AoS/SoA}{13}{section*.13}%
+\contentsline {paragraph}{Strict/Laziness}{13}{section*.14}%
+\contentsline {subsection}{\numberline {3.2}Entity-Component-System}{13}{subsection.3.2}%
+\contentsline {paragraph}{Apecs}{13}{section*.15}%
+\contentsline {paragraph}{Specs}{14}{section*.16}%
+\contentsline {paragraph}{Unity}{14}{section*.17}%
+\contentsline {subsection}{\numberline {3.3}Embedded}{14}{subsection.3.3}%
+\contentsline {subsection}{\numberline {3.4}WIP}{14}{subsection.3.4}%
+\contentsline {section}{\numberline {4}Implementation}{14}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Algebraic Data Type}{14}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Accelerate}{16}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}*Mainstream languages temp name*}{16}{subsection.4.3}%
+\contentsline {paragraph}{C/C++}{16}{section*.18}%
+\contentsline {paragraph}{Haskell}{16}{section*.19}%
+\contentsline {paragraph}{Dynamic programming languages}{17}{section*.20}%
+\contentsline {subsection}{\numberline {4.4}Embedded Languages}{17}{subsection.4.4}%
+\contentsline {paragraph}{C$\lambda $aSH}{17}{section*.21}%
+\contentsline {paragraph}{Lava}{17}{section*.22}%
+\contentsline {paragraph}{Accelerate}{17}{section*.23}%
+\contentsline {section}{\numberline {5}Interface}{17}{section.5}%

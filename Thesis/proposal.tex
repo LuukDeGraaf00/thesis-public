@@ -462,40 +462,41 @@ Both allow instructions to be vectorized, but there exist several other consider
 
 \newpage
 
-\section{Types (related work)}
+\section{Related Work}
 
-A conclusion of the previous section can be, that the most performant internal representation cannot be deducted from a theoretical framework.
-Algorithmic complexity can be used to get a general idea of the most performant solution, but not a definitive answer.
-Extensive profiling and defined parameters are required, due to the many factors that can impact the performance of a program.
-In a programming language, abstraction on the internal representation can be used to ergonomically change the foundation of the program.
-This can be used to determine the most performant solution, due to the ease of which multiple solutions can be profiled.
-Within this chapter related implementations that preserve their behavior are discussed in the context of user defined data types.
+A preliminary conclusion of the previous section is that a performant internal representation cannot be deducted from a mere theoretical framework.
+With this in mind many programming languages allow for flexibility around the internal representation of datatypes, while preserving the type identity.
+This makes profiling ergonomically attractive due to the simplicity of which the foundation of a program can be changed. 
+Within this chapter existing implementations that include such dynamic will be discussed, within the context of high-performance computing.
+
+\subsection{Memory Representation}
+
+The most universal example is the direct memory representation of a datatype. 
+Memory instructions operate on fixed boundaries, which means operations that overlap these boundaries require additional but strictly unnecessary instructions.
+A natural alignment of a datatype is achieved by aligning all types according to the instructions that access them\footnote{SIMD instructions}. 
+Many compilers introduce {\it padding} to enforce natural alignment.
+While computational efficient, the alternative of {\it packing} can be preferred for a smaller memory footprint.  
+
+\begin{figure}[ht]
+    \centering
+    \caption{data alignment example}
+\end{figure}
 
 
-\subsection{Alignment}
 
-\subsection{Packed/Unpacked}
+\paragraph{AoS/SoA}
+
 
 Remove/add form of indirection...
 
-\subsection{Strict/Laziness}
+\paragraph{Strict/Laziness}
 
-\subsection{AoS/SoA}
-
-\subsection{Embedded/Framework}
-
-\subsection{WIP}
-
-User defined types are fundamental in many programming languages.
-There exist many distinct implementations that allow for defining your own custom composite datatypes.
-Within this section applicable implementations will be discussed in the context of variants, i.e. datatypes that have several representations.
+\subsection{Entity-Component-System}
 
 The ECS pattern is arguably a reaction to the prevalence of object-oriented languages within game engines.
 The premise is to organizes game-logic within systems rather than components, where the relation between components is flexible\cite{ecs-origin}.
 In contrast to inheritance, where relations are statically determined and game-logic is embedded within an hierarchy.
 In this chapter the type interpretation of entities is discussed, and linked to functional languages.
-
-\subsection{Entity}
 
 An entity is fundamentally a composition of components, irrespective of which components can be combined.
 As many object-oriented languages are nominally typed, an entity is often implemented to only have one component of each.
@@ -514,7 +515,40 @@ Apecs, an ECS implementation in Haskell, achieves this imperative style through 
 All these considerations are related to the interpretation of the relation between components, in essence the {\it type} of an entity. 
 Rather than emulating ECS, existing type systems can be used to handle the relation between data.
 
-\newpage
+\paragraph{Apecs}
+
+Apecs\cite{ecs-apecs} is an ECS library in Haskell, with experimental support for concurrency through the Software Transactional Memory (STM) monad\cite{STM-monad}.
+The STM monad utilizes atomic instructions to achieve concurrency within a monadic context.
+Entities are stored with an integer dictionary, but can be explicitly stored in a sparse fixed size {\it cache} which allows for constant access time. 
+
+\paragraph{Specs}
+
+Specs is an ECS library in Rust\cite{ecs-specs}, with native support for parallelism.
+It supports several storages such as: a tree data structure, dense vector, sparse vector and an hashmap.
+Iteration on entities is done by specifying the relation between the components: join, optional and excluded.
+An entity can be {\it flagged} (tag) to denote events such as the destruction of the entity.
+
+\paragraph{Unity}
+
+Unity is a game-engine which released their production ready Data-Oriented-Tech-Stack (DOTS) in 2022, which centres around an ECS implementation which they have patented\cite{unity-ecs-patent}.
+It uses LLVM to optimize and vectorize C\# code (burst compiler) and has access to their internal c++ library for parallel and concurrent tasks (job system).
+The ECS implementation heavily employs the .NET Compiler Platform Roslyn to generate source-code for iterations on user-defined datatypes.
+An \type{Entity} is idiomatically a composite datatype but implemented as an \type{identifier} with a \type{version}\footnote{Destroying an entity increments the \type{version}, which means copies of entities know they are destroyed and the \type{identifier} can be reused at a later point.}.
+A single array keeps track of all entities, without data components.
+Each \type{Entity} and related data components are stored in a \type{Chunk}, a fixed size buffer of 16000 bytes, alongside other entities with the same \type{Archetype}\footnote{An \type{ISharedComponent} extends this to the value of a component, which means each value has a unique \type{Chunk} and the value can be stored within the \type{Chunk} header. }.
+Instead of pattern matching, a \type{Query} matches on certain properties of entities, such as containing a certain component.
+Collective operations, such as a \type{Job}, operate on a \type{Chunk} directly.
+Structural changes can be queued in parallel, but create a sync-point when executed and involves entities to be moved between chunks.
+This is not required for an \type{IEnableComponent}, which functions as an tagged component akin to the \type{Maybe a} type. 
+A notable observation is that delaying structural changes has side-effects as queued structural changes are not taking in account.
+
+\subsection{Embedded}
+
+\subsection{WIP}
+
+
+
+\section{Implementation}
 
 \subsection{Algebraic Data Type}
 
@@ -665,37 +699,6 @@ Research has been done on including structural sum types to the Futhark compiler
 A sum type is flattened to a tuple, which is stored as a struct-of-arrays. 
 Identical primitive types are {\it deduplicated} and share the same tuple slot.
 
-
-\subsection{ECS}
-
-\paragraph{Apecs}
-
-Apecs\cite{ecs-apecs} is an ECS library in Haskell, with experimental support for concurrency through the Software Transactional Memory (STM) monad\cite{STM-monad}.
-The STM monad utilizes atomic instructions to achieve concurrency within a monadic context.
-Entities are stored with an integer dictionary, but can be explicitly stored in a sparse fixed size {\it cache} which allows for constant access time. 
-
-\paragraph{Specs}
-
-Specs is an ECS library in Rust\cite{ecs-specs}, with native support for parallelism.
-It supports several storages such as: a tree data structure, dense vector, sparse vector and an hashmap.
-Iteration on entities is done by specifying the relation between the components: join, optional and excluded.
-An entity can be {\it flagged} (tag) to denote events such as the destruction of the entity.
-
-\paragraph{Unity}
-
-Unity is a game-engine which released their production ready Data-Oriented-Tech-Stack (DOTS) in 2022, which centres around an ECS implementation which they have patented\cite{unity-ecs-patent}.
-It uses LLVM to optimize and vectorize C\# code (burst compiler) and has access to their internal c++ library for parallel and concurrent tasks (job system).
-The ECS implementation heavily employs the .NET Compiler Platform Roslyn to generate source-code for iterations on user-defined datatypes.
-An \type{Entity} is idiomatically a composite datatype but implemented as an \type{identifier} with a \type{version}\footnote{Destroying an entity increments the \type{version}, which means copies of entities know they are destroyed and the \type{identifier} can be reused at a later point.}.
-A single array keeps track of all entities, without data components.
-Each \type{Entity} and related data components are stored in a \type{Chunk}, a fixed size buffer of 16000 bytes, alongside other entities with the same \type{Archetype}\footnote{An \type{ISharedComponent} extends this to the value of a component, which means each value has a unique \type{Chunk} and the value can be stored within the \type{Chunk} header. }.
-Instead of pattern matching, a \type{Query} matches on certain properties of entities, such as containing a certain component.
-Collective operations, such as a \type{Job}, operate on a \type{Chunk} directly.
-Structural changes can be queued in parallel, but create a sync-point when executed and involves entities to be moved between chunks.
-This is not required for an \type{IEnableComponent}, which functions as an tagged component akin to the \type{Maybe a} type. 
-A notable observation is that delaying structural changes has side-effects as queued structural changes are not taking in account.
-
-\newpage
 
 \section{Interface}
 

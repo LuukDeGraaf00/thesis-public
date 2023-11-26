@@ -465,7 +465,7 @@ Both allow instructions to be vectorized, but there exist several other consider
 \section{Related Work}
 
 A preliminary conclusion of the previous section is that a performant internal representation cannot be deducted from a mere theoretical framework.
-With this in mind many programming languages allow for flexibility around the internal representation of datatypes, while preserving the type identity.
+With this in mind many high performance programming languages allow for flexibility around the internal representation of datatypes, while preserving behavior and type identity.
 This makes profiling ergonomically attractive due to the simplicity of which the foundation of a program can be changed. 
 Within this chapter existing implementations that include such dynamic will be discussed, within the context of high-performance computing.
 
@@ -475,21 +475,25 @@ The most universal example is the direct memory representation of a datatype.
 Memory instructions operate on fixed boundaries, which means operations that overlap these boundaries require additional but strictly unnecessary instructions.
 A natural alignment of a datatype is achieved by aligning all types according to the instructions that access them\footnote{SIMD instructions}. 
 Many compilers introduce {\it padding} to enforce natural alignment.
-While computational efficient, the alternative of {\it packing} can be preferred for a smaller memory footprint.  
+While computational efficient, the alternative of {\it packing} types together can be preferred for a smaller memory footprint.  
+Programming languages on a lower abstraction level, such as C/C++ and Rust, allow for some influence on the memory representation of a user defined type.  
 
 \begin{figure}[ht]
     \centering
     \caption{data alignment example}
 \end{figure}
 
+Parallel arrays enforce a natural alignment by being standalone and adjacent to the same type.
+General purpose languages often default to the Array of Struct, while data-parallel languages use the Struct of Arrays representation.
+Ergonomically switching between these constructs is a non-trivial endeavour. 
+A generic implementation requires (costless) abstraction on an index access and/or a way to apply functions independently of the representation while preserving vectorization opportunities.   
+Switching between representations was an initial\footnote{Not anymore.} focal point of the experimental language {\it Jai}, a c-like programming language for games.
 
-
-\paragraph{AoS/SoA}
-
-
-Remove/add form of indirection...
+\paragraph{By reference} Remove/add form of indirection...
 
 \paragraph{Strict/Laziness}
+
+\subsection{Embedded}
 
 \subsection{Entity-Component-System}
 
@@ -541,11 +545,6 @@ Collective operations, such as a \type{Job}, operate on a \type{Chunk} directly.
 Structural changes can be queued in parallel, but create a sync-point when executed and involves entities to be moved between chunks.
 This is not required for an \type{IEnableComponent}, which functions as an tagged component akin to the \type{Maybe a} type. 
 A notable observation is that delaying structural changes has side-effects as queued structural changes are not taking in account.
-
-\subsection{Embedded}
-
-\subsection{WIP}
-
 
 
 \section{Implementation}

@@ -65,12 +65,30 @@ This is complicated in languages that are not inherently thread-safe.
 Many high-performance applications adopt a data-oriented design, which centres around data transformations and avoiding abstractions around data. 
 Both parallelization opportunities and cache efficiency are focal points of the data-oriented design paradigm.
 
-A challenge with data-oriented design is representing non-uniform data without abstracting on the data itself.
-Game-engines, which deal with many clusters of data, have started using the Entity-Component-System (ECS) pattern. 
+A challenge with data-oriented design is representing non-uniform data without abstracting on the data itself and preserving vectorization opportunities. 
+Game-engines, which deal with many clusters of data, have adopted the Entity-Component-System (ECS) pattern. 
 Systems are top-level functions that operate on all entities that implement a set of components. 
 An entity is idiomatically a set of components, but instantiated as a globally unique index that can identify the associated data components.
-Rather than iterating with this index, systems utilize the implicit structure of an entity to directly iterate on the data components.
-An entity is effectively a persistent index across iterations and used to invoke structural changes.
+Rather than iterating with this index, systems utilize the implicit structure of an entity to directly iterate on the data components. 
+
+A performant generic implementation is often non-trivial to create due to the task of statically linking different internal representations to single functions.
+
+
+Due to the inability to generate and operate on distinct internal representations many ECS implementations resort to some form of code generation. 
+The problem can be put in a broader perspective, where internal representations of datatypes are restricted to statically determined properties.
+A generic implementation can be resolved through type-level programming, which is non-existent in many languages.
+
+Embedded (domain-specific) languages can be used to bridge the gap, in particular for efficient traversal on non-uniform data.
+
+\section{Related Work}
+
+An efficient representation for user defined data types is an almost universal problem for programming languages.
+In embedded domain specific languages user defined data types can be contextual aware of the environment. 
+
+
+There exist some widely adopted representations, such as the Structure of Arrays representation.
+
+\paragraph{Embedded}
 
 Accelerate is an array processing language embedded within Haskell, which uses Algebraic Data Types (ADT's).
 Choosing a performant internal representation for ADT's in parallel languages is challenging due to their non-uniform size, which is a prerequisite for arrays.
@@ -82,6 +100,9 @@ This flexibility aligns with structural sum types, as variant changes can be def
 The idea is proposed of utilizing the ECS pattern to preserve existing functionality of an array language, while extending the scope of data structures for ADT's beyond tagged unions.
 An extensive performance analysis is required, such that use cases of several data structures can be established.
 Results will be guiding in the creation of a type interface that aligns with the established properties and existing functionality of ADT's. 
+
+
+Embedded 'choice elements'
 
 \newpage
 
@@ -462,20 +483,21 @@ Both allow instructions to be vectorized, but there exist several other consider
 
 \newpage
 
-\section{Related Work}
+\subsection{Complexity Optimizations}
 
 A preliminary conclusion of the previous section is that a performant internal representation cannot be deducted from a mere theoretical framework.
-With this in mind many high performance programming languages allow for flexibility around the internal representation of datatypes, while preserving behavior and type identity.
+With this in mind many high performance oriented programming languages allow for flexibility around the internal representation of datatypes, while preserving semantics.
 This makes profiling ergonomically attractive due to the simplicity of which the foundation of a program can be changed. 
-Within this chapter existing implementations that include such dynamic will be discussed, within the context of high-performance computing.
+Within this chapter existing implementations that are flexible around the internal representation will be discussed within the context of high-performance computing. 
 
-\subsection{Memory Representation}
+\subsubsection{Memory Representation}
 
 The most universal example is the direct memory representation of a datatype. 
 Memory instructions operate on fixed boundaries, which means operations that overlap these boundaries require additional but strictly unnecessary instructions.
 A natural alignment of a datatype is achieved by aligning all types according to the instructions that access them\footnote{SIMD instructions}. 
 Many compilers introduce {\it padding} to enforce natural alignment.
 While computational efficient, the alternative of {\it packing} types together can be preferred for a smaller memory footprint.  
+Both approaches can be used to ensure the datatypes align with cache lines. 
 Programming languages on a lower abstraction level, such as C/C++ and Rust, allow for some influence on the memory representation of a user defined type.  
 
 \begin{figure}[ht]
@@ -486,14 +508,22 @@ Programming languages on a lower abstraction level, such as C/C++ and Rust, allo
 Parallel arrays enforce a natural alignment by being standalone and adjacent to the same type.
 General purpose languages often default to the Array of Struct, while data-parallel languages use the Struct of Arrays representation.
 Ergonomically switching between these constructs is a non-trivial endeavour. 
-A generic implementation requires (costless) abstraction on an index access and/or a way to apply functions independently of the representation while preserving vectorization opportunities.   
-Switching between representations was an initial\footnote{Not anymore.} focal point of the experimental language {\it Jai}, a c-like programming language for games.
+A generic implementation requires aggressive inlining to preserve vectorization opportunities, which is hard to enforce in many object-oriented languages.   
+Switching between representations was an initial\footnote{Not anymore.} focal point of the experimental language {\it Jai}, a c-like programming language for games, but was later dropped in development.
+Another notable example is the use of pointers as an intermediate 'boxed' structure around a primitive type. 
+While pointers to mutable data can wield different behavior, for immutable data it can be motivated as a performance consideration.
+A boxed representation can prevent the need for duplicates and is easier to pass along, while creating a performance loss inducing form of indirection.
+The choice is generally made by compilers\footnote{source}.
 
-\paragraph{By reference} Remove/add form of indirection...
+\begin{figure}[ht]
+    \centering
+    \caption{boxed representation}
+\end{figure}
 
-\paragraph{Strict/Laziness}
+\subsection{Array Fusion}
 
-\subsection{Embedded}
+embedded
+
 
 \subsection{Entity-Component-System}
 
@@ -547,7 +577,19 @@ This is not required for an \type{IEnableComponent}, which functions as an tagge
 A notable observation is that delaying structural changes has side-effects as queued structural changes are not taking in account.
 
 
+
 \section{Implementation}
+
+\subsection{Code Generation}
+
+A common factor with data type representation is that they are understandably heavily ingrained within a compiler. 
+This can make an ergonomic and zero-cost abstraction problematic as a compiler will treat the functionally identical types as distinct.
+This can be resolved by generating code dependent on the concrete instantiation of the type. 
+
+\begin{itemize}
+    \item [Polymorphism]
+    \item [Embedded]
+\end{itemize}
 
 \subsection{Algebraic Data Type}
 

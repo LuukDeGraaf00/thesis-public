@@ -1,18 +1,20 @@
 \BOOKMARK [1][-]{section.1}{Introduction}{}% 1
-\BOOKMARK [1][-]{section.2}{Background}{}% 2
-\BOOKMARK [2][-]{subsection.2.1}{Performance}{section.2}% 3
-\BOOKMARK [3][-]{subsubsection.2.1.1}{Optimizations}{subsection.2.1}% 4
-\BOOKMARK [3][-]{subsubsection.2.1.2}{Principles}{subsection.2.1}% 5
-\BOOKMARK [2][-]{subsection.2.2}{Data structures}{section.2}% 6
-\BOOKMARK [3][-]{subsubsection.2.2.1}{Element-wise}{subsection.2.2}% 7
-\BOOKMARK [3][-]{subsubsection.2.2.2}{Variant-wise}{subsection.2.2}% 8
-\BOOKMARK [1][-]{section.3}{Related Work}{}% 9
-\BOOKMARK [2][-]{subsection.3.1}{Memory Representation}{section.3}% 10
-\BOOKMARK [2][-]{subsection.3.2}{Embedded}{section.3}% 11
-\BOOKMARK [2][-]{subsection.3.3}{Entity-Component-System}{section.3}% 12
-\BOOKMARK [1][-]{section.4}{Implementation}{}% 13
-\BOOKMARK [2][-]{subsection.4.1}{Algebraic Data Type}{section.4}% 14
-\BOOKMARK [2][-]{subsection.4.2}{Accelerate}{section.4}% 15
-\BOOKMARK [2][-]{subsection.4.3}{*Mainstream languages temp name*}{section.4}% 16
-\BOOKMARK [2][-]{subsection.4.4}{Embedded Languages}{section.4}% 17
-\BOOKMARK [1][-]{section.5}{Interface}{}% 18
+\BOOKMARK [1][-]{section.2}{Related Work}{}% 2
+\BOOKMARK [1][-]{section.3}{Background}{}% 3
+\BOOKMARK [2][-]{subsection.3.1}{Performance}{section.3}% 4
+\BOOKMARK [3][-]{subsubsection.3.1.1}{Optimizations}{subsection.3.1}% 5
+\BOOKMARK [3][-]{subsubsection.3.1.2}{Principles}{subsection.3.1}% 6
+\BOOKMARK [2][-]{subsection.3.2}{Data structures}{section.3}% 7
+\BOOKMARK [3][-]{subsubsection.3.2.1}{Element-wise}{subsection.3.2}% 8
+\BOOKMARK [3][-]{subsubsection.3.2.2}{Variant-wise}{subsection.3.2}% 9
+\BOOKMARK [2][-]{subsection.3.3}{Complexity Optimizations}{section.3}% 10
+\BOOKMARK [3][-]{subsubsection.3.3.1}{Memory Representation}{subsection.3.3}% 11
+\BOOKMARK [2][-]{subsection.3.4}{Array Fusion}{section.3}% 12
+\BOOKMARK [2][-]{subsection.3.5}{Entity-Component-System}{section.3}% 13
+\BOOKMARK [1][-]{section.4}{Implementation}{}% 14
+\BOOKMARK [2][-]{subsection.4.1}{Code Generation}{section.4}% 15
+\BOOKMARK [2][-]{subsection.4.2}{Algebraic Data Type}{section.4}% 16
+\BOOKMARK [2][-]{subsection.4.3}{Accelerate}{section.4}% 17
+\BOOKMARK [2][-]{subsection.4.4}{*Mainstream languages temp name*}{section.4}% 18
+\BOOKMARK [2][-]{subsection.4.5}{Embedded Languages}{section.4}% 19
+\BOOKMARK [1][-]{section.5}{Interface}{}% 20

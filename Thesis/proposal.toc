@@ -1,40 +1,41 @@
 \contentsline {section}{\numberline {1}Introduction}{2}{section.1}%
-\contentsline {section}{\numberline {2}Background}{3}{section.2}%
-\contentsline {subsection}{\numberline {2.1}Performance}{3}{subsection.2.1}%
-\contentsline {subsubsection}{\numberline {2.1.1}Optimizations}{3}{subsubsection.2.1.1}%
-\contentsline {paragraph}{Instructions}{3}{section*.2}%
-\contentsline {paragraph}{Register Pressure}{4}{section*.3}%
-\contentsline {paragraph}{Memory Access Time}{4}{section*.4}%
-\contentsline {paragraph}{Caching}{5}{section*.5}%
-\contentsline {paragraph}{Parallelism}{6}{section*.6}%
-\contentsline {subsubsection}{\numberline {2.1.2}Principles}{7}{subsubsection.2.1.2}%
-\contentsline {paragraph}{Contiguous}{7}{section*.7}%
-\contentsline {paragraph}{Access Patterns}{7}{section*.8}%
-\contentsline {paragraph}{Branching}{8}{section*.9}%
-\contentsline {subsection}{\numberline {2.2}Data structures}{9}{subsection.2.2}%
-\contentsline {subsubsection}{\numberline {2.2.1}Element-wise}{9}{subsubsection.2.2.1}%
-\contentsline {paragraph}{Tagged Union}{9}{section*.10}%
-\contentsline {paragraph}{Tagged Pointer}{10}{section*.11}%
-\contentsline {paragraph}{Entity}{11}{section*.12}%
-\contentsline {subsubsection}{\numberline {2.2.2}Variant-wise}{12}{subsubsection.2.2.2}%
-\contentsline {section}{\numberline {3}Related Work}{13}{section.3}%
-\contentsline {subsection}{\numberline {3.1}Memory Representation}{13}{subsection.3.1}%
-\contentsline {paragraph}{By reference}{13}{section*.13}%
-\contentsline {paragraph}{Strict/Laziness}{13}{section*.14}%
-\contentsline {subsection}{\numberline {3.2}Embedded}{13}{subsection.3.2}%
-\contentsline {subsection}{\numberline {3.3}Entity-Component-System}{13}{subsection.3.3}%
-\contentsline {paragraph}{Apecs}{14}{section*.15}%
-\contentsline {paragraph}{Specs}{14}{section*.16}%
-\contentsline {paragraph}{Unity}{14}{section*.17}%
+\contentsline {section}{\numberline {2}Related Work}{2}{section.2}%
+\contentsline {paragraph}{Embedded}{2}{section*.2}%
+\contentsline {section}{\numberline {3}Background}{3}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Performance}{3}{subsection.3.1}%
+\contentsline {subsubsection}{\numberline {3.1.1}Optimizations}{3}{subsubsection.3.1.1}%
+\contentsline {paragraph}{Instructions}{3}{section*.3}%
+\contentsline {paragraph}{Register Pressure}{4}{section*.4}%
+\contentsline {paragraph}{Memory Access Time}{4}{section*.5}%
+\contentsline {paragraph}{Caching}{5}{section*.6}%
+\contentsline {paragraph}{Parallelism}{6}{section*.7}%
+\contentsline {subsubsection}{\numberline {3.1.2}Principles}{7}{subsubsection.3.1.2}%
+\contentsline {paragraph}{Contiguous}{7}{section*.8}%
+\contentsline {paragraph}{Access Patterns}{7}{section*.9}%
+\contentsline {paragraph}{Branching}{8}{section*.10}%
+\contentsline {subsection}{\numberline {3.2}Data structures}{9}{subsection.3.2}%
+\contentsline {subsubsection}{\numberline {3.2.1}Element-wise}{9}{subsubsection.3.2.1}%
+\contentsline {paragraph}{Tagged Union}{9}{section*.11}%
+\contentsline {paragraph}{Tagged Pointer}{10}{section*.12}%
+\contentsline {paragraph}{Entity}{11}{section*.13}%
+\contentsline {subsubsection}{\numberline {3.2.2}Variant-wise}{12}{subsubsection.3.2.2}%
+\contentsline {subsection}{\numberline {3.3}Complexity Optimizations}{13}{subsection.3.3}%
+\contentsline {subsubsection}{\numberline {3.3.1}Memory Representation}{13}{subsubsection.3.3.1}%
+\contentsline {subsection}{\numberline {3.4}Array Fusion}{13}{subsection.3.4}%
+\contentsline {subsection}{\numberline {3.5}Entity-Component-System}{13}{subsection.3.5}%
+\contentsline {paragraph}{Apecs}{14}{section*.14}%
+\contentsline {paragraph}{Specs}{14}{section*.15}%
+\contentsline {paragraph}{Unity}{14}{section*.16}%
 \contentsline {section}{\numberline {4}Implementation}{15}{section.4}%
-\contentsline {subsection}{\numberline {4.1}Algebraic Data Type}{15}{subsection.4.1}%
-\contentsline {subsection}{\numberline {4.2}Accelerate}{16}{subsection.4.2}%
-\contentsline {subsection}{\numberline {4.3}*Mainstream languages temp name*}{16}{subsection.4.3}%
-\contentsline {paragraph}{C/C++}{16}{section*.18}%
-\contentsline {paragraph}{Haskell}{16}{section*.19}%
-\contentsline {paragraph}{Dynamic programming languages}{17}{section*.20}%
-\contentsline {subsection}{\numberline {4.4}Embedded Languages}{17}{subsection.4.4}%
-\contentsline {paragraph}{C$\lambda $aSH}{17}{section*.21}%
-\contentsline {paragraph}{Lava}{17}{section*.22}%
-\contentsline {paragraph}{Accelerate}{17}{section*.23}%
-\contentsline {section}{\numberline {5}Interface}{17}{section.5}%
+\contentsline {subsection}{\numberline {4.1}Code Generation}{15}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Algebraic Data Type}{15}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Accelerate}{17}{subsection.4.3}%
+\contentsline {subsection}{\numberline {4.4}*Mainstream languages temp name*}{17}{subsection.4.4}%
+\contentsline {paragraph}{C/C++}{17}{section*.17}%
+\contentsline {paragraph}{Haskell}{17}{section*.18}%
+\contentsline {paragraph}{Dynamic programming languages}{18}{section*.19}%
+\contentsline {subsection}{\numberline {4.5}Embedded Languages}{18}{subsection.4.5}%
+\contentsline {paragraph}{C$\lambda $aSH}{18}{section*.20}%
+\contentsline {paragraph}{Lava}{18}{section*.21}%
+\contentsline {paragraph}{Accelerate}{18}{section*.22}%
+\contentsline {section}{\numberline {5}Interface}{18}{section.5}%

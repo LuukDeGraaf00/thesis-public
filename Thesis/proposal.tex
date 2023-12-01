@@ -65,57 +65,58 @@ This is complicated in languages that are not inherently thread-safe.
 Many high-performance applications adopt a data-oriented design, which centres around data transformations and avoiding abstractions around data. 
 Both parallelization opportunities and cache efficiency are focal points of the data-oriented design paradigm.
 
-A challenge with data-oriented design is representing non-uniform data without abstracting on the data itself and preserving vectorization opportunities. 
-Game-engines, which deal with many clusters of data, have adopted the Entity-Component-System (ECS) pattern. 
-Systems are top-level functions that operate on all entities that implement a set of components. 
-An entity is idiomatically a set of components, but instantiated as a globally unique index that can identify the associated data components.
-Rather than iterating with this index, systems utilize the implicit structure of an entity to directly iterate on the data components. 
+A challenge with data-oriented design is representing non-uniform data efficiently while preserving vectorization opportunities and type safety. 
+Operating on multiple variants can be done on the type-level (polymorphism) or on the value-level (tags).
+In the context of iterating on a collection of variants, branching on a tag or dynamically dispatching will inherently break vectorization.
+This means static polymorphism is a common way to operate on non-uniform data in data-parallel applications.
+In some cases this is impossible as the identity of a variant will only be known at runtime, such as exception states but also diverging states.
+Conceptually both approaches serve the same purpose, granting the ability to operate on multiple variants of a type.
+Unification of these concepts reformulates operating on non-uniform data to an optimization problem.
 
-A performant generic implementation is often non-trivial to create due to the task of statically linking different internal representations to single functions.
-
-
-Due to the inability to generate and operate on distinct internal representations many ECS implementations resort to some form of code generation. 
-The problem can be put in a broader perspective, where internal representations of datatypes are restricted to statically determined properties.
-A generic implementation can be resolved through type-level programming, which is non-existent in many languages.
-
-Embedded (domain-specific) languages can be used to bridge the gap, in particular for efficient traversal on non-uniform data.
-
-\section{Related Work}
-
-An efficient representation for user defined data types is an almost universal problem for programming languages.
-In embedded domain specific languages user defined data types can be contextual aware of the environment. 
-
-
-There exist some widely adopted representations, such as the Structure of Arrays representation.
-
-\paragraph{Embedded}
-
-Accelerate is an array processing language embedded within Haskell, which uses Algebraic Data Types (ADT's).
-Choosing a performant internal representation for ADT's in parallel languages is challenging due to their non-uniform size, which is a prerequisite for arrays.
-Currently Accelerate\cite{accelerate-sum-types}, and other functional array languages such as Futhark\cite{futhark-sum-types}, use tagged unions to represent types with multiple variants (sum types). 
-This increases the memory footprint and introduces branching, which can limit performance in data parallel languages.   
-The ECS pattern preserves the functionality of heterogeneous arrays while allowing for more flexibility for the internal representation.
-This flexibility aligns with structural sum types, as variant changes can be defined with more accuracy. 
-
-The idea is proposed of utilizing the ECS pattern to preserve existing functionality of an array language, while extending the scope of data structures for ADT's beyond tagged unions.
-An extensive performance analysis is required, such that use cases of several data structures can be established.
-Results will be guiding in the creation of a type interface that aligns with the established properties and existing functionality of ADT's. 
-
-
-Embedded 'choice elements'
+A type-safe way to achieve this is by elevating the concept of a mutual exclusive datatype to the type-level.
+This can be achieved through type-level constructors and datatype-generic functions.
+Such implementation can exist without it being natively supported in the implementation language.
+This can be utilized by libraries, frameworks and embedded domain-specific languages that exist in languages that facilitate type-level programming, like Haskell.
 
 \newpage
 
-\section{Background}
+\subsection{Related Work}
 
-\subsection{Performance}
+The contribution can be categorized as an interdisciplinary between three distinct fields.
+A computationally efficient representation of non-uniform data in data-parallel applications.
+This induced the need for a type-safe interface to such representation, which has been achieved through type-level functions and datatype-generic functions.
+The connection is made through an implementation in an embedded domain-specific language, which leverages the type-system of the host language. 
+
+\paragraph{Representation}
+
+The memory representation of a datatype is often based on the functionality they perform within a language.
+In data-parallel applications primitive types are distributed over multiple arrays to facilitate vectorization.
+It is not apparent what the representation of a tagged union should be, as they will inherently break vectorization. 
+A majority of languages natively represent tagged unions as a singular contiguous datatype; such as C, C++, Rust and OpenCL.
+Both Accelerate\cite{accelerate-sum-types} and Futhark\cite{futhark-sum-types} implicitly distribute primitive types of composite datatypes over multiple arrays, including tagged unions.
+Game-engines, which deal with many clusters of data, have a fundamentally different approach as they have widely adopted the Entity-Component-System (ECS) pattern. 
+Many implementations incite a collective re-organization of the internal representation when a variant change occurs.
+A type-safe and performant implementation is notably hard due to the statically resolving all interactions between the representations, which means meta-programming and unsafe code are extremely prevalent. 
+
+\paragraph{Types}
+
+Systems are top-level functions that operate on all entities that contain a set of components. 
+An entity is idiomatically a set of components, but instantiated as a globally unique index that can identify the associated data components.
+Rather than iterating with this index, systems utilize the implicit structure of an entity to directly iterate on the data components.  
+The 'type' of an entity can be modified by removing or adding components.
+
+\paragraph{Embedded Domain Specific Language}
+
+\newpage
+
+\section{Performance}
 
 There are many components that can influence the performance of a program.
 This grows the importance of being able to identify {\it bottlenecks} but also understanding the underlying technological performance considerations\cite{programming-optimization}.
 Within the first section fundamental optimizations related to the interaction between data and hardware are introduced.
 This is used to identify architecture agnostic performance considerations for array operations in the second section.
 
-\subsubsection{Optimizations}
+\subsection{Optimizations}
 
 In the early days of computing, memory was seen as a way to store data indefinitely.
 As computational power of processors increased, the importance of main memory increased.
@@ -256,7 +257,7 @@ Cores are often not independent processors and might share several components wi
 
 \newpage
 
-\subsubsection{Principles}
+\subsection{Principles}
 
 The are many components that can influence the performance of a program, some of which were discussed in previous sections.
 This makes general statements on optimizations often weak, as the interaction between these components is complex.
@@ -483,14 +484,12 @@ Both allow instructions to be vectorized, but there exist several other consider
 
 \newpage
 
-\subsection{Complexity Optimizations}
+\subsection{Memory Representation}
 
 A preliminary conclusion of the previous section is that a performant internal representation cannot be deducted from a mere theoretical framework.
 With this in mind many high performance oriented programming languages allow for flexibility around the internal representation of datatypes, while preserving semantics.
 This makes profiling ergonomically attractive due to the simplicity of which the foundation of a program can be changed. 
 Within this chapter existing implementations that are flexible around the internal representation will be discussed within the context of high-performance computing. 
-
-\subsubsection{Memory Representation}
 
 The most universal example is the direct memory representation of a datatype. 
 Memory instructions operate on fixed boundaries, which means operations that overlap these boundaries require additional but strictly unnecessary instructions.
@@ -520,65 +519,7 @@ The choice is generally made by compilers\footnote{source}.
     \caption{boxed representation}
 \end{figure}
 
-\subsection{Array Fusion}
-
-embedded
-
-
-\subsection{Entity-Component-System}
-
-The ECS pattern is arguably a reaction to the prevalence of object-oriented languages within game engines.
-The premise is to organizes game-logic within systems rather than components, where the relation between components is flexible\cite{ecs-origin}.
-In contrast to inheritance, where relations are statically determined and game-logic is embedded within an hierarchy.
-In this chapter the type interpretation of entities is discussed, and linked to functional languages.
-
-An entity is fundamentally a composition of components, irrespective of which components can be combined.
-As many object-oriented languages are nominally typed, an entity is often implemented to only have one component of each.
-This means an entity is effectively a {\it set} of components.
-Systems operate on all entities that contain such a set of components, where components are {\it mutated}.
-Structural changes to entities are invoked through statements.
-
-\begin{figure}[ht]
-    \centering
-    \includegraphics[scale=0.2]{ecs}
-    \caption{ conceptual entity-component-system representation of systems }
-\end{figure}
-
-The ECS design pattern is arguably inherently imperative, due to prevalence of mutating state. 
-Apecs, an ECS implementation in Haskell, achieves this imperative style through monads\cite{ecs-apecs}.
-All these considerations are related to the interpretation of the relation between components, in essence the {\it type} of an entity. 
-Rather than emulating ECS, existing type systems can be used to handle the relation between data.
-
-\paragraph{Apecs}
-
-Apecs\cite{ecs-apecs} is an ECS library in Haskell, with experimental support for concurrency through the Software Transactional Memory (STM) monad\cite{STM-monad}.
-The STM monad utilizes atomic instructions to achieve concurrency within a monadic context.
-Entities are stored with an integer dictionary, but can be explicitly stored in a sparse fixed size {\it cache} which allows for constant access time. 
-
-\paragraph{Specs}
-
-Specs is an ECS library in Rust\cite{ecs-specs}, with native support for parallelism.
-It supports several storages such as: a tree data structure, dense vector, sparse vector and an hashmap.
-Iteration on entities is done by specifying the relation between the components: join, optional and excluded.
-An entity can be {\it flagged} (tag) to denote events such as the destruction of the entity.
-
-\paragraph{Unity}
-
-Unity is a game-engine which released their production ready Data-Oriented-Tech-Stack (DOTS) in 2022, which centres around an ECS implementation which they have patented\cite{unity-ecs-patent}.
-It uses LLVM to optimize and vectorize C\# code (burst compiler) and has access to their internal c++ library for parallel and concurrent tasks (job system).
-The ECS implementation heavily employs the .NET Compiler Platform Roslyn to generate source-code for iterations on user-defined datatypes.
-An \type{Entity} is idiomatically a composite datatype but implemented as an \type{identifier} with a \type{version}\footnote{Destroying an entity increments the \type{version}, which means copies of entities know they are destroyed and the \type{identifier} can be reused at a later point.}.
-A single array keeps track of all entities, without data components.
-Each \type{Entity} and related data components are stored in a \type{Chunk}, a fixed size buffer of 16000 bytes, alongside other entities with the same \type{Archetype}\footnote{An \type{ISharedComponent} extends this to the value of a component, which means each value has a unique \type{Chunk} and the value can be stored within the \type{Chunk} header. }.
-Instead of pattern matching, a \type{Query} matches on certain properties of entities, such as containing a certain component.
-Collective operations, such as a \type{Job}, operate on a \type{Chunk} directly.
-Structural changes can be queued in parallel, but create a sync-point when executed and involves entities to be moved between chunks.
-This is not required for an \type{IEnableComponent}, which functions as an tagged component akin to the \type{Maybe a} type. 
-A notable observation is that delaying structural changes has side-effects as queued structural changes are not taking in account.
-
-
-
-\section{Implementation}
+\section{Types}
 
 \subsection{Code Generation}
 
@@ -689,23 +630,6 @@ The representation uses a unified tag for nested sum types, which optimizes memo
 It has been partly implemented in Accelerate, and has not yet been benchmarked.
 
 
-\subsection{*Mainstream languages temp name*}
-
-\paragraph{C/C++}
-
-An union is a structure identical to the largest member of the union.
-Accessing a member of the union extracts the raw value out of the union, independent of the last assigned variant.
-This makes using unions inherently not type-safe to use.
-The variant class template partly solves this by attaching a tag and throwing a runtime error when accessing a variant that was not assigned.
-
-\paragraph{Haskell}
-
-sum type / instances
-
-\paragraph{Dynamic programming languages}
-
-\subsection{Embedded Languages}
-
 An {\it embedded} language defines its terms and values in a {\it host language}.
 \\
 There are various degrees of embedding... shallow, deep, combinator, meta, compiler
@@ -741,8 +665,6 @@ A sum type is flattened to a tuple, which is stored as a struct-of-arrays.
 Identical primitive types are {\it deduplicated} and share the same tuple slot.
 
 
-\section{Interface}
-
 As Accelerate is a domain-specific-language within Haskell...
 
 The \type{Elt} type-class (Extract, Load, Transform) defines a mapping between the Haskell and the Accelerate datatype.
@@ -751,6 +673,90 @@ Functions do not use this process, and instead operate directly on the correspon
 
 
 \newpage
+
+\section{Implementation}
+
+\subsection{Array Fusion}
+
+embedded
+
+
+\section{Future work}
+
+\section{Conclusion}
+
+\section{Extra}
+
+\paragraph{Implementation}
+
+Accelerate\cite{accelerate-sum-types} and Futhark\cite{futhark-sum-types} are functional array languages that support 
+
+\paragraph{C/C++}
+
+An union is a structure identical to the largest member of the union.
+Accessing a member of the union extracts the raw value out of the union, independent of the last assigned variant.
+This makes using unions inherently not type-safe to use.
+The variant class template partly solves this by attaching a tag and throwing a runtime error when accessing a variant that was not assigned.
+
+\paragraph{Haskell}
+
+sum type / instances
+
+\paragraph{Dynamic programming languages}
+
+\paragraph{Entity-Component-System}
+
+The ECS pattern is arguably a reaction to the prevalence of object-oriented languages within game engines.
+The premise is to organizes game-logic within systems rather than components, where the relation between components is flexible\cite{ecs-origin}.
+In contrast to inheritance, where relations are statically determined and game-logic is embedded within an hierarchy.
+In this chapter the type interpretation of entities is discussed, and linked to functional languages.
+
+An entity is fundamentally a composition of components, irrespective of which components can be combined.
+As many object-oriented languages are nominally typed, an entity is often implemented to only have one component of each.
+This means an entity is effectively a {\it set} of components.
+Systems operate on all entities that contain such a set of components, where components are {\it mutated}.
+Structural changes to entities are invoked through statements.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=0.2]{ecs}
+    \caption{ conceptual entity-component-system representation of systems }
+\end{figure}
+
+The ECS design pattern is arguably inherently imperative, due to prevalence of mutating state. 
+Apecs, an ECS implementation in Haskell, achieves this imperative style through monads\cite{ecs-apecs}.
+All these considerations are related to the interpretation of the relation between components, in essence the {\it type} of an entity. 
+Rather than emulating ECS, existing type systems can be used to handle the relation between data.
+
+Apecs\cite{ecs-apecs} is an ECS library in Haskell, with experimental support for concurrency through the Software Transactional Memory (STM) monad\cite{STM-monad}.
+The STM monad utilizes atomic instructions to achieve concurrency within a monadic context.
+Entities are stored with an integer dictionary, but can be explicitly stored in a sparse fixed size {\it cache} which allows for constant access time. 
+
+Specs is an ECS library in Rust\cite{ecs-specs}, with native support for parallelism.
+It supports several storages such as: a tree data structure, dense vector, sparse vector and an hashmap.
+Iteration on entities is done by specifying the relation between the components: join, optional and excluded.
+An entity can be {\it flagged} (tag) to denote events such as the destruction of the entity.
+
+Unity is a game-engine which released their production ready Data-Oriented-Tech-Stack (DOTS) in 2022, which centres around an ECS implementation which they have patented\cite{unity-ecs-patent}.
+It uses LLVM to optimize and vectorize C\# code (burst compiler) and has access to their internal c++ library for parallel and concurrent tasks (job system).
+The ECS implementation heavily employs the .NET Compiler Platform Roslyn to generate source-code for iterations on user-defined datatypes.
+An \type{Entity} is idiomatically a composite datatype but implemented as an \type{identifier} with a \type{version}\footnote{Destroying an entity increments the \type{version}, which means copies of entities know they are destroyed and the \type{identifier} can be reused at a later point.}.
+A single array keeps track of all entities, without data components.
+Each \type{Entity} and related data components are stored in a \type{Chunk}, a fixed size buffer of 16000 bytes, alongside other entities with the same \type{Archetype}\footnote{An \type{ISharedComponent} extends this to the value of a component, which means each value has a unique \type{Chunk} and the value can be stored within the \type{Chunk} header. }.
+Instead of pattern matching, a \type{Query} matches on certain properties of entities, such as containing a certain component.
+Collective operations, such as a \type{Job}, operate on a \type{Chunk} directly.
+Structural changes can be queued in parallel, but create a sync-point when executed and involves entities to be moved between chunks.
+This is not required for an \type{IEnableComponent}, which functions as an tagged component akin to the \type{Maybe a} type. 
+A notable observation is that delaying structural changes has side-effects as queued structural changes are not taking in account.
+
+\paragraph{Motivation}
+
+A generic performant implementation is explored, which can alter between the representations.
+An implementation will be done in Accelerate, a data-parallel language embedded within Haskell.
+
+\paragraph{Contributions}
+
+
 
 \bibliographystyle{plain}
 \bibliography{refs}

@@ -1,20 +1,18 @@
-\BOOKMARK [1][-]{section.1}{Introduction}{}% 1
-\BOOKMARK [1][-]{section.2}{Related Work}{}% 2
-\BOOKMARK [1][-]{section.3}{Background}{}% 3
-\BOOKMARK [2][-]{subsection.3.1}{Performance}{section.3}% 4
-\BOOKMARK [3][-]{subsubsection.3.1.1}{Optimizations}{subsection.3.1}% 5
-\BOOKMARK [3][-]{subsubsection.3.1.2}{Principles}{subsection.3.1}% 6
-\BOOKMARK [2][-]{subsection.3.2}{Data structures}{section.3}% 7
-\BOOKMARK [3][-]{subsubsection.3.2.1}{Element-wise}{subsection.3.2}% 8
-\BOOKMARK [3][-]{subsubsection.3.2.2}{Variant-wise}{subsection.3.2}% 9
-\BOOKMARK [2][-]{subsection.3.3}{Complexity Optimizations}{section.3}% 10
-\BOOKMARK [3][-]{subsubsection.3.3.1}{Memory Representation}{subsection.3.3}% 11
-\BOOKMARK [2][-]{subsection.3.4}{Array Fusion}{section.3}% 12
-\BOOKMARK [2][-]{subsection.3.5}{Entity-Component-System}{section.3}% 13
-\BOOKMARK [1][-]{section.4}{Implementation}{}% 14
-\BOOKMARK [2][-]{subsection.4.1}{Code Generation}{section.4}% 15
-\BOOKMARK [2][-]{subsection.4.2}{Algebraic Data Type}{section.4}% 16
-\BOOKMARK [2][-]{subsection.4.3}{Accelerate}{section.4}% 17
-\BOOKMARK [2][-]{subsection.4.4}{*Mainstream languages temp name*}{section.4}% 18
-\BOOKMARK [2][-]{subsection.4.5}{Embedded Languages}{section.4}% 19
-\BOOKMARK [1][-]{section.5}{Interface}{}% 20
+\BOOKMARK [1][-]{section.1}{\376\377\000I\000n\000t\000r\000o\000d\000u\000c\000t\000i\000o\000n}{}% 1
+\BOOKMARK [2][-]{subsection.1.1}{\376\377\000R\000e\000l\000a\000t\000e\000d\000\040\000W\000o\000r\000k}{section.1}% 2
+\BOOKMARK [1][-]{section.2}{\376\377\000P\000e\000r\000f\000o\000r\000m\000a\000n\000c\000e}{}% 3
+\BOOKMARK [2][-]{subsection.2.1}{\376\377\000O\000p\000t\000i\000m\000i\000z\000a\000t\000i\000o\000n\000s}{section.2}% 4
+\BOOKMARK [2][-]{subsection.2.2}{\376\377\000P\000r\000i\000n\000c\000i\000p\000l\000e\000s}{section.2}% 5
+\BOOKMARK [2][-]{subsection.2.3}{\376\377\000D\000a\000t\000a\000\040\000s\000t\000r\000u\000c\000t\000u\000r\000e\000s}{section.2}% 6
+\BOOKMARK [3][-]{subsubsection.2.3.1}{\376\377\000E\000l\000e\000m\000e\000n\000t\000-\000w\000i\000s\000e}{subsection.2.3}% 7
+\BOOKMARK [3][-]{subsubsection.2.3.2}{\376\377\000V\000a\000r\000i\000a\000n\000t\000-\000w\000i\000s\000e}{subsection.2.3}% 8
+\BOOKMARK [2][-]{subsection.2.4}{\376\377\000M\000e\000m\000o\000r\000y\000\040\000R\000e\000p\000r\000e\000s\000e\000n\000t\000a\000t\000i\000o\000n}{section.2}% 9
+\BOOKMARK [1][-]{section.3}{\376\377\000T\000y\000p\000e\000s}{}% 10
+\BOOKMARK [2][-]{subsection.3.1}{\376\377\000C\000o\000d\000e\000\040\000G\000e\000n\000e\000r\000a\000t\000i\000o\000n}{section.3}% 11
+\BOOKMARK [2][-]{subsection.3.2}{\376\377\000A\000l\000g\000e\000b\000r\000a\000i\000c\000\040\000D\000a\000t\000a\000\040\000T\000y\000p\000e}{section.3}% 12
+\BOOKMARK [2][-]{subsection.3.3}{\376\377\000A\000c\000c\000e\000l\000e\000r\000a\000t\000e}{section.3}% 13
+\BOOKMARK [1][-]{section.4}{\376\377\000I\000m\000p\000l\000e\000m\000e\000n\000t\000a\000t\000i\000o\000n}{}% 14
+\BOOKMARK [2][-]{subsection.4.1}{\376\377\000A\000r\000r\000a\000y\000\040\000F\000u\000s\000i\000o\000n}{section.4}% 15
+\BOOKMARK [1][-]{section.5}{\376\377\000F\000u\000t\000u\000r\000e\000\040\000w\000o\000r\000k}{}% 16
+\BOOKMARK [1][-]{section.6}{\376\377\000C\000o\000n\000c\000l\000u\000s\000i\000o\000n}{}% 17
+\BOOKMARK [1][-]{section.7}{\376\377\000E\000x\000t\000r\000a}{}% 18

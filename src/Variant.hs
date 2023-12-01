@@ -103,8 +103,8 @@ pattern Con v <- (matchable (toWord @n) -> Just v)
 
 -- | 
 pattern Con0 :: forall v vs. (Elt (IX 0 vs), Elt (V vs), Elt (Preserving vs), Tags (V vs), Typeable (EltR (IX 0 vs))) => Exp (IX 0 vs) -> Exp (V vs)
-pattern Con0 v <- (matchable 1 -> Just v)
-  where Con0 v = constructable 1 (Construct v :: Exp (Preserving vs))
+pattern Con0 v <- (matchable 0 -> Just v)
+  where Con0 v = constructable 0 (Construct v :: Exp (Preserving vs))
 
 pattern Con1 :: forall v vs. (Elt (IX 1 vs), Elt (V vs), Elt (Preserving vs), Tags (V vs), Typeable (EltR (IX 1 vs))) => Exp (IX 1 vs) -> Exp (V vs)
 pattern Con1 v <- (matchable 1 -> Just v)

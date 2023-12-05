@@ -47,7 +47,7 @@
 
 \title{Accelerating Structural Sum Types}
 \author{Luuk de Graaf}
-\date{August 2023}
+\date{December 2023}
 
 \begin{document}
 
@@ -66,8 +66,8 @@ Many high-performance applications adopt a data-oriented design, which centres a
 Both parallelization opportunities and cache efficiency are focal points of the data-oriented design paradigm.
 
 A challenge with data-oriented design is representing non-uniform data efficiently while preserving vectorization opportunities and type safety. 
-Operating on multiple variants can be done on the type-level (polymorphism) or on the value-level (tags).
-In the context of iterating on a collection of variants, branching on a tag or dynamically dispatching will inherently break vectorization.
+Operating on multiple variants of a type can be done on the type-level or on the value-level.
+In the context of iterating on a collection of variants, branching on a value tag or dynamically dispatching will inherently break vectorization.
 This means static polymorphism is a common way to operate on non-uniform data in data-parallel applications.
 In some cases this is impossible as the identity of a variant will only be known at runtime, such as exception states but also diverging states.
 Conceptually both approaches serve the same purpose, granting the ability to operate on multiple variants of a type.
@@ -75,7 +75,7 @@ Unification of these concepts reformulates operating on non-uniform data to an o
 
 A type-safe way to achieve this is by elevating the concept of a mutual exclusive datatype to the type-level.
 This can be achieved through type-level constructors and datatype-generic functions.
-Such implementation can exist without it being natively supported in the implementation language.
+Such implementation can exist without it being natively supported as construct in the implementation language.
 This can be utilized by libraries, frameworks and embedded domain-specific languages that exist in languages that facilitate type-level programming, like Haskell.
 
 \newpage
@@ -83,29 +83,51 @@ This can be utilized by libraries, frameworks and embedded domain-specific langu
 \subsection{Related Work}
 
 The contribution can be categorized as an interdisciplinary between three distinct fields.
-A computationally efficient representation of non-uniform data in data-parallel applications.
-This induced the need for a type-safe interface to such representation, which has been achieved through type-level functions and datatype-generic functions.
-The connection is made through an implementation in an embedded domain-specific language, which leverages the type-system of the host language. 
+Initial objective was establishing computationally efficient representations for non-uniform data in data-parallel applications.
+This induced the need for a flexible and type-safe interface, which has been achieved through type-level and datatype generic programming.
+Relevance is established through an implementation in a data-parallel language embedded within Haskell.
 
 \paragraph{Representation}
 
 The memory representation of a datatype is often based on the functionality they perform within a language.
 In data-parallel applications primitive types are distributed over multiple arrays to facilitate vectorization.
-It is not apparent what the representation of a tagged union should be, as they will inherently break vectorization. 
-A majority of languages natively represent tagged unions as a singular contiguous datatype; such as C, C++, Rust and OpenCL.
-Both Accelerate\cite{accelerate-sum-types} and Futhark\cite{futhark-sum-types} implicitly distribute primitive types of composite datatypes over multiple arrays, including tagged unions.
+It is not apparent what the representation of a tagged union should be, as they inherently break vectorization in most cases. 
+The functional data-parallel languages Accelerate\cite{accelerate-sum-types} and Futhark\cite{futhark-sum-types} implicitly distribute primitive types in composite datatypes over multiple arrays.
+Both implementations have limited deduplication capabilities, but research has been done to integrate a memory efficient tagged union in Accelerate\cite{accelerate-sum-types}.
 Game-engines, which deal with many clusters of data, have a fundamentally different approach as they have widely adopted the Entity-Component-System (ECS) pattern. 
-Many implementations incite a collective re-organization of the internal representation when a variant change occurs.
-A type-safe and performant implementation is notably hard due to the statically resolving all interactions between the representations, which means meta-programming and unsafe code are extremely prevalent. 
+Many implementations incite a collective re-organization of the internal representation when a variant change occurs at runtime.
+A type-safe and performant implementation is notably hard due to having to statically resolve all interactions between the representations, which means meta-programming and untyped code are extremely prevalent. 
 
-\paragraph{Types}
+\paragraph{Type Interface}
 
-Systems are top-level functions that operate on all entities that contain a set of components. 
-An entity is idiomatically a set of components, but instantiated as a globally unique index that can identify the associated data components.
-Rather than iterating with this index, systems utilize the implicit structure of an entity to directly iterate on the data components.  
-The 'type' of an entity can be modified by removing or adding components.
+Functional languages handle tagged unions safely through Algebraic Data Types (ADTs), where sum types categorize ADTs with multiple variants.
+Constructors can be local to an unique ADT (nominally typed) or exist as independent types (structurally typed).
+Deconstructing is done by pattern matching, where functions natively branch on the current active variant.
+In Haskell sum types are nominally typed, which means variants are not standalone types and cannot exist safely outside the ADT.
+Structural sum types are often called extensible or open sum types, as they do not have to be explicitly declared before use.
+In OCaml these are natively supported as polymorphic variants, while Haskell libraries such as {\it fastsum} or {\it extensible} implement them through the type system.
+An efficient internal representation can be derived statically through associated types\cite{associated-types}.
+Datatype generic functions, which depend on the structure of a datatype, can be used to create isomorphic mappings between representations.
+Both concepts are used in highly generic libraries for a wide-range of applications\cite{generic-programming}. 
 
-\paragraph{Embedded Domain Specific Language}
+\paragraph{Implementation}
+
+Libraries and domain-specific languages that are embedded construct their user-defined-types through the host-language.
+A shallow embedding operates directly on types native to the host-language, while deep embeddings construct an abstract syntax tree that is later evaluated.
+The latter offers flexibility on how user-defined types are implemented, as types exist both on the surface level and as construct within the abstract syntax tree.   
+There are several approaches, which have been subject to research in the domain of circuit design.
+\begin{itemize}
+    \setlength\itemsep{0em}
+    \item {C$\lambda$aSH} is not deeply embedded and operates on user-defined types through generics\cite{clash}. 
+    \item Hydra has the deep embedding constructs nested into the shallow embedding constructs\cite{hydra}.
+    \item Kansas Lava has both embeddings exist in parallel under an encasing type\cite{kansas-lava}.
+    \item ForSyDe has both embeddings exist as standalone types\cite{forsyde}.
+\end{itemize}
+
+An observation is that user extendability is limited on deeply embedded constructs as execution models must be updated.
+A proposed approach is to have a small deeply embedded core language that only supports constructs that are relevant for combinatorial optimizations\cite{shallow-and-deep}. 
+The shallow embedding can be used to create an extensible and user-friendly interface to this core language.
+In the context of data-parallel applications and non-uniform data this leans itself to an implementation in the host-language.
 
 \newpage
 
@@ -519,20 +541,65 @@ The choice is generally made by compilers\footnote{source}.
     \caption{boxed representation}
 \end{figure}
 
+\newpage
+
 \section{Types}
 
-\subsection{Code Generation}
+\subsection{Kinds}
+
+A value is categorized by types, while a type is categorized by {\it kinds}.
+This is relevant when discussing type constructors, where each constructor with a different arity has a distinguishable kind.
+A well known exposition of type constructors are parametric polymorphic data types, which take type variables as argument.
+While a lot of languages support polymorphic data types, the concept of kinds is not evident as only concrete types are able to be used for arguments.
+Haskell supports higher-kinded types, which are analogous to higher-order functions for types.
+
+\begin{verbatim}
+    2.5f         :: Float
+    Float        :: *
+    Option a     :: * -> *
+    Option Float :: *
+    Apply f x    :: (* -> *) -> * -> *
+\end{verbatim}
+
+Type constructors can be used to encode data statically, such as Peano numbers.
+The \type{Succ a} and \type{Nil} types are axioms that can be used to construct a natural number on the type-level.
+By default these exist in a open universe, which means we can create ill-formed expressions.
+On the type-level this can be resolved by Generalized Algebraic Data Types (GADTs), a Haskell extension.
+It allows the types of constructors to diverge from the general type, which makes the type variable a phantom type.
+
+\begin{verbatim}
+    // open universe where 'a' can be anything
+    data Succ a
+    data Nil
+
+    // closed universe under the phantom type 'a'
+    data Natural a where
+        Succ :: Natural b -> Natural (Natural b)
+        Nil  :: Natural ()
+\end{verbatim}
+
+The consequence is that deconstructing a GADT will refine the type.
+This can be used to construct evidence of certain properties by pattern matching on data constructors.
+An observation is that this is a categorization of types, similar to how the kind \type{*} represents all concrete types.
+The \type{DataKind} extension promote types to the kind-level and constructors to the type-level. 
+The kind \type{Natural} includes the types \type{Succ} and \type{Nil}.
+It both creates a closed universe and allows type constructors to be defined with more precision than their arity.
+This requires kind-level functions.
+
+
+\newpage
+\subsection{Type Family}
+
+
+
+
+\paragraph{Code Generation}
 
 A common factor with data type representation is that they are understandably heavily ingrained within a compiler. 
 This can make an ergonomic and zero-cost abstraction problematic as a compiler will treat the functionally identical types as distinct.
 This can be resolved by generating code dependent on the concrete instantiation of the type. 
 
-\begin{itemize}
-    \item [Polymorphism]
-    \item [Embedded]
-\end{itemize}
-
-\subsection{Algebraic Data Type}
+\paragraph{Algebraic Data Type}
 
 An algebraic data type is a composite datatype, which is used to compose new datatypes in many functional languages.
 A product type (x) is the combination of datatypes, while a sum type (+) is the alternation between datatypes.
@@ -584,7 +651,7 @@ This flexibility aligns with the intention to create a modular system that is ag
 
 \newpage
 
-\subsection{Accelerate}
+\paragraph{Accelerate}
 
 Accelerate is a data-parallel array language deeply embedded within Haskell.
 An abstract syntax tree (AST) is created and optimized by Accelerate within Haskell's runtime system.
@@ -628,7 +695,6 @@ Currently Accelerate uses a non-compact tagged union representation for sum type
 Research has been done on a compact tagged union representation for parallel arrays, which has been named a {\it Recursive Tagged Union}\cite{accelerate-sum-types}.
 The representation uses a unified tag for nested sum types, which optimizes memory usage at the cost of tag (de-)construction.  
 It has been partly implemented in Accelerate, and has not yet been benchmarked.
-
 
 An {\it embedded} language defines its terms and values in a {\it host language}.
 \\
@@ -676,10 +742,7 @@ Functions do not use this process, and instead operate directly on the correspon
 
 \section{Implementation}
 
-\subsection{Array Fusion}
-
-embedded
-
+\paragraph{Array Fusion}
 
 \section{Future work}
 
@@ -705,6 +768,11 @@ sum type / instances
 \paragraph{Dynamic programming languages}
 
 \paragraph{Entity-Component-System}
+
+Systems are top-level functions that operate on all entities that contain a set of components. 
+An entity is idiomatically a set of components, but instantiated as a globally unique index that can identify the associated data components.
+Rather than iterating with this index, systems utilize the implicit structure of an entity to directly iterate on the data components.  
+The 'type' of an entity can be modified by removing or adding components.
 
 The ECS pattern is arguably a reaction to the prevalence of object-oriented languages within game engines.
 The premise is to organizes game-logic within systems rather than components, where the relation between components is flexible\cite{ecs-origin}.
@@ -748,6 +816,7 @@ Collective operations, such as a \type{Job}, operate on a \type{Chunk} directly.
 Structural changes can be queued in parallel, but create a sync-point when executed and involves entities to be moved between chunks.
 This is not required for an \type{IEnableComponent}, which functions as an tagged component akin to the \type{Maybe a} type. 
 A notable observation is that delaying structural changes has side-effects as queued structural changes are not taking in account.
+
 
 \paragraph{Motivation}
 

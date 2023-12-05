@@ -1,8 +1,8 @@
 \contentsline {section}{\numberline {1}Introduction}{2}{section.1}%
 \contentsline {subsection}{\numberline {1.1}Related Work}{3}{subsection.1.1}%
 \contentsline {paragraph}{Representation}{3}{section*.2}%
-\contentsline {paragraph}{Types}{3}{section*.3}%
-\contentsline {paragraph}{Embedded Domain Specific Language}{3}{section*.4}%
+\contentsline {paragraph}{Type Interface}{3}{section*.3}%
+\contentsline {paragraph}{Implementation}{3}{section*.4}%
 \contentsline {section}{\numberline {2}Performance}{4}{section.2}%
 \contentsline {subsection}{\numberline {2.1}Optimizations}{4}{subsection.2.1}%
 \contentsline {paragraph}{Instructions}{4}{section*.5}%
@@ -21,22 +21,24 @@
 \contentsline {paragraph}{Entity}{12}{section*.15}%
 \contentsline {subsubsection}{\numberline {2.3.2}Variant-wise}{13}{subsubsection.2.3.2}%
 \contentsline {subsection}{\numberline {2.4}Memory Representation}{14}{subsection.2.4}%
-\contentsline {section}{\numberline {3}Types}{14}{section.3}%
-\contentsline {subsection}{\numberline {3.1}Code Generation}{14}{subsection.3.1}%
-\contentsline {subsection}{\numberline {3.2}Algebraic Data Type}{15}{subsection.3.2}%
-\contentsline {subsection}{\numberline {3.3}Accelerate}{16}{subsection.3.3}%
-\contentsline {paragraph}{C$\lambda $aSH}{16}{section*.16}%
-\contentsline {paragraph}{Lava}{17}{section*.17}%
-\contentsline {paragraph}{Accelerate}{17}{section*.18}%
-\contentsline {section}{\numberline {4}Implementation}{18}{section.4}%
-\contentsline {subsection}{\numberline {4.1}Array Fusion}{18}{subsection.4.1}%
-\contentsline {section}{\numberline {5}Future work}{18}{section.5}%
-\contentsline {section}{\numberline {6}Conclusion}{18}{section.6}%
-\contentsline {section}{\numberline {7}Extra}{18}{section.7}%
-\contentsline {paragraph}{Implementation}{18}{section*.19}%
-\contentsline {paragraph}{C/C++}{18}{section*.20}%
-\contentsline {paragraph}{Haskell}{18}{section*.21}%
-\contentsline {paragraph}{Dynamic programming languages}{18}{section*.22}%
-\contentsline {paragraph}{Entity-Component-System}{18}{section*.23}%
-\contentsline {paragraph}{Motivation}{19}{section*.24}%
-\contentsline {paragraph}{Contributions}{19}{section*.25}%
+\contentsline {section}{\numberline {3}Types}{15}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Kinds}{15}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Type Family}{16}{subsection.3.2}%
+\contentsline {paragraph}{Code Generation}{16}{section*.16}%
+\contentsline {paragraph}{Algebraic Data Type}{16}{section*.17}%
+\contentsline {paragraph}{Accelerate}{18}{section*.18}%
+\contentsline {paragraph}{C$\lambda $aSH}{18}{section*.19}%
+\contentsline {paragraph}{Lava}{19}{section*.20}%
+\contentsline {paragraph}{Accelerate}{19}{section*.21}%
+\contentsline {section}{\numberline {4}Implementation}{20}{section.4}%
+\contentsline {paragraph}{Array Fusion}{20}{section*.22}%
+\contentsline {section}{\numberline {5}Future work}{20}{section.5}%
+\contentsline {section}{\numberline {6}Conclusion}{20}{section.6}%
+\contentsline {section}{\numberline {7}Extra}{20}{section.7}%
+\contentsline {paragraph}{Implementation}{20}{section*.23}%
+\contentsline {paragraph}{C/C++}{20}{section*.24}%
+\contentsline {paragraph}{Haskell}{20}{section*.25}%
+\contentsline {paragraph}{Dynamic programming languages}{20}{section*.26}%
+\contentsline {paragraph}{Entity-Component-System}{20}{section*.27}%
+\contentsline {paragraph}{Motivation}{21}{section*.28}%
+\contentsline {paragraph}{Contributions}{21}{section*.29}%

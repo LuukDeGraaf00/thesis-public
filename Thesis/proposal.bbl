@@ -35,6 +35,11 @@ G.~J. Chaitin, M.~A. Auslander, A.~K. Chandra, J.~Cocke, M.~E. Hopkins, and
 \newblock Register allocation via coloring.
 \newblock {\em Computer Languages}, 6:47--57, 1981.
 
+\bibitem{associated-types}
+Manuel M.~T. Chakravarty, Gabriele Keller, Simon~Peyton Jones, and Simon
+  Marlow.
+\newblock Associated types with class, 2004.
+
 \bibitem{intermediate-representation}
 David Chisnall.
 \newblock The challenge of cross-language interoperability, 2013.
@@ -64,6 +69,11 @@ A.~Fog.
 Amethyst Foundation.
 \newblock The specs book.
 \newblock \url{https://specs.amethyst.rs/docs/tutorials/}.
+
+\bibitem{kansas-lava}
+Andy Gill, Tristan Bull, Garrin Kimmell, Erik Perrins, Ed~Komp, and Brett
+  Werling.
+\newblock Introducing kansas lava, 2010.
 
 \bibitem{STM-monad}
 Tim Harris, Simon Marlow, and Simon Peyton~Jones.
@@ -128,6 +138,20 @@ Dorit Nuzman, Ira Rosen, and Ayal Zaks.
 Nvidia.
 \newblock Nvidia tesla v100 gpu architecture.
 
+\bibitem{hydra}
+John~T O'Donnell.
+\newblock Overview of hydra: A concurrent language for synchronous digital
+  circuit design, 2002.
+
+\bibitem{generic-programming}
+Alexey Rodriguez, Johan Jeuring, Patrik Jansson, Alex Gerdes, Oleg Kiselyov,
+  and Bruna~C. d.~S.~Oliveira.
+\newblock Comparing libraries for generic programming in haskell, 2008.
+
+\bibitem{forsyde}
+Ingo Sander.
+\newblock System modeling and design refinment in forsyde, 2003.
+
 \bibitem{futhark-sum-types}
 Robert Schenck.
 \newblock Sum types in futhark, 2019.
@@ -138,6 +162,11 @@ Michael~S. Schlansker, B.~Ramakrishna Rau, Scott Mahlke, Vinod Kathail, Richard
 \newblock Achieving high levels of instruction-level parallelism with reduced
   hardware complexity.
 \newblock Technical Report HPL-96-120, Hewlett--Packard Corporation, 2000.
+
+\bibitem{shallow-and-deep}
+Josef Svenningsson and Emil Axelsson.
+\newblock Combining deep and shallow embedding of domain-specific-languages,
+  2015.
 
 \bibitem{accelerate-sum-types}
 Rick van Hoef.

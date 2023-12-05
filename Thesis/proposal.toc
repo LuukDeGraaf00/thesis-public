@@ -21,9 +21,11 @@
 \contentsline {paragraph}{Entity}{12}{section*.15}%
 \contentsline {subsubsection}{\numberline {2.3.2}Variant-wise}{13}{subsubsection.2.3.2}%
 \contentsline {subsection}{\numberline {2.4}Memory Representation}{14}{subsection.2.4}%
-\contentsline {section}{\numberline {3}Types}{15}{section.3}%
-\contentsline {subsection}{\numberline {3.1}Kinds}{15}{subsection.3.1}%
-\contentsline {subsection}{\numberline {3.2}Type Family}{16}{subsection.3.2}%
+\contentsline {section}{\numberline {3}Interface}{15}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Type-level programming}{15}{subsection.3.1}%
+\contentsline {subsubsection}{\numberline {3.1.1}Kinds}{15}{subsubsection.3.1.1}%
+\contentsline {subsubsection}{\numberline {3.1.2}Type Family}{16}{subsubsection.3.1.2}%
+\contentsline {subsection}{\numberline {3.2}Other}{16}{subsection.3.2}%
 \contentsline {paragraph}{Code Generation}{16}{section*.16}%
 \contentsline {paragraph}{Algebraic Data Type}{16}{section*.17}%
 \contentsline {paragraph}{Accelerate}{18}{section*.18}%

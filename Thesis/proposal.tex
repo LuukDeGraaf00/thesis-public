@@ -543,15 +543,21 @@ The choice is generally made by compilers\footnote{source}.
 
 \newpage
 
-\section{Types}
+\section{Interface}
 
-\subsection{Kinds}
+temporary conclusion
+
+\subsection{Type-level programming}
+
+deriving intermediate data structures
+
+\subsubsection{Kinds}
 
 A value is categorized by types, while a type is categorized by {\it kinds}.
 This is relevant when discussing type constructors, where each constructor with a different arity has a distinguishable kind.
 A well known exposition of type constructors are parametric polymorphic data types, which take type variables as argument.
 While a lot of languages support polymorphic data types, the concept of kinds is not evident as only concrete types are able to be used for arguments.
-Haskell supports higher-kinded types, which are analogous to higher-order functions for types.
+Haskell supports higher-kinded types, which are analogous to higher-order functions for types, which makes kinds apparent.
 
 \begin{verbatim}
     2.5f         :: Float
@@ -562,10 +568,10 @@ Haskell supports higher-kinded types, which are analogous to higher-order functi
 \end{verbatim}
 
 Type constructors can be used to encode data statically, such as Peano numbers.
-The \type{Succ a} and \type{Nil} types are axioms that can be used to construct a natural number on the type-level.
-By default these exist in a open universe, which means we can create ill-formed expressions.
+The parametric \type{Succ a} and \type{Nil} types are axioms that can be used to construct a natural number on the type-level.
+By default these exist in a open universe, which means ill-formed expressions can be created.
 On the type-level this can be resolved by Generalized Algebraic Data Types (GADTs), a Haskell extension.
-It allows the types of constructors to diverge from the general type, which makes the type variable a phantom type.
+It allows the type variables of constructors to diverge from the more general type.
 
 \begin{verbatim}
     // open universe where 'a' can be anything
@@ -582,16 +588,25 @@ The consequence is that deconstructing a GADT will refine the type.
 This can be used to construct evidence of certain properties by pattern matching on data constructors.
 An observation is that this is a categorization of types, similar to how the kind \type{*} represents all concrete types.
 The \type{DataKind} extension promote types to the kind-level and constructors to the type-level. 
-The kind \type{Natural} includes the types \type{Succ} and \type{Nil}.
-It both creates a closed universe and allows type constructors to be defined with more precision than their arity.
-This requires kind-level functions.
+The kind \type{Natural} includes the types \type{Succ (a :: Natural)} and \type{Nil}.
+It both creates a closed universe and allows other type constructors to expect the more precise kind \type{Natural}.
+A limitation is that the construction of the type, which is needed for arithmetic operations, is guarded by the definition of \type{Natural}.
 
+\begin{verbatim}
+    data Natural = Succ Natural | Nil | Add Natural Natural | Minus Natural Natural
+\end{verbatim}
+
+On the value-level this is made easier by functions that transform their input into another output type.
+Translated to the type-level it requires type-level functions that transform an input kind into an output kind.
 
 \newpage
-\subsection{Type Family}
+
+\subsubsection{Type Family}
+
+Parametric 
 
 
-
+\subsection{Other}
 
 \paragraph{Code Generation}
 

@@ -616,17 +616,24 @@ This is particularly useful for domain-specific languages, as an instance can ha
 \end{verbatim}
 
 While these integrate well with type classes, type families is the terminology for the standalone concept.
-A \type{data family} has unique types associated with them, while a \type{type family} is merely the type synonym equivalent.
+A \type{data family} has unique types associated with the type, while a \type{type family} is merely the type synonym equivalent.
 In some instances this is insufficient to represent a function, as the type checker is unsure which instance to use.
-This is due to instances existing in an open universe.
-A closed type family attempts the instances in order of declaration, which expresses itself in being able to pattern match on types.
+A closed type family attempts the instances in order of definition, which expresses itself in being able to pattern match on types.
 
 \begin{verbatim}
-    type family BitSize (a :: *) :: Nat where
-        BitSize Bool = 8
-        BitSize Int  = 32
-        ...
+    type family Elem a (bs :: [b]) :: Bool where
+        Elem x '[]       = False        -- no
+        Elem x (x : ys)  = True         -- yes
+        Elem x (y : ys)  = Elem x ys    -- no, but recurse
 \end{verbatim}
+
+An annoying limitation is that type families cannot be partially applied, which means a lot of boilerplate is required to capture more complex functions.
+
+\subsubsection{Compact Variant}
+
+
+
+
 
 
 \subsection{Other}

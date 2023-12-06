@@ -56,8 +56,8 @@ type family Any (f :: a -> Bool) (xs :: [a]) :: Bool where
 -- | returns true on equality
 type family Elem a (b :: [*]) :: Bool where
 
+    Elem x '[]       = False        -- no
     Elem x (x : ys)  = True         -- yes
-    Elem x (y : '[]) = False        -- no
     Elem x (y : ys)  = Elem x ys    -- no, but recurse
 
 -- | append list
@@ -196,9 +196,5 @@ type family IX (index :: Nat) (types :: [t]) :: t where
     IX 0 (x : xs) = x
     IX n (x : xs) = IX (n - 1) xs
     IX n '[]      = TypeError (Text "Index out of range!")
-
-
-
-
 
 

@@ -25,6 +25,7 @@
 \contentsline {subsection}{\numberline {3.1}Type-level programming}{15}{subsection.3.1}%
 \contentsline {subsubsection}{\numberline {3.1.1}Kinds}{15}{subsubsection.3.1.1}%
 \contentsline {subsubsection}{\numberline {3.1.2}Type Family}{16}{subsubsection.3.1.2}%
+\contentsline {subsubsection}{\numberline {3.1.3}Compact Variant}{16}{subsubsection.3.1.3}%
 \contentsline {subsection}{\numberline {3.2}Other}{16}{subsection.3.2}%
 \contentsline {paragraph}{Code Generation}{16}{section*.16}%
 \contentsline {paragraph}{Algebraic Data Type}{16}{section*.17}%

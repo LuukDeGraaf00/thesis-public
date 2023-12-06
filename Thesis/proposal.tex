@@ -597,13 +597,36 @@ A limitation is that the construction of the type, which is needed for arithmeti
 \end{verbatim}
 
 On the value-level this is made easier by functions that transform their input into another output type.
-Translated to the type-level it requires type-level functions that transform an input kind into an output kind.
+Translated to the type-level it means type-level functions that transform an input kind into an output kind.
 
 \newpage
 
 \subsubsection{Type Family}
 
-Parametric 
+A way to approach type-level functions is to see it as a type dependent on the instantiation of a type variable.
+This is akin to functions in type classes, where type-indexing allows functions to be overloaded.
+Haskell reuses this functionality for types, categorizable as {\it associated types}\cite{associated-types}.
+This is particularly useful for domain-specific languages, as an instance can have a specialized return type.
+
+\begin{verbatim}
+    class (Elt a) where
+        type EltR a :: *
+        toElt       :: a -> EltR a
+        fromElt     :: EltR a -> a
+\end{verbatim}
+
+While these integrate well with type classes, type families is the terminology for the standalone concept.
+A \type{data family} has unique types associated with them, while a \type{type family} is merely the type synonym equivalent.
+In some instances this is insufficient to represent a function, as the type checker is unsure which instance to use.
+This is due to instances existing in an open universe.
+A closed type family attempts the instances in order of declaration, which expresses itself in being able to pattern match on types.
+
+\begin{verbatim}
+    type family BitSize (a :: *) :: Nat where
+        BitSize Bool = 8
+        BitSize Int  = 32
+        ...
+\end{verbatim}
 
 
 \subsection{Other}

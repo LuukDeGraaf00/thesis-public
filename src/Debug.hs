@@ -1,12 +1,25 @@
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 
 module Debug where
+import GHC.Int
+import GHC.TypeLits
 
-data Nat = Succ Nat | Nil
 
-data Add (a :: Nat) (b :: Nat) where
+class (Elt a) where
+    type EltR a :: *
+    toElt :: a -> EltR a
+    fromElt :: EltR a -> a
 
-    Plus :: Add (a :: Nat) (a :: Nat)
+
+type family BitSize (a :: *) :: Nat where
+    BitSize Bool = 1
+    BitSize Int  = 4
+    BitSize a    = TypeError (Text "Unsupported type!")
+

@@ -506,38 +506,69 @@ Both allow instructions to be vectorized, but there exist several other consider
 
 \newpage
 
+\subsection{Memory Representation}
+
+Memory instructions operate on fixed boundaries, which means operations that overlap these boundaries require additional but strictly unnecessary instructions.
+A natural alignment of a datatype is achieved by aligning all types according to the instructions that access them\footnote{SIMD instructions}. 
+Many compilers introduce {\it padding} to enforce natural alignment.
+While computational efficient, the alternative of {\it packing} types together can be preferred for a smaller memory footprint.  
+Both approaches can be used to ensure the datatypes align with cache lines. 
+
+\begin{figure}[ht]
+    \centering
+    \caption{data alignment example with cache lines (c++ code)}
+\end{figure}
+
+Parallel arrays (Struct of Arrays) have a natural alignment by default as they contain primitives types, which are naturally aligned.
+General purpose languages often default to the Array of Struct, while data-parallel applications use the Struct of Arrays representation.
+A zero-cost abstraction that can ergonomically switch between these constructs is non-trivial.
+An interface to index access with an intermediate structure can break automatic vectorization\cite{abstraction-vectorization}. 
+In addition the different internal representations must be statically definable and able to be handled by the data structures.
+Many C++ libraries utilize {\it class templates} to achieve this\cite{abstraction-vectorization}.
+Being able to switch between representations was an initial focal point of the experimental language {\it Jai}, a c-like programming language for games.
+The switch between representations is currently possible through a more general pre-processors macro's approach.
 
 \newpage
 
 \section{Interface}
 
-A preliminary conclusion of the previous section is that a performant internal representation cannot be deducted from a mere theoretical framework.
-With this in mind it is important for high performance oriented applications to allow for flexibility, while preserving semantics.
-For operating on non-uniform data there are three primary parameters which can be adjusted. 
-Those are whether an element or variant-wise data structure is used, the layout for mutually exclusive variants and the ability to operate on those variants.
-Within this chapter a modular interface is proposed that separates these concerns. 
+A preliminary conclusion of the previous chapter is that a performant internal representation cannot be deducted from a mere theoretical framework.
+With this in mind it is important for high performance oriented applications to be flexible within the internal representation of datatypes.
+This is important for both composite types and data structures.
+Within this chapter a modular interface is explored for iterating on collections of non-uniform data.
 
-\subsection{Storage}
+\subsection{Data Structure}
 
+As discussed in the data structures section, there are two internal representations for collections of non-uniform data.
+Variants of a particular type are stored either element-wise or variant-wise.
 There are several considerations for a data structure that is agnostic to if it stores non-uniform data in element-wise or a variant-wise way.
+A variant-wise collection can operate on only the relevant variants, while an element-wise is forced to discover that at runtime.
+To avoid redundant iterations for variant-wise collections, a function must be able to be defined on a subset of all possible variants.
+This section will be used to explain how the ECS-pattern handles operating on some variants and extending the use case to Algebraic Data Types.
+
+\newpage
 
 \subsubsection{Entity-Component-System}
+
+The ECS pattern is arguably a reaction to the prevalence of object-oriented languages within game engines.
+The premise is to organizes game-logic within functions rather than components, where the relation between components is flexible\cite{ecs-origin}.
+In contrast to inheritance, where relations are statically determined and game-logic is embedded within an predetermined hierarchy.
+The pattern is often combined with data-oriented design.
+
+\paragraph{Entity}
+
+An entity is idiomatically a set of components, but instantiated as a globally unique index that can identify the associated data components.
+An entity can generally only have one component.
+This means an entity is effectively a {\it set} of components.
+
+\paragraph{Systems}
+Systems operate on all entities that contain such a set of components, where components are {\it mutated}.
+Structural changes to entities are invoked through statements.
 
 Systems are top-level functions that operate on all entities that contain a set of components. 
 An entity is idiomatically a set of components, but instantiated as a globally unique index that can identify the associated data components.
 Rather than iterating with this index, systems utilize the implicit structure of an entity to directly iterate on the data components.  
 The 'type' of an entity can be modified by removing or adding components.
-
-The ECS pattern is arguably a reaction to the prevalence of object-oriented languages within game engines.
-The premise is to organizes game-logic within systems rather than components, where the relation between components is flexible\cite{ecs-origin}.
-In contrast to inheritance, where relations are statically determined and game-logic is embedded within an hierarchy.
-In this chapter the type interpretation of entities is discussed, and linked to functional languages.
-
-An entity is fundamentally a composition of components, irrespective of which components can be combined.
-As many object-oriented languages are nominally typed, an entity is often implemented to only have one component of each.
-This means an entity is effectively a {\it set} of components.
-Systems operate on all entities that contain such a set of components, where components are {\it mutated}.
-Structural changes to entities are invoked through statements.
 
 \begin{figure}[ht]
     \centering
@@ -550,6 +581,28 @@ Apecs, an ECS implementation in Haskell, achieves this imperative style through 
 All these considerations are related to the interpretation of the relation between components, in essence the {\it type} of an entity. 
 Rather than emulating ECS, existing type systems can be used to handle the relation between data.
 
+Apecs\cite{ecs-apecs} is an ECS library in Haskell, with experimental support for concurrency through the Software Transactional Memory (STM) monad\cite{STM-monad}.
+The STM monad utilizes atomic instructions to achieve concurrency within a monadic context.
+Entities are stored with an integer dictionary, but can be explicitly stored in a sparse fixed size {\it cache} which allows for constant access time. 
+
+Specs is an ECS library in Rust\cite{ecs-specs}, with native support for parallelism.
+It supports several storages such as: a tree data structure, dense vector, sparse vector and an hashmap.
+Iteration on entities is done by specifying the relation between the components: join, optional and excluded.
+An entity can be {\it flagged} (tag) to denote events such as the destruction of the entity.
+
+Unity is a game-engine which released their production ready Data-Oriented-Tech-Stack (DOTS) in 2022, which centres around an ECS implementation which they have patented\cite{unity-ecs-patent}.
+It uses LLVM to optimize and vectorize C\# code (burst compiler) and has access to their internal c++ library for parallel and concurrent tasks (job system).
+The ECS implementation heavily employs the .NET Compiler Platform Roslyn to generate source-code for iterations on user-defined datatypes.
+An \type{Entity} is idiomatically a composite datatype but implemented as an \type{identifier} with a \type{version}\footnote{Destroying an entity increments the \type{version}, which means copies of entities know they are destroyed and the \type{identifier} can be reused at a later point.}.
+A single array keeps track of all entities, without data components.
+Each \type{Entity} and related data components are stored in a \type{Chunk}, a fixed size buffer of 16000 bytes, alongside other entities with the same \type{Archetype}\footnote{An \type{ISharedComponent} extends this to the value of a component, which means each value has a unique \type{Chunk} and the value can be stored within the \type{Chunk} header. }.
+Instead of pattern matching, a \type{Query} matches on certain properties of entities, such as containing a certain component.
+Collective operations, such as a \type{Job}, operate on a \type{Chunk} directly.
+Structural changes can be queued in parallel, but create a sync-point when executed and involves entities to be moved between chunks.
+This is not required for an \type{IEnableComponent}, which functions as an tagged component akin to the \type{Maybe a} type. 
+A notable observation is that delaying structural changes has side-effects as queued structural changes are not taking in account.
+
+\newpage
 
 \subsubsection{Algebraic Data Type}
 
@@ -602,6 +655,8 @@ OCaml calls these {\it polymorphic variants}\footnote{OCaml also implements nomi
 A motivating example is that a collection of \type{Maybe a} can be an heterogeneous collection or two variant-wise collections of \type{Just a} and \type{Nothing}\footnote{As \type{Nothing} does not hold data, a size descriptor is sufficient.}.
 While the former involves branching for \type{fmap}, the latter can ignore the \type{Nothing} collection and vectorize the \type{fmap} function.
 This flexibility aligns with the intention to create a modular system that is agnostic to the internal representation.
+
+\newpage
 
 \subsection{Type-level programming}
 
@@ -663,6 +718,7 @@ A way to approach type-level functions is to see it as a type dependent on the i
 This is akin to functions in type classes, where type-indexing allows functions to be overloaded.
 Haskell reuses this functionality for types, categorizable as {\it associated types}\cite{associated-types}.
 This is particularly useful for domain-specific languages, as an instance can have a specialized return type.
+Accelerate uses the \type{Elt} class to map between surface types and a internal representation.
 
 \begin{verbatim}
     class (Elt a) where
@@ -683,9 +739,60 @@ A closed type family attempts the instances in order of definition, which expres
         Elem x (y : ys)  = Elem x ys    -- no, but recurse
 \end{verbatim}
 
-An annoying limitation is that type families cannot be partially applied, which means a lot of boilerplate is required to capture more complex functions.
+An annoying limitation is that type families in Haskell cannot be partially applied, which means a lot of boilerplate is required to capture more complex functions.
+It cannot be partially applied due to partially applied type synonyms requiring full fledged higher-order unification, which is not supported in Haskell.
 
-\subsubsection{Compact Variant}
+\newpage
+
+\subsubsection{Type Structure}
+
+With closed type families it is possible to derive compact layouts for multiple variants of a type.
+As a memory layout only concerns itself with the bit sizes of types, the intermediate structure will be the previously discussed natural number.
+The \type{DataKinds} extension natively supports the \type{Nat} kind with arithmetic expressions and literals for syntax.
+While mapping of primitive types to their corresponding natural number is trivial, this is not the case for user-defined datatypes.
+
+\begin{verbatim}
+    type family BitSize (a :: *) :: Nat where
+        BitSize Word8  = 8
+        BitSize Custom = ?
+\end{verbatim}
+
+It is not possible to statically derive the bit size of the \type{Custom} type within the type family.
+For this the types of which \type{Custom} is composed must be known to the type family.
+This means the structure of the type must be apparent to the type family.
+One way is to use a kind more specific then \type{*} that is explicit in the composition, such as the \type{Natural} kind but for all datatypes.
+Another way is to enforce an implicit constraint by ensuring the type can be constructed with a particular GADT.
+The latter is used by Accelerate where the \type{TupR} constructor ensures that the type is composed of only units, singles and pairs.
+The function \type{eltR} enforces this by requiring the associated type \type{EltR a} to have a mapping to the \type{TupR} type\footnote{Note this can circumvented by merely returning a bottom type such as \type{undefined}}. 
+The GADT approach is preferable when access to the structure on the value-level is needed, which is the case for future datatype generic programming endeavors.
+
+\begin{verbatim}
+    class (Elt a) where
+        type EltR a :: *
+        eltR        :: TupR ScalarType (EltR a)
+
+    data TupR s a where
+        TupRunit   ::                         TupR s ()
+        TupRsingle :: s a                  -> TupR s a
+        TupRpair   :: TupR s a -> TupR s b -> TupR s (a, b)
+
+    type family BitSize (a :: *) :: Nat where
+        BitSize (a, b)   = BitSize a + BitSize b 
+        BitSize ()       = 0                   
+        BitSize Word8    = 8 
+\end{verbatim}
+
+\newpage
+
+\subsubsection{Layout}
+
+For simplification the list {\it kind}, that is the promoted native list type, is used to denote all possible variants of a certain type.
+
+An apparent structure also allows for type families to make informed decisions about an optimal layout.
+
+
+In the case of Accelerate each primitive type within a tuple is spread out over multiple arrays.
+
 
 \subsection{Datatype generic programming}
 
@@ -765,41 +872,6 @@ Collective operations, such as a \type{Job}, operate on a \type{Chunk} directly.
 Structural changes can be queued in parallel, but create a sync-point when executed and involves entities to be moved between chunks.
 This is not required for an \type{IEnableComponent}, which functions as an tagged component akin to the \type{Maybe a} type. 
 A notable observation is that delaying structural changes has side-effects as queued structural changes are not taking in account.
-
-\paragraph{Memory Representation}
-
-A preliminary conclusion of the previous section is that a performant internal representation cannot be deducted from a mere theoretical framework.
-With this in mind many high performance oriented programming languages allow for flexibility around the internal representation of datatypes, while preserving semantics.
-This makes profiling ergonomically attractive due to the simplicity of which the foundation of a program can be changed. 
-Within this chapter existing implementations that are flexible around the internal representation will be discussed within the context of high-performance computing. 
-
-The most universal example is the direct memory representation of a datatype. 
-Memory instructions operate on fixed boundaries, which means operations that overlap these boundaries require additional but strictly unnecessary instructions.
-A natural alignment of a datatype is achieved by aligning all types according to the instructions that access them\footnote{SIMD instructions}. 
-Many compilers introduce {\it padding} to enforce natural alignment.
-While computational efficient, the alternative of {\it packing} types together can be preferred for a smaller memory footprint.  
-Both approaches can be used to ensure the datatypes align with cache lines. 
-Programming languages on a lower abstraction level, such as C/C++ and Rust, allow for some influence on the memory representation of a user defined type.  
-
-\begin{figure}[ht]
-    \centering
-    \caption{data alignment example}
-\end{figure}
-
-Parallel arrays enforce a natural alignment by being standalone and adjacent to the same type.
-General purpose languages often default to the Array of Struct, while data-parallel languages use the Struct of Arrays representation.
-Ergonomically switching between these constructs is a non-trivial endeavour. 
-A generic implementation requires aggressive inlining to preserve vectorization opportunities, which is hard to enforce in many object-oriented languages.   
-Switching between representations was an initial\footnote{Not anymore.} focal point of the experimental language {\it Jai}, a c-like programming language for games, but was later dropped in development.
-Another notable example is the use of pointers as an intermediate 'boxed' structure around a primitive type. 
-While pointers to mutable data can wield different behavior, for immutable data it can be motivated as a performance consideration.
-A boxed representation can prevent the need for duplicates and is easier to pass along, while creating a performance loss inducing form of indirection.
-The choice is generally made by compilers\footnote{source}.
-
-\begin{figure}[ht]
-    \centering
-    \caption{boxed representation}
-\end{figure}
 
 paragraph{Code Generation}
 

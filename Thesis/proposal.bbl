@@ -86,6 +86,11 @@ Tim Harris, Simon Marlow, and Simon Peyton~Jones.
 Paul Hsieh.
 \newblock Programming optimization, 2016.
 
+\bibitem{abstraction-vectorization}
+Sylvain Jubertie, Ian Masliah, and Joel Falcou.
+\newblock Data layout and simd abstraction layers: Decoupling interfaces from
+  implementations, 2018.
+
 \bibitem{destructive-update-array}
 Georgios Korfiatis, Michalis~A. Papakyriakou, and Nikolaos Papaspyrou.
 \newblock A type and effect system for implementing functional arrays with

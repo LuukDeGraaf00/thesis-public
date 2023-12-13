@@ -20,29 +20,32 @@
 \contentsline {paragraph}{Tagged Pointer}{11}{section*.14}%
 \contentsline {paragraph}{Entity}{12}{section*.15}%
 \contentsline {subsubsection}{\numberline {2.3.2}Variant-wise}{13}{subsubsection.2.3.2}%
-\contentsline {section}{\numberline {3}Interface}{14}{section.3}%
-\contentsline {subsection}{\numberline {3.1}Storage}{14}{subsection.3.1}%
-\contentsline {subsubsection}{\numberline {3.1.1}Entity-Component-System}{14}{subsubsection.3.1.1}%
-\contentsline {subsubsection}{\numberline {3.1.2}Algebraic Data Type}{15}{subsubsection.3.1.2}%
-\contentsline {subsection}{\numberline {3.2}Type-level programming}{16}{subsection.3.2}%
-\contentsline {subsubsection}{\numberline {3.2.1}Kinds}{16}{subsubsection.3.2.1}%
-\contentsline {subsubsection}{\numberline {3.2.2}Type Family}{17}{subsubsection.3.2.2}%
-\contentsline {subsubsection}{\numberline {3.2.3}Compact Variant}{17}{subsubsection.3.2.3}%
-\contentsline {subsection}{\numberline {3.3}Datatype generic programming}{17}{subsection.3.3}%
-\contentsline {section}{\numberline {4}Implementation}{18}{section.4}%
-\contentsline {section}{\numberline {5}Future work}{18}{section.5}%
-\contentsline {section}{\numberline {6}Conclusion}{18}{section.6}%
-\contentsline {section}{\numberline {7}Extra}{18}{section.7}%
-\contentsline {paragraph}{Implementation}{18}{section*.16}%
-\contentsline {paragraph}{C/C++}{18}{section*.17}%
-\contentsline {paragraph}{Haskell}{18}{section*.18}%
-\contentsline {paragraph}{Dynamic programming languages}{18}{section*.19}%
-\contentsline {paragraph}{Entity-Component-System}{18}{section*.20}%
-\contentsline {paragraph}{Memory Representation}{19}{section*.21}%
-\contentsline {paragraph}{Algebraic Data Type}{20}{section*.22}%
-\contentsline {paragraph}{Accelerate}{20}{section*.23}%
-\contentsline {paragraph}{C$\lambda $aSH}{21}{section*.24}%
-\contentsline {paragraph}{Lava}{21}{section*.25}%
-\contentsline {paragraph}{Accelerate}{21}{section*.26}%
-\contentsline {paragraph}{Motivation}{21}{section*.27}%
-\contentsline {paragraph}{Contributions}{21}{section*.28}%
+\contentsline {subsection}{\numberline {2.4}Memory Representation}{14}{subsection.2.4}%
+\contentsline {section}{\numberline {3}Interface}{15}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Data Structure}{15}{subsection.3.1}%
+\contentsline {subsubsection}{\numberline {3.1.1}Entity-Component-System}{16}{subsubsection.3.1.1}%
+\contentsline {paragraph}{Entity}{16}{section*.16}%
+\contentsline {paragraph}{Systems}{16}{section*.17}%
+\contentsline {subsubsection}{\numberline {3.1.2}Algebraic Data Type}{18}{subsubsection.3.1.2}%
+\contentsline {subsection}{\numberline {3.2}Type-level programming}{19}{subsection.3.2}%
+\contentsline {subsubsection}{\numberline {3.2.1}Kinds}{19}{subsubsection.3.2.1}%
+\contentsline {subsubsection}{\numberline {3.2.2}Type Family}{20}{subsubsection.3.2.2}%
+\contentsline {subsubsection}{\numberline {3.2.3}Type Structure}{21}{subsubsection.3.2.3}%
+\contentsline {subsubsection}{\numberline {3.2.4}Layout}{22}{subsubsection.3.2.4}%
+\contentsline {subsection}{\numberline {3.3}Datatype generic programming}{22}{subsection.3.3}%
+\contentsline {section}{\numberline {4}Implementation}{23}{section.4}%
+\contentsline {section}{\numberline {5}Future work}{23}{section.5}%
+\contentsline {section}{\numberline {6}Conclusion}{23}{section.6}%
+\contentsline {section}{\numberline {7}Extra}{23}{section.7}%
+\contentsline {paragraph}{Implementation}{23}{section*.18}%
+\contentsline {paragraph}{C/C++}{23}{section*.19}%
+\contentsline {paragraph}{Haskell}{23}{section*.20}%
+\contentsline {paragraph}{Dynamic programming languages}{23}{section*.21}%
+\contentsline {paragraph}{Entity-Component-System}{23}{section*.22}%
+\contentsline {paragraph}{Algebraic Data Type}{24}{section*.23}%
+\contentsline {paragraph}{Accelerate}{24}{section*.24}%
+\contentsline {paragraph}{C$\lambda $aSH}{25}{section*.25}%
+\contentsline {paragraph}{Lava}{25}{section*.26}%
+\contentsline {paragraph}{Accelerate}{25}{section*.27}%
+\contentsline {paragraph}{Motivation}{26}{section*.28}%
+\contentsline {paragraph}{Contributions}{26}{section*.29}%

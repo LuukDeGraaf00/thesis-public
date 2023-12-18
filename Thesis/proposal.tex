@@ -533,7 +533,7 @@ The switch between representations is currently possible through a more general 
 \section{Interface}
 
 A preliminary conclusion of the previous chapter is that a performant internal representation cannot be deducted from a mere theoretical framework.
-With this in mind it is important for high performance oriented applications to be flexible within the internal representation of datatypes.
+With this in mind it is important for high performance oriented applications to be flexible with the internal representation of datatypes.
 This is important for both composite types and data structures.
 Within this chapter a modular interface is explored for iterating on collections of non-uniform data.
 
@@ -551,24 +551,29 @@ This section will be used to explain how the ECS-pattern handles operating on so
 \subsubsection{Entity-Component-System}
 
 The ECS pattern is arguably a reaction to the prevalence of object-oriented languages within game engines.
-The premise is to organizes game-logic within functions rather than components, where the relation between components is flexible\cite{ecs-origin}.
+The premise is to organizes game-logic within functions rather than data, where the relation between data is flexible\cite{ecs-origin}.
 In contrast to inheritance, where relations are statically determined and game-logic is embedded within an predetermined hierarchy.
-The pattern is often combined with data-oriented design.
+The pattern is often combined with data-oriented design and is used to be able to implicitly exploit data-parallelism in general purpose languages. 
+While there exist many implementations of the pattern in many languages, the principles remain similar.  
+
+\paragraph{Components}
+A component is the smallest addressable type within the pattern.
+Examples of components are \type{Position} and \type{Velocity}, which together represent movement.
+Components are generally value types to avoid race conditions when using data-parallelism.
+Some implementations allow for a (readonly) reference component that is shared along multiple instances.
+A shared \type{Mesh} component prevents redundant geometry to be stored by referencing it.
 
 \paragraph{Entity}
-
-An entity is idiomatically a set of components, but instantiated as a globally unique index that can identify the associated data components.
-An entity can generally only have one component.
-This means an entity is effectively a {\it set} of components.
+An entity is idiomatically a set of components.
+A movable entity has the \type{Position} and \type{Velocity} components, while an immovable entity only has the \type{Position} component.
+Adding and removing components is done at runtime and there is no predetermined relation between any of the components.   
+Any immovable entity can be made movable by attaching the \type{Velocity} component.
 
 \paragraph{Systems}
-Systems operate on all entities that contain such a set of components, where components are {\it mutated}.
-Structural changes to entities are invoked through statements.
-
-Systems are top-level functions that operate on all entities that contain a set of components. 
-An entity is idiomatically a set of components, but instantiated as a globally unique index that can identify the associated data components.
-Rather than iterating with this index, systems utilize the implicit structure of an entity to directly iterate on the data components.  
-The 'type' of an entity can be modified by removing or adding components.
+Systems operate on all entities that match a specific set of components.
+The \type{Movement} system will operate on all movable entities, irrespective of any other attached components.
+Systems are effectively global functions, which operate only on specific variants of the more general entity type. 
+This allows for a variant-wise collection of entities, which most ECS implementations utilize to implicitly create performant vectorized code.
 
 \begin{figure}[ht]
     \centering
@@ -576,31 +581,14 @@ The 'type' of an entity can be modified by removing or adding components.
     \caption{ conceptual entity-component-system representation of systems }
 \end{figure}
 
-The ECS design pattern is arguably inherently imperative, due to prevalence of mutating state. 
-Apecs, an ECS implementation in Haskell, achieves this imperative style through monads\cite{ecs-apecs}.
-All these considerations are related to the interpretation of the relation between components, in essence the {\it type} of an entity. 
-Rather than emulating ECS, existing type systems can be used to handle the relation between data.
+The ECS design pattern is arguably inherently imperative, as structural changes to entities are done imperatively.
+Apecs, an ECS library in Haskell, achieves this imperative style through monads\cite{ecs-apecs}.
+The ECS pattern makes element-wise collections infeasible, as there is no type-safe way to restrict the possible amount of structural changes to an entity.
+This is inherit to the pattern, as any component can be attached to any entity.
+Implementations circumvent this limitation by allowing components to be enabled and disabled through a tag.
+Disabling a component changes the {\it type} of an entity but the internal representation remains the same.
+An analogy can be made to a non-deduplicated tagged union. 
 
-Apecs\cite{ecs-apecs} is an ECS library in Haskell, with experimental support for concurrency through the Software Transactional Memory (STM) monad\cite{STM-monad}.
-The STM monad utilizes atomic instructions to achieve concurrency within a monadic context.
-Entities are stored with an integer dictionary, but can be explicitly stored in a sparse fixed size {\it cache} which allows for constant access time. 
-
-Specs is an ECS library in Rust\cite{ecs-specs}, with native support for parallelism.
-It supports several storages such as: a tree data structure, dense vector, sparse vector and an hashmap.
-Iteration on entities is done by specifying the relation between the components: join, optional and excluded.
-An entity can be {\it flagged} (tag) to denote events such as the destruction of the entity.
-
-Unity is a game-engine which released their production ready Data-Oriented-Tech-Stack (DOTS) in 2022, which centres around an ECS implementation which they have patented\cite{unity-ecs-patent}.
-It uses LLVM to optimize and vectorize C\# code (burst compiler) and has access to their internal c++ library for parallel and concurrent tasks (job system).
-The ECS implementation heavily employs the .NET Compiler Platform Roslyn to generate source-code for iterations on user-defined datatypes.
-An \type{Entity} is idiomatically a composite datatype but implemented as an \type{identifier} with a \type{version}\footnote{Destroying an entity increments the \type{version}, which means copies of entities know they are destroyed and the \type{identifier} can be reused at a later point.}.
-A single array keeps track of all entities, without data components.
-Each \type{Entity} and related data components are stored in a \type{Chunk}, a fixed size buffer of 16000 bytes, alongside other entities with the same \type{Archetype}\footnote{An \type{ISharedComponent} extends this to the value of a component, which means each value has a unique \type{Chunk} and the value can be stored within the \type{Chunk} header. }.
-Instead of pattern matching, a \type{Query} matches on certain properties of entities, such as containing a certain component.
-Collective operations, such as a \type{Job}, operate on a \type{Chunk} directly.
-Structural changes can be queued in parallel, but create a sync-point when executed and involves entities to be moved between chunks.
-This is not required for an \type{IEnableComponent}, which functions as an tagged component akin to the \type{Maybe a} type. 
-A notable observation is that delaying structural changes has side-effects as queued structural changes are not taking in account.
 
 \newpage
 
@@ -967,7 +955,31 @@ The \type{Elt} type-class (Extract, Load, Transform) defines a mapping between t
 This process has been streamlined through a {\it generic} default implementation, which utilizes a standardized mapping.
 Functions do not use this process, and instead operate directly on the corresponding datatype.
 
+The ECS design pattern is arguably inherently imperative, due to prevalence of mutating state. 
+Apecs, an ECS implementation in Haskell, achieves this imperative style through monads\cite{ecs-apecs}.
+All these considerations are related to the interpretation of the relation between components, in essence the {\it type} of an entity. 
+Rather than emulating ECS, existing type systems can be used to handle the relation between data.
 
+Apecs\cite{ecs-apecs} is an ECS library in Haskell, with experimental support for concurrency through the Software Transactional Memory (STM) monad\cite{STM-monad}.
+The STM monad utilizes atomic instructions to achieve concurrency within a monadic context.
+Entities are stored with an integer dictionary, but can be explicitly stored in a sparse fixed size {\it cache} which allows for constant access time. 
+
+Specs is an ECS library in Rust\cite{ecs-specs}, with native support for parallelism.
+It supports several storages such as: a tree data structure, dense vector, sparse vector and an hashmap.
+Iteration on entities is done by specifying the relation between the components: join, optional and excluded.
+An entity can be {\it flagged} (tag) to denote events such as the destruction of the entity.
+
+Unity is a game-engine which released their production ready Data-Oriented-Tech-Stack (DOTS) in 2022, which centres around an ECS implementation which they have patented\cite{unity-ecs-patent}.
+It uses LLVM to optimize and vectorize C\# code (burst compiler) and has access to their internal c++ library for parallel and concurrent tasks (job system).
+The ECS implementation heavily employs the .NET Compiler Platform Roslyn to generate source-code for iterations on user-defined datatypes.
+An \type{Entity} is idiomatically a composite datatype but implemented as an \type{identifier} with a \type{version}\footnote{Destroying an entity increments the \type{version}, which means copies of entities know they are destroyed and the \type{identifier} can be reused at a later point.}.
+A single array keeps track of all entities, without data components.
+Each \type{Entity} and related data components are stored in a \type{Chunk}, a fixed size buffer of 16000 bytes, alongside other entities with the same \type{Archetype}\footnote{An \type{ISharedComponent} extends this to the value of a component, which means each value has a unique \type{Chunk} and the value can be stored within the \type{Chunk} header. }.
+Instead of pattern matching, a \type{Query} matches on certain properties of entities, such as containing a certain component.
+Collective operations, such as a \type{Job}, operate on a \type{Chunk} directly.
+Structural changes can be queued in parallel, but create a sync-point when executed and involves entities to be moved between chunks.
+This is not required for an \type{IEnableComponent}, which functions as an tagged component akin to the \type{Maybe a} type. 
+A notable observation is that delaying structural changes has side-effects as queued structural changes are not taking in account.
 
 \paragraph{Motivation}
 

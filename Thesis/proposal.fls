@@ -529,6 +529,7 @@ INPUT /home/luukdegraaf00/ecs-accelerate-main/Thesis/proposal.toc
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmbx10.tfm
 OUTPUT /home/luukdegraaf00/ecs-accelerate-main/Thesis/proposal.toc
 INPUT /var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmtt10.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmbx12.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmti10.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/tcrm1000.tfm
@@ -601,7 +602,6 @@ INPUT ./Images/Variant3.png
 INPUT ./Images/Variant3.png
 INPUT ./Images/Variant3.png
 INPUT ./Images/Variant3.png
-INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmtt10.tfm
 INPUT ./Images/ECS.png
 INPUT ./Images/ECS.png
 INPUT ./Images/ECS.png

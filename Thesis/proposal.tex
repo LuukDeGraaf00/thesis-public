@@ -64,8 +64,29 @@ Pure functional array languages utilize the independence between computations to
 This is complicated in languages that are not inherently thread-safe.
 Many high-performance applications adopt a data-oriented design, which centres around data transformations and avoiding abstractions around data. 
 Both parallelization opportunities and cache efficiency are focal points of the data-oriented design paradigm.
-
 A challenge with data-oriented design is representing non-uniform data efficiently while preserving vectorization opportunities and type safety. 
+The issue can be illustrated with a simple raytracing algorithm. 
+
+\begin{verbatim}
+    trace :: Ray -> Geometry -> Maybe Hit
+\end{verbatim}
+
+Only a ray that hit geometry in the scene has data associated with it, such as the distance to the nearest intersection point.
+A naive raytracer will branch on the result of each individual trace, which inherently breaks vectorization.
+A solution is to either regroup all hits after each step, or unconditionally execute each trace.
+These approaches are all similar in intent, to iterate on a specific variant of a type, but have significant performance implications.
+An efficient and type-safe abstraction is non-trivial as value-level variants and type-level variants exist separately in many languages.  
+Unification of these concepts reformulates operating on non-uniform data to an optimization problem.
+
+\begin{verbatim}
+
+    naive :: Rays -> Hits
+    naive = map (if Just then else )
+
+
+
+\end{verbatim}
+
 Operating on multiple variants of a type can be done on the type-level or on the value-level.
 In the context of iterating on a collection of variants, branching on a value tag or dynamically dispatching will inherently break vectorization.
 This means static polymorphism is a common way to operate on non-uniform data in data-parallel applications.

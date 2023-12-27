@@ -800,21 +800,36 @@ The GADT approach is preferable when access to the structure on the value-level 
 \begin{verbatim}
     class (Elt a) where
         type EltR a :: *
-        eltR        :: TupR ScalarType (EltR a)
+        eltR        :: TupR (EltR a)
 
     data TupR v where
         TupRunit   ::                     TupR ()
         TupRsingle :: a                -> TupR a
         TupRpair   :: TupR a -> TupR b -> TupR (a, b)
-
-    type family BitSize (a :: *) :: Nat where
-        BitSize (a, b)   = BitSize a + BitSize b 
-        BitSize ()       = 0                   
-        BitSize Word8    = 8 
-
-    type Size a = BitSize (EltR a)
-
 \end{verbatim}
+
+A simple example to demonstrate the explicit structure is to convert tuples of \type{Word8} to a single type. 
+In Accelerate each primitive type in a tuple is spread out over multiple arrays, which means this type-family enables an Array of Struct representation.
+
+
+\begin{verbatim}
+    type family ToBitSize (a :: *) :: Nat where
+        ToBitSize (a, b) = ToBitSize a + ToBitSize b 
+        ToBitSize ()     = 0                   
+        ToBitSize Word8  = 8 
+
+    type family FromBitSize (a :: Nat) :: * where
+        FromBitSize 0    = ()
+        FromBitSize 8    = Word8
+        FromBitSize ...  = Word...
+\end{verbatim}
+
+In Accelerate the embedded representation is the one relevant for optimizations.
+All type-functions therefore operate on the embedded representation, the type associated with \type{EltR}.
+It is impossible to construct such type outside the \type{Elt} class.
+A solution is to automatically derive the \type{EltR} class for a set of types with a fixed representation, such as tuples. 
+A return type with a fixed representation means that all computed representations will implement the \type{Elt} class. 
+It is now possible to ergonomically define many internal representations for embedded representations.
 
 \newpage
 

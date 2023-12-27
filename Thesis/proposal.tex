@@ -65,27 +65,30 @@ This is complicated in languages that are not inherently thread-safe.
 Many high-performance applications adopt a data-oriented design, which centres around data transformations and avoiding abstractions around data. 
 Both parallelization opportunities and cache efficiency are focal points of the data-oriented design paradigm.
 A challenge with data-oriented design is representing non-uniform data efficiently while preserving vectorization opportunities and type safety. 
-The issue can be illustrated with a simple raytracing algorithm. 
+The issue can be illustrated through raytracing, an embarrassingly parallel problem with several instances of iterating on non-uniform data.
 
 \begin{verbatim}
-    trace :: Ray -> Geometry -> Maybe Hit
+    image that explains raytracing
 \end{verbatim}
 
-Only a ray that hit geometry in the scene has data associated with it, such as the distance to the nearest intersection point.
-A naive raytracer will branch on the result of each individual trace, which inherently breaks vectorization.
-A solution is to either regroup all hits after each step, or unconditionally execute each trace.
-These approaches are all similar in intent, to iterate on a specific variant of a type, but have significant performance implications.
+An instance of iterating on non-uniform data is the recursive case of a ray intersecting with geometry.
+The exception state of a ray not intersection with any geometry is propagated along, which prevents any vectorization attempts of subsequent rays. 
+In practice this is solved by either unconditionally executing subsequent rays or eliminating all failure states for each recursive step.
+Conditionally throwing the exception can also be redundant when the identity of the variant is inherit to the value, such as a negative distance in intersection algorithms. 
+Some raytracers also support geometry shapes outside triangles, such as spheres.
+Intersection of multiple shapes can be done within the same function, or by treating all shapes separately.
+These approaches are all similar in intent\footnote{This is not necessarily semantics, as unconditional execution can have (acceptable) side-effects in some instances.}, to iterate on a specific variant of a type, but can have significant runtime performance implications.
+
+\begin{verbatim}
+    show intent of a function
+
+    constructor
+
+    deconstructor
+\end{verbatim}
+
 An efficient and type-safe abstraction is non-trivial as value-level variants and type-level variants exist separately in many languages.  
 Unification of these concepts reformulates operating on non-uniform data to an optimization problem.
-
-\begin{verbatim}
-
-    naive :: Rays -> Hits
-    naive = map (if Just then else )
-
-
-
-\end{verbatim}
 
 Operating on multiple variants of a type can be done on the type-level or on the value-level.
 In the context of iterating on a collection of variants, branching on a value tag or dynamically dispatching will inherently break vectorization.
@@ -555,17 +558,33 @@ The switch between representations is currently possible through a more general 
 
 A preliminary conclusion of the previous chapter is that a performant internal representation cannot be deducted from a mere theoretical framework.
 With this in mind it is important for high performance oriented applications to be flexible with the internal representation of datatypes.
-This is important for both composite types and data structures.
-Within this chapter a modular interface is explored for iterating on collections of non-uniform data.
+This is important for both composite data types and data structures.
+Within this chapter a modular interface is explored around iterating on collections of non-uniform data.
 
-\subsection{Data Structure}
+\subsection{Paradigm}
 
 As discussed in the data structures section, there are two internal representations for collections of non-uniform data.
 Variants of a particular type are stored either element-wise or variant-wise.
 There are several considerations for a data structure that is agnostic to if it stores non-uniform data in element-wise or a variant-wise way.
 A variant-wise collection can operate on only the relevant variants, while an element-wise is forced to discover that at runtime.
-To avoid redundant iterations for variant-wise collections, a function must be able to be defined on a subset of all possible variants.
-This section will be used to explain how the ECS-pattern handles operating on some variants and extending the use case to Algebraic Data Types.
+To avoid redundant iterations for variant-wise collections, a function must be able to be defined on the most specific subset of all variants.
+For element-wise collection the amount of variants must be finite and no large discrepancies exist between the size of all the variants.
+
+\begin{verbatim}
+    image explaining the issues of both cases (maybe use raytracing)
+
+
+
+
+
+
+
+\end{verbatim}
+
+For variant-wise collections the ECS-pattern will be used as reference.
+The first section goes into how the ECS-pattern collectively operates on only certain variants.
+For element-wise collections Algebraic Data Types (ADTs) are used to safely discriminate between multiple variants as element. 
+The second section utilizes structurally typed ADTs to create an efficient interface for a variant-wise and element-wise collection.  
 
 \newpage
 
@@ -588,13 +607,13 @@ A shared \type{Mesh} component prevents redundant geometry to be stored by refer
 An entity is idiomatically a set of components.
 A movable entity has the \type{Position} and \type{Velocity} components, while an immovable entity only has the \type{Position} component.
 Adding and removing components is done at runtime and there is no predetermined relation between any of the components.   
-Any immovable entity can be made movable by attaching the \type{Velocity} component.
+Any immovable entity can be made movable by attaching the \type{Velocity} component at runtime.
 
 \paragraph{Systems}
-Systems operate on all entities that match a specific set of components.
+A system operates on all entities that match a specific set of components.
 The \type{Movement} system will operate on all movable entities, irrespective of any other attached components.
 Systems are effectively global functions, which operate only on specific variants of the more general entity type. 
-This allows for a variant-wise collection of entities, which most ECS implementations utilize to implicitly create performant vectorized code.
+This allows for a variant-wise collection of entities, which most ECS implementations enforce to implicitly create performant vectorized code.
 
 \begin{figure}[ht]
     \centering
@@ -608,8 +627,7 @@ The ECS pattern makes element-wise collections infeasible, as there is no type-s
 This is inherit to the pattern, as any component can be attached to any entity.
 Implementations circumvent this limitation by allowing components to be enabled and disabled through a tag.
 Disabling a component changes the {\it type} of an entity but the internal representation remains the same.
-An analogy can be made to a non-deduplicated tagged union. 
-
+An analogy can be made to a non-deduplicated tagged union that is explicit in the variants it holds.
 
 \newpage
 
@@ -637,14 +655,13 @@ It can be seen as a native control-flow mechanism that ensures only the operatio
     
 \end{verbatim}
 
-
 In Haskell, algebraic data types are distinguishable by name (nominally typed) and therefore explicitly declared.
 This means data constructors are local to the declared type and pattern matching happens within the same type.
 The type signature of the \type{fmap} function provides no information on the potential structural change of a datatype.
 It is possible to return \type{Nothing} for both cases\footnote{\type{Just b} is not possible as it can only be inferred through \type{Just a} and the \type{a -> b} function.}.
 A function that takes \type{Just a} and returns \type{Just b} ensures that the {\it collective identity} is preserved in a collective operation, irrespective of the data transformation.
 This exact definition is not possible due to being nominally typed, as \type{Just a} is not a type but a data constructor under the type \type{Maybe a}. 
-In some cases, such as a safe division function, the introduced branching is inherit to function and is now explicit in the type definition.   
+In some cases, such as a safe division function, the introduced branching is inherit to the function and is now made explicit in the type definition.   
 
 \begin{verbatim}
 
@@ -661,7 +678,7 @@ In this case a function is defined on the structure of a type, the data construc
 \type{Maybe a} is now an alias for the mutually exclusive relationship \type{Just a | Nothing}, rather than a unique and standalone type. 
 This generalizes variance to be between all types.
 OCaml calls these {\it polymorphic variants}\footnote{OCaml also implements nominally typed sum types, so called {\it variants}.}, while other functional languages generally refer to them as {\it extensible} or {\it open sum types}.
-A motivating example is that a collection of \type{Maybe a} can be an heterogeneous collection or two variant-wise collections of \type{Just a} and \type{Nothing}\footnote{As \type{Nothing} does not hold data, a size descriptor is sufficient.}.
+A motivating example is that a collection of \type{Maybe a} can be an element-wise collection or two variant-wise collections of \type{Just a} and \type{Nothing}\footnote{As \type{Nothing} does not hold data, a size descriptor is sufficient.}.
 While the former involves branching for \type{fmap}, the latter can ignore the \type{Nothing} collection and vectorize the \type{fmap} function.
 This flexibility aligns with the intention to create a modular system that is agnostic to the internal representation.
 
@@ -669,7 +686,11 @@ This flexibility aligns with the intention to create a modular system that is ag
 
 \subsection{Type-level programming}
 
-deriving intermediate data structures
+In the previous section an interface that is agnostic to the variant-wise and element-wise collection is proposed.
+This demands defining efficient intermediate internal representations for all possible variant combinations, which defeats the purpose of ergonomic switching between representations.
+Statically deriving an internal representation is impossible or restricted to predetermined parameters in most languages.
+Some high-performance libraries circumvent this restriction by meta-programming or custom data layouts\cite{llama}.
+A customizable and type-safe solution is type-level programming, which will be explored in this chapter.
 
 \subsubsection{Kinds}
 
@@ -677,7 +698,7 @@ A value is categorized by types, while a type is categorized by {\it kinds}.
 This is relevant when discussing type constructors, where each constructor with a different arity has a distinguishable kind.
 A well known exposition of type constructors are parametric polymorphic data types, which take type variables as argument.
 While a lot of languages support polymorphic data types, the concept of kinds is not evident as only concrete types are able to be used for arguments.
-Haskell supports higher-kinded types, which are analogous to higher-order functions for types, which makes kinds apparent.
+Haskell supports higher-kinded types, which are analogous to higher-order functions for types, which makes kinds apparent to the user.
 
 \begin{verbatim}
     2.5f         :: Float
@@ -727,7 +748,7 @@ A way to approach type-level functions is to see it as a type dependent on the i
 This is akin to functions in type classes, where type-indexing allows functions to be overloaded.
 Haskell reuses this functionality for types, categorizable as {\it associated types}\cite{associated-types}.
 This is particularly useful for domain-specific languages, as an instance can have a specialized return type.
-Accelerate uses the \type{Elt} class to map between surface types and a internal representation.
+Accelerate uses the \type{Elt} class to map between surface types and the internal representation.
 
 \begin{verbatim}
     class (Elt a) where
@@ -738,7 +759,8 @@ Accelerate uses the \type{Elt} class to map between surface types and a internal
 
 While these integrate well with type classes, type families is the terminology for the standalone concept.
 A \type{data family} has unique types associated with the type, while a \type{type family} is merely the type synonym equivalent.
-In some instances this is insufficient to represent a function, as the type checker is unsure which instance to use.
+In some cases this is insufficient to represent a function, as the type checker is unsure which instance to use.
+This is the case when the function has a more general default case which will always match.
 A closed type family attempts the instances in order of definition, which expresses itself in being able to pattern match on types.
 
 \begin{verbatim}
@@ -749,7 +771,7 @@ A closed type family attempts the instances in order of definition, which expres
 \end{verbatim}
 
 An annoying limitation is that type families in Haskell cannot be partially applied, which means a lot of boilerplate is required to capture more complex functions.
-It cannot be partially applied due to partially applied type synonyms requiring full fledged higher-order unification, which is not supported in Haskell.
+It cannot be partially applied due to partially applied type synonyms requiring higher-order unification, which is not supported in Haskell.
 
 \newpage
 
@@ -772,7 +794,7 @@ This means the structure of the type must be apparent to the type family.
 One way is to use a kind more specific then \type{*} that is explicit in the composition, such as the \type{Natural} kind but for all datatypes.
 Another way is to enforce an implicit constraint by ensuring the type can be constructed with a particular GADT.
 The latter is used by Accelerate where the \type{TupR} constructor ensures that the type is composed of only units, singles and pairs.
-The function \type{eltR} enforces this by requiring the associated type \type{EltR a} to have a mapping to the \type{TupR} type\footnote{Note this can circumvented by merely returning a bottom type such as \type{undefined}}. 
+The function \type{eltR} enforces this by requiring the associated type \type{EltR a} to have a mapping to the \type{TupR} type\footnote{Note this can circumvented by merely returning a bottom type such as \type{undefined}, which will only be detected when using the value. }. 
 The GADT approach is preferable when access to the structure on the value-level is needed, which is the case for future datatype generic programming endeavors.
 
 \begin{verbatim}
@@ -780,15 +802,18 @@ The GADT approach is preferable when access to the structure on the value-level 
         type EltR a :: *
         eltR        :: TupR ScalarType (EltR a)
 
-    data TupR s a where
-        TupRunit   ::                         TupR s ()
-        TupRsingle :: s a                  -> TupR s a
-        TupRpair   :: TupR s a -> TupR s b -> TupR s (a, b)
+    data TupR v where
+        TupRunit   ::                     TupR ()
+        TupRsingle :: a                -> TupR a
+        TupRpair   :: TupR a -> TupR b -> TupR (a, b)
 
     type family BitSize (a :: *) :: Nat where
         BitSize (a, b)   = BitSize a + BitSize b 
         BitSize ()       = 0                   
         BitSize Word8    = 8 
+
+    type Size a = BitSize (EltR a)
+
 \end{verbatim}
 
 \newpage
@@ -799,9 +824,9 @@ For simplification the list {\it kind}, that is the promoted native list type, i
 
 An apparent structure also allows for type families to make informed decisions about an optimal layout.
 
-
 In the case of Accelerate each primitive type within a tuple is spread out over multiple arrays.
 
+\newpage
 
 \subsection{Datatype generic programming}
 

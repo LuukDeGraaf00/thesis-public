@@ -22,7 +22,7 @@
 \contentsline {subsubsection}{\numberline {2.3.2}Variant-wise}{13}{subsubsection.2.3.2}%
 \contentsline {subsection}{\numberline {2.4}Memory Representation}{14}{subsection.2.4}%
 \contentsline {section}{\numberline {3}Interface}{15}{section.3}%
-\contentsline {subsection}{\numberline {3.1}Data Structure}{15}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.1}Paradigm}{15}{subsection.3.1}%
 \contentsline {subsubsection}{\numberline {3.1.1}Entity-Component-System}{16}{subsubsection.3.1.1}%
 \contentsline {paragraph}{Components}{16}{section*.16}%
 \contentsline {paragraph}{Entity}{16}{section*.17}%
@@ -33,20 +33,20 @@
 \contentsline {subsubsection}{\numberline {3.2.2}Type Family}{19}{subsubsection.3.2.2}%
 \contentsline {subsubsection}{\numberline {3.2.3}Type Structure}{20}{subsubsection.3.2.3}%
 \contentsline {subsubsection}{\numberline {3.2.4}Layout}{21}{subsubsection.3.2.4}%
-\contentsline {subsection}{\numberline {3.3}Datatype generic programming}{21}{subsection.3.3}%
-\contentsline {section}{\numberline {4}Implementation}{22}{section.4}%
-\contentsline {section}{\numberline {5}Future work}{22}{section.5}%
-\contentsline {section}{\numberline {6}Conclusion}{22}{section.6}%
-\contentsline {section}{\numberline {7}Extra}{22}{section.7}%
-\contentsline {paragraph}{Implementation}{22}{section*.19}%
-\contentsline {paragraph}{C/C++}{22}{section*.20}%
-\contentsline {paragraph}{Haskell}{22}{section*.21}%
-\contentsline {paragraph}{Dynamic programming languages}{22}{section*.22}%
-\contentsline {paragraph}{Entity-Component-System}{22}{section*.23}%
-\contentsline {paragraph}{Algebraic Data Type}{23}{section*.24}%
-\contentsline {paragraph}{Accelerate}{23}{section*.25}%
-\contentsline {paragraph}{C$\lambda $aSH}{24}{section*.26}%
-\contentsline {paragraph}{Lava}{24}{section*.27}%
-\contentsline {paragraph}{Accelerate}{24}{section*.28}%
-\contentsline {paragraph}{Motivation}{25}{section*.29}%
-\contentsline {paragraph}{Contributions}{25}{section*.30}%
+\contentsline {subsection}{\numberline {3.3}Datatype generic programming}{22}{subsection.3.3}%
+\contentsline {section}{\numberline {4}Implementation}{23}{section.4}%
+\contentsline {section}{\numberline {5}Future work}{23}{section.5}%
+\contentsline {section}{\numberline {6}Conclusion}{23}{section.6}%
+\contentsline {section}{\numberline {7}Extra}{23}{section.7}%
+\contentsline {paragraph}{Implementation}{23}{section*.19}%
+\contentsline {paragraph}{C/C++}{23}{section*.20}%
+\contentsline {paragraph}{Haskell}{23}{section*.21}%
+\contentsline {paragraph}{Dynamic programming languages}{23}{section*.22}%
+\contentsline {paragraph}{Entity-Component-System}{23}{section*.23}%
+\contentsline {paragraph}{Algebraic Data Type}{24}{section*.24}%
+\contentsline {paragraph}{Accelerate}{24}{section*.25}%
+\contentsline {paragraph}{C$\lambda $aSH}{25}{section*.26}%
+\contentsline {paragraph}{Lava}{25}{section*.27}%
+\contentsline {paragraph}{Accelerate}{25}{section*.28}%
+\contentsline {paragraph}{Motivation}{26}{section*.29}%
+\contentsline {paragraph}{Contributions}{26}{section*.30}%

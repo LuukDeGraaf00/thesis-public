@@ -75,6 +75,11 @@ Andy Gill, Tristan Bull, Garrin Kimmell, Erik Perrins, Ed~Komp, and Brett
   Werling.
 \newblock Introducing kansas lava, 2010.
 
+\bibitem{llama}
+Bernhard~Manfred Gruber, Guilherme Amadio, Jakob Blomer, Alexander Matthes,
+  Rene Widera, and Michael Bussmann.
+\newblock Llama: The low-level abstraction for memory access, 2022.
+
 \bibitem{STM-monad}
 Tim Harris, Simon Marlow, and Simon Peyton~Jones.
 \newblock Composable memory transactions.

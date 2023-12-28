@@ -139,7 +139,7 @@ type family VarNatType (a :: Nat) :: * where
     VarNatType 4 = Word16
     VarNatType 5 = Word32
     VarNatType 6 = Word64
-    VarNatType a = TypeError (Text "large variable sizes are not yet supported!")
+    VarNatType a = TypeError (Text "large variable sizes are not yet supported!") 
 
 -- | size of snoc-like type (if bool = 1 :: change to byte size)
 type family MaximumBitSize (a :: Nat) (b :: [r]) :: Nat where

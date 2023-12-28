@@ -711,7 +711,7 @@ Haskell supports higher-kinded types, which are analogous to higher-order functi
 Type constructors can be used to encode data statically, such as Peano numbers.
 The parametric \type{Succ a} and \type{Nil} types are axioms that can be used to construct a natural number on the type-level.
 By default these exist in a open universe, which means ill-formed expressions can be created.
-On the type-level this can be resolved by Generalized Algebraic Data Types (GADTs), a Haskell extension.
+On the type-level this can be resolved by Generalized Algebraic Data Types (GADTs), implemented in Haskell as an extension.
 It allows the type variables of constructors to diverge from the more general type.
 
 \begin{verbatim}
@@ -737,7 +737,7 @@ A limitation is that the construction of the type, which is needed for arithmeti
     data Natural = Succ Natural | Nil | Add Natural Natural | Minus Natural Natural
 \end{verbatim}
 
-On the value-level this is made easier by functions that transform their input into another output type.
+On the value-level this is solved through functions that transform their input into another output type.
 Translated to the type-level it means type-level functions that transform an input kind into an output kind.
 
 \newpage
@@ -748,7 +748,7 @@ A way to approach type-level functions is to see it as a type dependent on the i
 This is akin to functions in type classes, where type-indexing allows functions to be overloaded.
 Haskell reuses this functionality for types, categorizable as {\it associated types}\cite{associated-types}.
 This is particularly useful for domain-specific languages, as an instance can have a specialized return type.
-Accelerate uses the \type{Elt} class to map between surface types and the internal representation.
+Accelerate uses the \type{Elt} class to create a mapping between surface types and the internal representation.
 
 \begin{verbatim}
     class (Elt a) where
@@ -791,7 +791,7 @@ While mapping of primitive types to their corresponding natural number is trivia
 It is not possible to statically derive the bit size of the \type{Custom} type within the type family.
 For this the types of which \type{Custom} is composed must be known to the type family.
 This means the structure of the type must be apparent to the type family.
-One way is to use a kind more specific then \type{*} that is explicit in the composition, such as the \type{Natural} kind but for all datatypes.
+One way to approach this is to use a kind more specific then \type{*} that is explicit in the composition, such as the \type{Natural} kind but for all datatypes.
 Another way is to enforce an implicit constraint by ensuring the type can be constructed with a particular GADT.
 The latter is used by Accelerate where the \type{TupR} constructor ensures that the type is composed of only units, singles and pairs.
 The function \type{eltR} enforces this by requiring the associated type \type{EltR a} to have a mapping to the \type{TupR} type\footnote{Note this can circumvented by merely returning a bottom type such as \type{undefined}, which will only be detected when using the value. }. 
@@ -809,7 +809,7 @@ The GADT approach is preferable when access to the structure on the value-level 
 \end{verbatim}
 
 A simple example to demonstrate the explicit structure is to convert tuples of \type{Word8} to a single type. 
-In Accelerate each primitive type in a tuple is spread out over multiple arrays, which means this type-family enables an Array of Struct representation.
+In Accelerate each primitive type in a tuple is spread out over multiple arrays, which means this type-family enables an Array of Struct representation for such a tuple.
 
 
 \begin{verbatim}
@@ -835,11 +835,55 @@ It is now possible to ergonomically define many internal representations for emb
 
 \subsubsection{Layout}
 
-For simplification the list {\it kind}, that is the promoted native list type, is used to denote all possible variants of a certain type.
+While the tools are there to generically construct intermediate representations, it is not trivial to create a single performant solution.
+Within this section a modular interface is proposed which allows for ergonomic switching between internal representations of multiple variants.
+The most general intermediate structure of a composite datatype is a collection with the size in bits of each field in the datatype.
+This removes both hierarchy and type identity, which makes it is easier to reason about the layout of a datatype.
+The representation does preserve performance critical information about the way data is retrieved from the internal representation.
 
-An apparent structure also allows for type families to make informed decisions about an optimal layout.
+\begin{verbatim}
 
-In the case of Accelerate each primitive type within a tuple is spread out over multiple arrays.
+    image of conversion process
+
+type family FieldSizes (a :: *) :: [Nat] where
+    FieldSizes (a, b)   = FieldSizes a ++ FieldSizes b 
+    FieldSizes ()       = '[]                   
+    FieldSizes a        = BitSize a : '[]
+
+\end{verbatim}
+
+
+For simplicity the kind \type{[]}, the promoted list type, is used to denote all possible variants of a certain type.
+With closed type-families it is possible to define all relevant operations on lists.
+The definition of these are similar to their value-level counterparts without any partial application.
+With these operations it is possible to define a type-level union that creates a compact deduplicated union.
+The \type{FieldSizes} function returns a list of natural numbers, the size for each individual field in a tuple. 
+The \type{BitSizeUnion} recursively adds the unique elements for each datatype, such that all fields map to a distinct element.
+This is achieved by removing the element from the comparison list once it has been matched.
+
+\begin{verbatim}
+type family Difference (a :: [r]) (b :: [r]) :: [r] where
+    Difference '[]      bs = bs
+    Difference (a : as) bs = a : Difference as (RemoveOne a bs)
+
+type family BitSizeUnion (a :: [Nat]) (b :: [r]) :: [Nat] where
+    BitSizeUnion xs  '[]      = xs
+    BitSizeUnion xs  (y : ys) = BitSizeUnion (Difference xs (BitSizes (EltR y))) ys
+\end{verbatim}
+
+While strictly speaking the representation is compact, it deduplicates when the bit size of the primitive type is of equal size.
+This is very safe, as there is no inherit performance cost to operating on types with the same size.
+This is not necessarily the case for types stored in a larger type, or even a type spread out over multiple types.
+In some memory-bound cases this approach can still be preferable.
+An efficient implementations requires type-level sorting, to avoid a scenario where the smallest type is inserted into the largest type.
+
+\begin{verbatim}
+    quick sort algorithm
+\end{verbatim}
+
+The derivation of such a compact layout is not particularly complex, as it is similar to the deduplication approach but with multiple stages.
+Each step increasing the perceived performance cost of the merge and avoiding a local optimum solution by unifying large datatypes first. 
+The complexities of such layout exist within generically operating on such a layout. 
 
 \newpage
 

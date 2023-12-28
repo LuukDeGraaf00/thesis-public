@@ -70,6 +70,10 @@ Amethyst Foundation.
 \newblock The specs book.
 \newblock \url{https://specs.amethyst.rs/docs/tutorials/}.
 
+\bibitem{datatype-generic-programming}
+Jeremy Gibbons.
+\newblock Datatype generic programming, 2006.
+
 \bibitem{kansas-lava}
 Andy Gill, Tristan Bull, Garrin Kimmell, Erik Perrins, Ed~Komp, and Brett
   Werling.

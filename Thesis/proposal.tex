@@ -887,7 +887,29 @@ The complexities of such layout exist within generically operating on such a lay
 
 \newpage
 
-\subsection{Datatype generic programming}
+\subsection{Datatype-Generic programming}
+
+In the previous chapter we established a way to compute a wide-range of internal representations for a variant type.
+It is not ergonomically viable to write insertion and extraction functions for all the different internal representations. 
+As users can create their own representations there is no closed system, so mapping between all datatypes must be handled.
+This can be done through datatype-generic programming, which parametrizes to the shape of a datatype\cite{datatype-generic-programming}. 
+
+\begin{verbatim}
+    datatype generic programming
+\end{verbatim}
+
+A mapping must be isomorphic, such that all information is preserved between construction and deconstruction of the representation.
+This is not possible for all possible pairings, as the variant must be smaller or equal to the representation.
+Within the first section a type-level way to prove valid pairings is explored, essential for supporting user-defined datatypes.
+The second section goes onto the theory of datatype-generic programming, which is used for an implementation in the third section.
+
+\subsubsection{Constraints}
+
+\subsubsection{Shape}
+
+\subsubsection{Implementation}
+
+
 
 \newpage
 

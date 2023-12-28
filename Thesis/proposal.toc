@@ -33,7 +33,10 @@
 \contentsline {subsubsection}{\numberline {3.2.2}Type Family}{19}{subsubsection.3.2.2}%
 \contentsline {subsubsection}{\numberline {3.2.3}Type Structure}{20}{subsubsection.3.2.3}%
 \contentsline {subsubsection}{\numberline {3.2.4}Layout}{21}{subsubsection.3.2.4}%
-\contentsline {subsection}{\numberline {3.3}Datatype generic programming}{22}{subsection.3.3}%
+\contentsline {subsection}{\numberline {3.3}Datatype-Generic programming}{22}{subsection.3.3}%
+\contentsline {subsubsection}{\numberline {3.3.1}Constraints}{22}{subsubsection.3.3.1}%
+\contentsline {subsubsection}{\numberline {3.3.2}Shape}{22}{subsubsection.3.3.2}%
+\contentsline {subsubsection}{\numberline {3.3.3}Implementation}{22}{subsubsection.3.3.3}%
 \contentsline {section}{\numberline {4}Implementation}{23}{section.4}%
 \contentsline {section}{\numberline {5}Future work}{23}{section.5}%
 \contentsline {section}{\numberline {6}Conclusion}{23}{section.6}%

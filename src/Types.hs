@@ -28,7 +28,7 @@ import Data.Array.Accelerate.Representation.Tag
 
 -- helper expression
 type Insert value expression   = SmartExp value -> SmartExp expression -> SmartExp expression
-type Retrieve value expression = SmartExp expression -> SmartExp value
+type Retrieve value expression = SmartExp expression -> SmartExp value 
 
 -- | traverse expression
 traverse :: Monoid r => forall e. (forall a. ScalarType a -> Insert a e -> Retrieve a e -> r) -> TypeR e -> r

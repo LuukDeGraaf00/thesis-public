@@ -770,9 +770,34 @@ A closed type family attempts the instances in order of definition, which expres
         Elem x (y : ys)  = Elem x ys    -- no, but recurse
 \end{verbatim}
 
+In this example the variable \type{y} can be \type{x}, which means the second and third instance are overlapping with each other.
+A closed type-family resolves this by attempting the more specific case of \type{x = x} first.
 An annoying limitation is that type families in Haskell cannot be partially applied, which means a lot of boilerplate is required to capture more complex functions.
-It cannot be partially applied due to partially applied type synonyms requiring higher-order unification, which is not supported in Haskell.
+It cannot be partially applied due to partially applied type synonyms requiring higher-order unification, which is currently not supported in Haskell.
 
+\subsubsection{Interface}
+
+Type-level functions allow for computation of types, and as such a way to easily construct multiple representations for a single type.
+The process of constructing multiple representations can be captured within a single datatype.
+
+\begin{verbatim}
+    data Variant (constructor :: [variant] -> *) (variants :: [variant])
+\end{verbatim}
+
+The data type \type{Variant} takes two type variables, a higher-kinded construction type and a promoted list type.
+The constructor takes the promoted list and transforms it into a concrete type.
+As type families cannot be partially applied, a data family is used to create a constructor.
+
+\begin{verbatim}
+    data family Constructor argument :: [variant] -> *
+
+    type V argument (variants :: [variant]) = V (Constructor argument) variants
+\end{verbatim}
+
+An instance of the constructor data family constructs a unique type based on some type argument.
+An example variant type is \type{V Compact [Int, Float, Bool]}, where \type{Compact} is an (empty) descriptive datatype.
+The \type{Compact} type is associated with the constructed type within the data family.
+ 
 \newpage
 
 \subsubsection{Type Structure}
@@ -852,7 +877,6 @@ type family FieldSizes (a :: *) :: [Nat] where
 
 \end{verbatim}
 
-
 For simplicity the kind \type{[]}, the promoted list type, is used to denote all possible variants of a certain type.
 With closed type-families it is possible to define all relevant operations on lists.
 The definition of these are similar to their value-level counterparts without any partial application.
@@ -889,31 +913,162 @@ The complexities of such layout exist within generically operating on such a lay
 
 \subsection{Datatype-Generic programming}
 
-In the previous chapter we established a way to compute a wide-range of internal representations for a variant type.
+In the previous chapter we established a way to compute a wide-range of internal representations for a set of variants.
 It is not ergonomically viable to write insertion and extraction functions for all the different internal representations. 
 As users can create their own representations there is no closed system, so mapping between all datatypes must be handled.
-This can be done through datatype-generic programming, which parametrizes to the shape of a datatype\cite{datatype-generic-programming}. 
-
-\begin{verbatim}
-    datatype generic programming
-\end{verbatim}
-
-A mapping must be isomorphic, such that all information is preserved between construction and deconstruction of the representation.
-This is not possible for all possible pairings, as the variant must be smaller or equal to the representation.
+This can be done through datatype-generic programming, which parametrizes on the composition of a datatype\cite{datatype-generic-programming}. 
+A mapping must be isomorphic, such that all information is preserved between construction and deconstruction of the union.
+This is not possible for all possible pairings, as the variant must be smaller or equal to the size of the representation.
 Within the first section a type-level way to prove valid pairings is explored, essential for supporting user-defined datatypes.
 The second section goes onto the theory of datatype-generic programming, which is used for an implementation in the third section.
 
-\subsubsection{Constraints}
+\subsubsection{Verifying}
 
-\subsubsection{Shape}
+A variant must be smaller or equal to the representation.
+A variant that is larger than its representation loses information when constructing and deconstructing, which means type safety is breached.
+While it is possible to ensure that the computation of the representation is always larger than all the variants, this is a risky construction.
+It limits users extensibility and does not catch flaws within the type computation code. 
+A modular implementation requires an independent method that ensures the variant is smaller than its representation.
+The \type{Constraint} kind can be used to restrict the construction to larger or equal types.
+Constraints occur on the left-hand side and are generally constructed through type-classes to enforce a general interface.
+A relevant example is ensuring that our newly computed representation has a mapping to the embedded representation.
 
-\subsubsection{Implementation}
+\begin{verbatim}
+    class (Elt a) where
+        type EltR a :: *
 
+    instance (Elt (constructor types)) => Elt (Variant constructor types) where
+\end{verbatim}
 
+In the type-level programming chapter we already achieved a way to determine the size of any type as kind \type{Nat}.
+Fortunately the native \type{Nat} type already has several comparison operators with the kind \type{Nat -> Nat -> Constraint}.
+A simple but functional constraint is the \type{<=} operator\footnote{It does omit any performance considerations which can be preferable in certain situations.}.
+The \type{IsVariant} class has a default implementation but can be extended by the user to support unsafe variants, such as sentinel values.
+The data-type generic programming part pertains to implementing the default \type{Construct} and \type{Destruct} functions.
+
+\begin{verbatim}
+    class (Elt var, Elt rep, BitSize var <= BitSize rep) => IsVariant var rep where
+
+        construct :: Exp var -> Exp rep
+        construct = Construct
+
+        destruct  :: Exp rep -> Exp var
+        destruct = Destruct
+\end{verbatim}
+
+\newpage
+
+\subsubsection{Theory}
+
+Before looking into how \type{Construct} and \type{Destruct} are implemented concretely, it is essential to understand the problem datatype-generic programming is attempting to solve. 
+Paradoxically variant types are best to illustrate the problem, coined the {\it expression problem}\cite{expression-problem}.
+Extending the variants within the \type{Color} type means all functions that pattern match on \type{Color} must be changed. 
+This can be resolved by having a general interface, but extending the behavior of this interface requires all types that implement the interface to change. 
+
+\begin{verbatim}
+    data Color = Red | Green | Blue
+
+    class ColorInterface a  
+\end{verbatim}
+
+The impact of the {\it expression problem} can be minimized through several methods. 
+Some argue that polymorphic variants fit within this category themselves, as it separates pattern matching with the underlying data\cite{polymorphic-variants-expression-problem}.
+In our case we have chosen for the representations to be extensible, which requires behavior to be defined for each possible representation.
+Both constructing and deconstructing the variant type into a specific variant.
+The possible datatypes is an infinite domain, which can be made finite by considering that all composite types can be reduced to primitive types.
+Datatype-generic programming utilizes the inherit concept of composition in programming languages to operate on any type.
+
+\begin{verbatim}
+    image composite type operating
+\end{verbatim}
+
+This is sufficient to generically operate on the multiple representations, as the semantics of the type are irrelevant for constructing and deconstructing the variant type.
+It requires access to the composition of a type, which is often not natively supported in programming languages.
+While Haskell does support datatype-generic programming through many libraries, we do not operate directly on native Haskell types.
+An implementation through native Haskell types, which Accelerate currently uses for sum types, is restrictive.
+This is apparent when attempting to implement structurally typed sum types or more complex representations\cite{accelerate-sum-types}.
+The translation layer remains essential, but can be implemented with the help of the standalone implementation.
+Operating directly on embedded types results in a more targeted and adaptable implementation. 
+
+\begin{verbatim}
+    image separation of concerns
+\end{verbatim}
+
+\newpage
+
+\subsubsection{Framework}
+
+The composition of types is enforced through a GADT, as stated within the type-level programming section.
+As such a type can only have three cases; the empty type \type{()}, the primitive type \type{a} and the composed type \type{(a, b)}.
+An initial attempt would be to traverse the structure and apply a function to each primitive type.
+This means we need a function that discriminates between primitives types at the value level.
+This is possible in most embedded languages, as the abstract syntax tree itself is represented through a GADT.
+
+\paragraph{Traversing}
+A generic way to apply a function on each primitive type is hard to define.
+Each pattern match will refine the type further, which means we need a function that operates on multiple types.
+When passing a polymorphic function to a higher-order function it is not instantiated on the refined type, which means we cannot apply it.
+A solution is to explicitly limit the scope of type variables\footnote{Extension}, such that it is local to the function.
+
+\begin{verbatim}
+    traverse :: Monoid r => (forall v. Type v -> r) -> Structure e -> r
+\end{verbatim}
+
+A generic traversal of a structure is extremely powerful and the first step to a datatype-generic implementation.
+The next step is traversing over the values of a structure, which is only a small step up.
+It simply includes an expression with the same type as the structure, which is also refined when pattern matching on the structure.
+This allows for functions to operate on fields within the datatype individually, but is restrictive in that it does not account for the hierarchy it exists in.
+A more involved traverse function makes available how a primitive type can be inserted and retrieved from the structure. 
+
+\begin{verbatim}
+    type Insert value expression   = value -> expression -> expression
+    type Retrieve value expression = expression -> value 
+
+    traverse :: Monoid r => Structure a 
+                         -> (forall v. Type v -> Insert v e -> Retrieve v e -> r) 
+                         -> Insert a e 
+                         -> Retrieve a e 
+                         -> r                  
+\end{verbatim}
+
+The \type{Retrieve} function recursively accumulates the further we traverse into the structure.
+The \type{Insert} function is slightly more involved, as it is tail-recursive on the composed value.
+Normally this would just be the expression that is passed along, but we are operating on the structure and do not have access to the actual expression.
+Fortunately the \type{Retrieve} function is available to construct the expression to that point, which make the traversal function quite simple and compact.
+
+\newpage
+
+\paragraph{Intermediate}
+
+The traversal function is the foundation for operating on two structures, required to construct and deconstruct variant types.
+It is possible to create a mapping by traversing the other structure for each primitive value.
+This is both redundant and highly complex when removing values from the available mappings.
+The intermediate representation of a list, also used for computing the type representation, only requires a single traversal for each structure.
+This requires an heterogeneous list with all the different primitive types.
+Extensional types allow a type variable to be hidden, and thus they can be stored in a singe list.
+
+\begin{verbatim}
+    data Field e = forall v. Field (Type v) (Insert v e) (Retrieve v e)
+
+    fields :: Structure e -> [Field e]
+    fields = traverse (\type insert retrieve -> [Field type insert retrieve])
+\end{verbatim}
+
+Normally extensional types results in functions not being able to discriminate between the hidden types.
+As the primitive types exist within a GADT, pattern matching on \type{Type v} will reveal the type to the type system.
+A structure can now be constructed or destructed by folding over such a list, but more importantly the fields can be compared between structures.
+
+\paragraph{Isomorphism}
+
+\paragraph{Steps}
 
 \newpage
 
 \section{Implementation}
+
+\paragraph{Structural}
+
+\paragraph{Nominal}
 
 \section{Future work}
 

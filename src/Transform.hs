@@ -52,7 +52,7 @@ data Getter e = forall v. Getter !(ScalarType v) !(Get v e)
 data Setter e = forall v. Setter !(ScalarType v) !(Set v e)
 
 -- | inserts a datatype into another datatype 
-insert :: forall v t. (Elt v, Elt t) => (Exp v -> Exp t, Exp t -> Exp v)
+insert :: forall v t. (Elt v, Elt t) => (Exp v -> Exp t, Exp t -> Exp v) 
 insert = (\(Exp v) -> Exp (l (unExp (undef :: Exp t)) v), \(Exp t) -> Exp (r (unExp (undef :: Exp v)) t))
   where (l, r) = information @v @t [equal, equalSize, largerSize]
 

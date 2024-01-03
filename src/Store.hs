@@ -36,8 +36,8 @@ import Data.Kind
 
 
 
-mapG :: forall a b c. (Sum a, Sum b, Sum c, Variant a b, Variant a c) => (Exp b -> Exp c) -> Acc (Array DIM1 a) -> Acc (Array DIM1 a)
+mapG :: forall a b c. (Sum a, Sum b, Sum c, VariantF a b, VariantF a c) => (Exp b -> Exp c) -> Acc (Array DIM1 a) -> Acc (Array DIM1 a)
 mapG function = A.map (construct @a @c . function . destruct @a @b)
 
-mapFlex :: forall a b c d. (Sum a, Sum b, Sum c, Sum d, Variant a b, Variant d c) => (Exp b -> Exp c) -> Acc (Array DIM1 a) -> Acc (Array DIM1 d)
+mapFlex :: forall a b c d. (Sum a, Sum b, Sum c, Sum d, VariantF a b, VariantF d c) => (Exp b -> Exp c) -> Acc (Array DIM1 a) -> Acc (Array DIM1 d)
 mapFlex function = A.map (construct @d @c . function . destruct @a @b)

@@ -70,6 +70,10 @@ Amethyst Foundation.
 \newblock The specs book.
 \newblock \url{https://specs.amethyst.rs/docs/tutorials/}.
 
+\bibitem{polymorphic-variants-expression-problem}
+Jacques Garrigue.
+\newblock Code reuse through polymorphic variants, 2000.
+
 \bibitem{datatype-generic-programming}
 Jeremy Gibbons.
 \newblock Datatype generic programming, 2006.
@@ -185,6 +189,10 @@ Josef Svenningsson and Emil Axelsson.
 \bibitem{accelerate-sum-types}
 Rick van Hoef.
 \newblock Accelerating sum types, 2022.
+
+\bibitem{expression-problem}
+Philip Wadler.
+\newblock The expression problem, 1998.
 
 \bibitem{accelerate-performance}
 Bart Wijgers.

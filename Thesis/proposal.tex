@@ -944,16 +944,16 @@ In the type-level programming chapter we already achieved a way to determine the
 Fortunately the native \type{Nat} type already has several comparison operators with the kind \type{Nat -> Nat -> Constraint}.
 A simple but functional constraint is the \type{<=} operator\footnote{It does omit any performance considerations which can be preferable in certain situations.}.
 The \type{IsVariant} class has a default implementation but can be extended by the user to support unsafe variants, such as sentinel values.
-The data-type generic programming part pertains to implementing the default \type{Construct} and \type{Destruct} functions.
+The data-type generic programming part pertains to implementing the default \type{construct} and \type{destruct} functions.
 
 \begin{verbatim}
-    class (Elt var, Elt rep, BitSize var <= BitSize rep) => IsVariant var rep where
+    class (Elt v, Elt t, BitSize v <= BitSize t) => IsVariant v t where
 
-        construct :: Exp var -> Exp rep
-        construct = Construct
+        construct :: Exp v -> Exp t
+        construct = ...
 
-        destruct  :: Exp rep -> Exp var
-        destruct = Destruct
+        destruct  :: Exp t -> Exp v
+        destruct = ...
 \end{verbatim}
 
 \newpage
@@ -1032,8 +1032,8 @@ A more involved traverse function makes available how a primitive type can be in
 \end{verbatim}
 
 The \type{Retrieve} function recursively accumulates the further we traverse into the structure.
-The \type{Insert} function is slightly more involved, as it is tail-recursive on the composed value.
-Normally this would just be the expression that is passed along, but we are operating on the structure and do not have access to the actual expression.
+The \type{Insert} function is slightly more involved, as it is recursive on the composed value.
+Normally this would just be the input expression, but we are operating on the structure and do not have access to the actual expression.
 Fortunately the \type{Retrieve} function is available to construct the expression to that point, which make the traversal function quite simple and compact.
 
 \newpage
@@ -1060,7 +1060,35 @@ A structure can now be constructed or destructed by folding over such a list, bu
 
 \paragraph{Isomorphism}
 
+An undiscussed constraint is that the \type{construct} and \type{destruct} functions must be isomorphic from each other.
+Both must map primitive types to the same fields, otherwise we cannot retrieve the same type from the representation.
+A simple way to achieve this is by creating both within the same function, such that all mapping decisions are inherently isomorphic.
+This is trivial with access to the \type{Field} type, as we have access to functions that insert and retrieve the value.
+
+\begin{verbatim}
+    decisions :: forall v t. (Elt v, Elt t) => (Exp v -> Exp t, Exp t -> Exp v) 
+    decisions = ...
+
+    construct :: forall v t. (Elt v, Elt t) => Exp v -> Exp t
+    construct = fst (decisions @v @t)
+
+    destruct :: forall v t. (Elt v, Elt t) => Exp t -> Exp v
+    destruct = snd (decisions @v @t)
+\end{verbatim}
+
+It does mean that the constructor \type{v -> t} might make different decisions than the constructor \type{t -> v}, as decisions are made based from the perspective of one side. 
+This is not a problem as constructed types must always be destructed first.
+The \type{t} type within the \type{decisions} function is allowed to have spare fields, as they are the undefined fields within an union.
+
 \paragraph{Steps}
+
+To avoid a local optimum in the representation several iterations must be done within the \type{decisions} function.
+A matching function determines whether there exist a mapping between two fields, and returns the functions that transform between the two primitive types.
+This makes the decision function extensible, as long as the user specifies the relation between two fields.
+Matching functions can be provided in order of preference.
+An implementations can in some cases be made more efficient by sorting before matching, but this reduces the generality of the function. 
+Some cases might require a custom \type{decisions} function, such as inserting multiple fields into a single field.
+In general the implementation should be tailored to the implementation language.
 
 \newpage
 

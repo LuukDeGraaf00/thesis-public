@@ -8,11 +8,6 @@ Daniel~Meister 0002, Jakub Boksansk{\'y}, Michael Guthe, and Jir{\'i} Bittner.
   and Games, San Francisco, CA, USA, September 15-17, 2020}, pages 13:1--13:9.
   ACM, 2020.
 
-\bibitem{unity-ecs-patent}
-Joachim~Christoph Ante and Tim Johansson.
-\newblock Method and system for improved performance of a video game engine,
-  March 2020.
-
 \bibitem{clash}
 Christiaan Baaij, Matthijs Kooijman, Jan Kuper, Arjan Boeijink, and Marco
   Gerards.
@@ -65,11 +60,6 @@ A.~Fog.
 \newblock Optimizing subroutines in assembly language: An optimization guide
   for x86 platforms, 2008.
 
-\bibitem{ecs-specs}
-Amethyst Foundation.
-\newblock The specs book.
-\newblock \url{https://specs.amethyst.rs/docs/tutorials/}.
-
 \bibitem{polymorphic-variants-expression-problem}
 Jacques Garrigue.
 \newblock Code reuse through polymorphic variants, 2000.
@@ -87,13 +77,6 @@ Andy Gill, Tristan Bull, Garrin Kimmell, Erik Perrins, Ed~Komp, and Brett
 Bernhard~Manfred Gruber, Guilherme Amadio, Jakob Blomer, Alexander Matthes,
   Rene Widera, and Michael Bussmann.
 \newblock Llama: The low-level abstraction for memory access, 2022.
-
-\bibitem{STM-monad}
-Tim Harris, Simon Marlow, and Simon Peyton~Jones.
-\newblock Composable memory transactions.
-\newblock In {\em PPoPP '05: Proceedings of the tenth ACM SIGPLAN symposium on
-  Principles and practice of parallel programming}, pages 48--60. ACM Press,
-  January 2005.
 
 \bibitem{programming-optimization}
 Paul Hsieh.
@@ -128,24 +111,6 @@ Deborah~T. Marr, Frank Binns, David~L. Hill, Glenn Hinton, David~A. Koufaty,
 \bibitem{ecs-origin}
 Adam Martin.
 \newblock Entity systems are the future of mmog development, 2007.
-
-\bibitem{accelerate-llvm}
-Trevor~L. McDonell, Manuel M~T Chakravarty, Vinod Grover, and Ryan~R Newton.
-\newblock {Type-safe Runtime Code Generation: Accelerate to LLVM}.
-\newblock In {\em Haskell '15: The 8th ACM SIGPLAN Symposium on Haskell}, pages
-  201--212. ACM, September 2015.
-
-\bibitem{accelerate-array-fusion}
-Trevor~L. McDonell, Manuel M~T Chakravarty, Gabriele Keller, and Ben Lippmeier.
-\newblock {Optimising Purely Functional GPU Programs}.
-\newblock In {\em ICFP '13: The 18th ACM SIGPLAN International Conference on
-  Functional Programming}. ACM, September 2013.
-
-\bibitem{accelerate-pattern-matching}
-Trevor~L. McDonell, Joshua~D. Meredith, and Gabriele Keller.
-\newblock Embedded pattern matching.
-\newblock In {\em Proceedings of the 15th {ACM} {SIGPLAN} International Haskell
-  Symposium}. {ACM}, sep 2022.
 
 \bibitem{interleaved-SIMD}
 Dorit Nuzman, Ira Rosen, and Ayal Zaks.
@@ -193,10 +158,5 @@ Rick van Hoef.
 \bibitem{expression-problem}
 Philip Wadler.
 \newblock The expression problem, 1998.
-
-\bibitem{accelerate-performance}
-Bart Wijgers.
-\newblock Investigating the performance of the implementations of embedded
-  languages in haskell, 2022.
 
 \end{thebibliography}

@@ -187,8 +187,8 @@ type family SplitBitSize (a :: [Nat]) (b :: [r]) :: [Nat] where
 
 type family Length (xs :: [r]) :: Nat where
 
-    Length '[]       = 0
-    Length (x ': xs) = 1 + Length xs
+    Length '[]      = 0
+    Length (x : xs) = 1 + Length xs
 
 
 type family IX (index :: Nat) (types :: [t]) :: t where
@@ -199,5 +199,14 @@ type family IX (index :: Nat) (types :: [t]) :: t where
 
 
 
+type family Sort (types :: [Nat]) :: [Nat] where
+  Sort '[]      = '[]
+  Sort (x : xs) = Insert x (Sort xs)
 
+type family Insert x xs where
+  Insert x '[]       = x ': '[]
+  Insert x (y ': ys) = Insert' (CmpNat x y) x y ys
 
+type family Insert' b x y ys where
+  Insert' 'LT  x y ys = x ': (y ': ys)
+  Insert' _    x y ys = y ': Insert x ys

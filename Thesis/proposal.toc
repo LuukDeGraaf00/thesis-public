@@ -1,62 +1,49 @@
 \contentsline {section}{\numberline {1}Introduction}{2}{section.1}%
-\contentsline {subsection}{\numberline {1.1}Related Work}{3}{subsection.1.1}%
-\contentsline {paragraph}{Representation}{3}{section*.2}%
-\contentsline {paragraph}{Type Interface}{3}{section*.3}%
-\contentsline {paragraph}{Implementation}{3}{section*.4}%
-\contentsline {section}{\numberline {2}Performance}{4}{section.2}%
-\contentsline {subsection}{\numberline {2.1}Optimizations}{4}{subsection.2.1}%
-\contentsline {paragraph}{Instructions}{4}{section*.5}%
-\contentsline {paragraph}{Register Pressure}{5}{section*.6}%
-\contentsline {paragraph}{Memory Access Time}{5}{section*.7}%
-\contentsline {paragraph}{Caching}{6}{section*.8}%
-\contentsline {paragraph}{Parallelism}{7}{section*.9}%
-\contentsline {subsection}{\numberline {2.2}Principles}{8}{subsection.2.2}%
-\contentsline {paragraph}{Contiguous}{8}{section*.10}%
-\contentsline {paragraph}{Access Patterns}{8}{section*.11}%
-\contentsline {paragraph}{Branching}{9}{section*.12}%
-\contentsline {subsection}{\numberline {2.3}Data structures}{10}{subsection.2.3}%
-\contentsline {subsubsection}{\numberline {2.3.1}Element-wise}{10}{subsubsection.2.3.1}%
-\contentsline {paragraph}{Tagged Union}{10}{section*.13}%
-\contentsline {paragraph}{Tagged Pointer}{11}{section*.14}%
-\contentsline {paragraph}{Entity}{12}{section*.15}%
-\contentsline {subsubsection}{\numberline {2.3.2}Variant-wise}{13}{subsubsection.2.3.2}%
-\contentsline {subsection}{\numberline {2.4}Memory Representation}{14}{subsection.2.4}%
-\contentsline {section}{\numberline {3}Interface}{15}{section.3}%
-\contentsline {subsection}{\numberline {3.1}Paradigm}{15}{subsection.3.1}%
-\contentsline {subsubsection}{\numberline {3.1.1}Entity-Component-System}{16}{subsubsection.3.1.1}%
-\contentsline {paragraph}{Components}{16}{section*.16}%
-\contentsline {paragraph}{Entity}{16}{section*.17}%
-\contentsline {paragraph}{Systems}{16}{section*.18}%
-\contentsline {subsubsection}{\numberline {3.1.2}Algebraic Data Type}{17}{subsubsection.3.1.2}%
-\contentsline {subsection}{\numberline {3.2}Type-level programming}{18}{subsection.3.2}%
-\contentsline {subsubsection}{\numberline {3.2.1}Kinds}{18}{subsubsection.3.2.1}%
-\contentsline {subsubsection}{\numberline {3.2.2}Type Family}{19}{subsubsection.3.2.2}%
-\contentsline {subsubsection}{\numberline {3.2.3}Interface}{19}{subsubsection.3.2.3}%
-\contentsline {subsubsection}{\numberline {3.2.4}Type Structure}{20}{subsubsection.3.2.4}%
-\contentsline {subsubsection}{\numberline {3.2.5}Layout}{21}{subsubsection.3.2.5}%
-\contentsline {subsection}{\numberline {3.3}Datatype-Generic programming}{22}{subsection.3.3}%
-\contentsline {subsubsection}{\numberline {3.3.1}Verifying}{22}{subsubsection.3.3.1}%
-\contentsline {subsubsection}{\numberline {3.3.2}Theory}{23}{subsubsection.3.3.2}%
-\contentsline {subsubsection}{\numberline {3.3.3}Framework}{24}{subsubsection.3.3.3}%
-\contentsline {paragraph}{Traversing}{24}{section*.19}%
-\contentsline {paragraph}{Intermediate}{25}{section*.20}%
-\contentsline {paragraph}{Isomorphism}{25}{section*.21}%
-\contentsline {paragraph}{Steps}{25}{section*.22}%
-\contentsline {section}{\numberline {4}Implementation}{26}{section.4}%
-\contentsline {paragraph}{Structural}{26}{section*.23}%
-\contentsline {paragraph}{Nominal}{26}{section*.24}%
-\contentsline {section}{\numberline {5}Future work}{26}{section.5}%
-\contentsline {section}{\numberline {6}Conclusion}{26}{section.6}%
-\contentsline {section}{\numberline {7}Extra}{26}{section.7}%
-\contentsline {paragraph}{Implementation}{26}{section*.25}%
-\contentsline {paragraph}{C/C++}{26}{section*.26}%
-\contentsline {paragraph}{Haskell}{26}{section*.27}%
-\contentsline {paragraph}{Dynamic programming languages}{26}{section*.28}%
-\contentsline {paragraph}{Entity-Component-System}{26}{section*.29}%
-\contentsline {paragraph}{Algebraic Data Type}{27}{section*.30}%
-\contentsline {paragraph}{Accelerate}{27}{section*.31}%
-\contentsline {paragraph}{C$\lambda $aSH}{28}{section*.32}%
-\contentsline {paragraph}{Lava}{28}{section*.33}%
-\contentsline {paragraph}{Accelerate}{28}{section*.34}%
-\contentsline {paragraph}{Motivation}{29}{section*.35}%
-\contentsline {paragraph}{Contributions}{29}{section*.36}%
+\contentsline {section}{\numberline {2}Introduction}{3}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Related Work}{4}{subsection.2.1}%
+\contentsline {paragraph}{Performance}{4}{section*.2}%
+\contentsline {paragraph}{Interface}{4}{section*.3}%
+\contentsline {paragraph}{Implementation}{4}{section*.4}%
+\contentsline {section}{\numberline {3}Performance}{5}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Optimizations}{5}{subsection.3.1}%
+\contentsline {paragraph}{Instructions}{5}{section*.5}%
+\contentsline {paragraph}{Register Pressure}{6}{section*.6}%
+\contentsline {paragraph}{Memory Access Time}{6}{section*.7}%
+\contentsline {paragraph}{Caching}{7}{section*.8}%
+\contentsline {paragraph}{Parallelism}{8}{section*.9}%
+\contentsline {subsection}{\numberline {3.2}Principles}{9}{subsection.3.2}%
+\contentsline {paragraph}{Contiguous}{9}{section*.10}%
+\contentsline {paragraph}{Access Patterns}{9}{section*.11}%
+\contentsline {paragraph}{Branching}{10}{section*.12}%
+\contentsline {subsection}{\numberline {3.3}Data structures}{11}{subsection.3.3}%
+\contentsline {subsubsection}{\numberline {3.3.1}Element-wise}{11}{subsubsection.3.3.1}%
+\contentsline {paragraph}{Tagged Union}{11}{section*.13}%
+\contentsline {paragraph}{Tagged Pointer}{12}{section*.14}%
+\contentsline {paragraph}{Entity}{13}{section*.15}%
+\contentsline {subsubsection}{\numberline {3.3.2}Variant-wise}{14}{subsubsection.3.3.2}%
+\contentsline {subsection}{\numberline {3.4}Memory Representation}{15}{subsection.3.4}%
+\contentsline {section}{\numberline {4}Interface}{16}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Paradigm}{16}{subsection.4.1}%
+\contentsline {subsubsection}{\numberline {4.1.1}Entity-Component-System}{17}{subsubsection.4.1.1}%
+\contentsline {paragraph}{Components}{17}{section*.16}%
+\contentsline {paragraph}{Entity}{17}{section*.17}%
+\contentsline {paragraph}{Systems}{17}{section*.18}%
+\contentsline {subsubsection}{\numberline {4.1.2}Algebraic Data Type}{18}{subsubsection.4.1.2}%
+\contentsline {subsection}{\numberline {4.2}Type-level programming}{19}{subsection.4.2}%
+\contentsline {subsubsection}{\numberline {4.2.1}Kinds}{19}{subsubsection.4.2.1}%
+\contentsline {subsubsection}{\numberline {4.2.2}Type Family}{20}{subsubsection.4.2.2}%
+\contentsline {subsubsection}{\numberline {4.2.3}Interface}{20}{subsubsection.4.2.3}%
+\contentsline {subsubsection}{\numberline {4.2.4}Type Structure}{21}{subsubsection.4.2.4}%
+\contentsline {subsubsection}{\numberline {4.2.5}Layout}{22}{subsubsection.4.2.5}%
+\contentsline {subsection}{\numberline {4.3}Datatype-Generic programming}{23}{subsection.4.3}%
+\contentsline {subsubsection}{\numberline {4.3.1}Verifying}{23}{subsubsection.4.3.1}%
+\contentsline {subsubsection}{\numberline {4.3.2}Theory}{24}{subsubsection.4.3.2}%
+\contentsline {subsubsection}{\numberline {4.3.3}Framework}{25}{subsubsection.4.3.3}%
+\contentsline {paragraph}{Traversing}{25}{section*.19}%
+\contentsline {paragraph}{Intermediate}{26}{section*.20}%
+\contentsline {paragraph}{Isomorphism}{26}{section*.21}%
+\contentsline {paragraph}{Steps}{26}{section*.22}%
+\contentsline {section}{\numberline {5}Implementation}{27}{section.5}%
+\contentsline {section}{\numberline {6}Benchmarks}{27}{section.6}%
+\contentsline {section}{\numberline {7}Future work}{27}{section.7}%
+\contentsline {section}{\numberline {8}Conclusion}{27}{section.8}%

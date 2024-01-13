@@ -59,59 +59,69 @@
 
 \section{Introduction}
 
+Data-parallel array languages can operate on a higher abstraction level by distributing instructions over multiple elements. 
+A data-parallel \type{map} and \type{fold} function is sufficient to cover a wide range of high-performance applications.
+A naive intersection algorithm for a raytracer can be defined incredibly concisely compared to a manually vectorized c++ implementation.
+
+\begin{verbatim}
+    nearest :: Ray -> Objects -> Distance
+    nearest ray = fold min 1e30f . map (intersect ray)
+
+    float minDistance = 1e30f;
+    for (int i = 0; i < objects.Length; i++)
+    {
+        float distance = intersect(ray, objects[i]);
+        minDistance = min(minDistance, distance);
+    }
+\end{verbatim}
+
+An obvious limitation is the lack of low-level control, which is apparent 
+
+
+
+
+
+\newpage
+
+\section{Introduction}
+
 Abstractions in programming languages simplify code and allow for implicit exploitation of arising properties.
 Pure functional array languages utilize the independence between computations to implicitly parallelize array operations.
 This is complicated in languages that are not inherently thread-safe.
 Many high-performance applications adopt a data-oriented design, which centres around data transformations and avoiding abstractions around data. 
 Both parallelization opportunities and cache efficiency are focal points of the data-oriented design paradigm.
 A challenge with data-oriented design is representing non-uniform data efficiently while preserving vectorization opportunities and type safety. 
-The issue can be illustrated through raytracing, an embarrassingly parallel problem with several instances of iterating on non-uniform data.
 
-\begin{verbatim}
-    image that explains raytracing
-\end{verbatim}
-
-An instance of iterating on non-uniform data is the recursive case of a ray intersecting with geometry.
+The issue can be illustrated through raytracing, an embarrassingly parallel problem with several instances of non-uniform data.
+The main instance occurs when recursively intersecting geometry.
 The exception state of a ray not intersection with any geometry is propagated along, which prevents any vectorization attempts of subsequent rays. 
-In practice this is solved by either unconditionally executing subsequent rays or eliminating all failure states for each recursive step.
-Conditionally throwing the exception can also be redundant when the identity of the variant is inherit to the value, such as a negative distance in intersection algorithms. 
-Some raytracers also support geometry shapes outside triangles, such as spheres.
-Intersection of multiple shapes can be done within the same function, or by treating all shapes separately.
-These approaches are all similar in intent\footnote{This is not necessarily semantics, as unconditional execution can have (acceptable) side-effects in some instances.}, to iterate on a specific variant of a type, but can have significant runtime performance implications.
+In practice this is solved by either unconditionally executing subsequent rays or reordering the rays for each recursive step.
+These considerations also exist outside exception states, such as handling multiple shapes of geometry efficiently in data-parallel context.  
 
-\begin{verbatim}
-    show intent of a function
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=0.3]{introduction.drawio.png}
+\end{figure}
 
-    constructor
-
-    deconstructor
-\end{verbatim}
-
-An efficient and type-safe abstraction is non-trivial as value-level variants and type-level variants exist separately in many languages.  
-Unification of these concepts reformulates operating on non-uniform data to an optimization problem.
-
-Operating on multiple variants of a type can be done on the type-level or on the value-level.
-In the context of iterating on a collection of variants, branching on a value tag or dynamically dispatching will inherently break vectorization.
-This means static polymorphism is a common way to operate on non-uniform data in data-parallel applications.
-In some cases this is impossible as the identity of a variant will only be known at runtime, such as exception states but also diverging states.
-Conceptually both approaches serve the same purpose, granting the ability to operate on multiple variants of a type.
-Unification of these concepts reformulates operating on non-uniform data to an optimization problem.
-
-A type-safe way to achieve this is by elevating the concept of a mutual exclusive datatype to the type-level.
-This can be achieved through type-level constructors and datatype-generic functions.
-Such implementation can exist without it being natively supported as construct in the implementation language.
-This can be utilized by libraries, frameworks and embedded domain-specific languages that exist in languages that facilitate type-level programming, like Haskell.
+The approaches are all similar in intent, to iterate on a variant of a type, but can have significant runtime performance implications.
+An ergonomic way to switch between these approaches can be essential for deducing the most performant option through benchmarking.
+An efficient and type-safe abstraction that encapsulates these approaches is non-trivial, as it involves both the value and type representation.
+This is apparent when attempting to define functions that can operate on both value-level variants (tagged unions) and type-level variants (types).
+Unification of these concepts would reformulate operating on non-uniform data to an optimization problem.
+Within this paper we propose a way to ergonomically switch between efficient representations of non-uniform data.
+We preserve type-safety by elevating the concept of a mutual exclusive datatype to the type-level, which is achieved through type-level and datatype-generic programming.
+An implementation can exist without it being natively supported as construct in the implementation language.
+Which can be utilized by libraries, frameworks and embedded domain-specific languages that exist in languages that facilitate type-level programming and datatype-generic programming, like Haskell.
 
 \newpage
 
 \subsection{Related Work}
 
-The contribution can be categorized as an interdisciplinary between three distinct fields.
-Initial objective was establishing computationally efficient representations for non-uniform data in data-parallel applications.
+Initial objective was establishing a computational efficient representations for non-uniform data in data-parallel applications.
 This induced the need for a flexible and type-safe interface, which has been achieved through type-level and datatype generic programming.
-Relevance is established through an implementation in a data-parallel language embedded within Haskell.
+Relevance is established by an implementation in the data-parallel language Accelerate, which is deeply embedded within Haskell.
 
-\paragraph{Representation}
+\paragraph{Performance}
 
 The memory representation of a datatype is often based on the functionality they perform within a language.
 In data-parallel applications primitive types are distributed over multiple arrays to facilitate vectorization.
@@ -122,16 +132,16 @@ Game-engines, which deal with many clusters of data, have a fundamentally differ
 Many implementations incite a collective re-organization of the internal representation when a variant change occurs at runtime.
 A type-safe and performant implementation is notably hard due to having to statically resolve all interactions between the representations, which means meta-programming and untyped code are extremely prevalent. 
 
-\paragraph{Type Interface}
+\paragraph{Interface}
 
 Functional languages handle tagged unions safely through Algebraic Data Types (ADTs), where sum types categorize ADTs with multiple variants.
 Constructors can be local to an unique ADT (nominally typed) or exist as independent types (structurally typed).
 Deconstructing is done by pattern matching, where functions natively branch on the current active variant.
 In Haskell sum types are nominally typed, which means variants are not standalone types and cannot exist safely outside the ADT.
 Structural sum types are often called extensible or open sum types, as they do not have to be explicitly declared before use.
-In OCaml these are natively supported as polymorphic variants, while Haskell libraries such as {\it fastsum} or {\it extensible} implement them through the type system.
-An efficient internal representation can be derived statically through associated types\cite{associated-types}.
-Datatype generic functions, which depend on the structure of a datatype, can be used to create isomorphic mappings between representations.
+In OCaml these are natively supported as polymorphic variants.
+In Haskell an efficient internal representation can be derived statically through associated types\cite{associated-types}.
+Datatype generic functions, which depend on the structure of a datatype, can be used to create isomorphic mappings between the computed representations.
 Both concepts are used in highly generic libraries for a wide-range of applications\cite{generic-programming}. 
 
 \paragraph{Implementation}
@@ -145,7 +155,7 @@ There are several approaches, which have been subject to research in the domain 
     \item {C$\lambda$aSH} is not deeply embedded and operates on user-defined types through generics\cite{clash}. 
     \item Hydra has the deep embedding constructs nested into the shallow embedding constructs\cite{hydra}.
     \item Kansas Lava has both embeddings exist in parallel under an encasing type\cite{kansas-lava}.
-    \item ForSyDe has both embeddings exist as standalone types\cite{forsyde}.
+    \item ForSyDe has both embeddings exist separately as standalone types\cite{forsyde}.
 \end{itemize}
 
 An observation is that user extendability is limited on deeply embedded constructs as execution models must be updated.
@@ -533,15 +543,30 @@ Both allow instructions to be vectorized, but there exist several other consider
 \subsection{Memory Representation}
 
 Memory instructions operate on fixed boundaries, which means operations that overlap these boundaries require additional but strictly unnecessary instructions.
-A natural alignment of a datatype is achieved by aligning all types according to the instructions that access them\footnote{SIMD instructions}. 
-Many compilers introduce {\it padding} to enforce natural alignment.
+A natural alignment of a datatype is achieved by aligning all types according to the instructions that access them.
+Many compilers introduce {\it padding} to enforce natural alignment for all the types within the structure.
 While computational efficient, the alternative of {\it packing} types together can be preferred for a smaller memory footprint.  
-Both approaches can be used to ensure the datatypes align with cache lines. 
 
-\begin{figure}[ht]
-    \centering
-    \caption{data alignment example with cache lines (c++ code)}
-\end{figure}
+\begin{verbatim}
+
+    struct PackedData // 8 bytes
+    {
+        char  name;         // 1 byte
+        int   node;         // 4 bytes
+        short identifier;   // 2 bytes
+        byte  alignment[1]; // 1 byte
+    };
+
+    struct PaddedData // 12 bytes
+    {
+        char  name;         // 1 byte
+        byte  padding[3];   // 3 bytes
+        int   node;         // 4 bytes
+        short identifier;   // 2 bytes
+        byte  alignment[2]; // 2 bytes
+    };    
+
+\end{verbatim}
 
 Parallel arrays (Struct of Arrays) have a natural alignment by default as they contain primitives types, which are naturally aligned.
 General purpose languages often default to the Array of Struct, while data-parallel applications use the Struct of Arrays representation.
@@ -549,8 +574,6 @@ A zero-cost abstraction that can ergonomically switch between these constructs i
 An interface to index access with an intermediate structure can break automatic vectorization\cite{abstraction-vectorization}. 
 In addition the different internal representations must be statically definable and able to be handled by the data structures.
 Many C++ libraries utilize {\it class templates} to achieve this\cite{abstraction-vectorization}.
-Being able to switch between representations was an initial focal point of the experimental language {\it Jai}, a c-like programming language for games.
-The switch between representations is currently possible through a more general pre-processors macro's approach.
 
 \newpage
 
@@ -568,21 +591,17 @@ Variants of a particular type are stored either element-wise or variant-wise.
 There are several considerations for a data structure that is agnostic to if it stores non-uniform data in element-wise or a variant-wise way.
 A variant-wise collection can operate on only the relevant variants, while an element-wise is forced to discover that at runtime.
 To avoid redundant iterations for variant-wise collections, a function must be able to be defined on the most specific subset of all variants.
-For element-wise collection the amount of variants must be finite and no large discrepancies exist between the size of all the variants.
-
-\begin{verbatim}
-    image explaining the issues of both cases (maybe use raytracing)
+For element-wise collection the amount of variants must be finite and no large discrepancies can exist between the size of all the variants.
 
 
-
-
-
-
-
-\end{verbatim}
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=0.1]{paradigm.png}
+    \caption{A non-exhaustive function can skip a significant amount of work when non-uniform data is stored in a variant-wise collection, while this is problematic for an element-wise collection. }
+\end{figure}
 
 For variant-wise collections the ECS-pattern will be used as reference.
-The first section goes into how the ECS-pattern collectively operates on only certain variants.
+The first section goes into how the ECS-pattern collectively operates on only some variants.
 For element-wise collections Algebraic Data Types (ADTs) are used to safely discriminate between multiple variants as element. 
 The second section utilizes structurally typed ADTs to create an efficient interface for a variant-wise and element-wise collection.  
 
@@ -836,7 +855,6 @@ The GADT approach is preferable when access to the structure on the value-level 
 A simple example to demonstrate the explicit structure is to convert tuples of \type{Word8} to a single type. 
 In Accelerate each primitive type in a tuple is spread out over multiple arrays, which means this type-family enables an Array of Struct representation for such a tuple.
 
-
 \begin{verbatim}
     type family ToBitSize (a :: *) :: Nat where
         ToBitSize (a, b) = ToBitSize a + ToBitSize b 
@@ -867,14 +885,10 @@ This removes both hierarchy and type identity, which makes it is easier to reaso
 The representation does preserve performance critical information about the way data is retrieved from the internal representation.
 
 \begin{verbatim}
-
-    image of conversion process
-
-type family FieldSizes (a :: *) :: [Nat] where
-    FieldSizes (a, b)   = FieldSizes a ++ FieldSizes b 
-    FieldSizes ()       = '[]                   
-    FieldSizes a        = BitSize a : '[]
-
+    type family FieldSizes (a :: *) :: [Nat] where
+        FieldSizes (a, b)   = FieldSizes a ++ FieldSizes b 
+        FieldSizes ()       = '[]                   
+        FieldSizes a        = ToBitSize a : '[]
 \end{verbatim}
 
 For simplicity the kind \type{[]}, the promoted list type, is used to denote all possible variants of a certain type.
@@ -886,28 +900,31 @@ The \type{BitSizeUnion} recursively adds the unique elements for each datatype, 
 This is achieved by removing the element from the comparison list once it has been matched.
 
 \begin{verbatim}
-type family Difference (a :: [r]) (b :: [r]) :: [r] where
-    Difference '[]      bs = bs
-    Difference (a : as) bs = a : Difference as (RemoveOne a bs)
+    type family Difference (a :: [r]) (b :: [r]) :: [r] where
+        Difference '[]      bs = bs
+        Difference (a : as) bs = a : Difference as (RemoveOne a bs)
 
-type family BitSizeUnion (a :: [Nat]) (b :: [r]) :: [Nat] where
-    BitSizeUnion xs  '[]      = xs
-    BitSizeUnion xs  (y : ys) = BitSizeUnion (Difference xs (BitSizes (EltR y))) ys
+    type family BitSizeUnion (a :: [Nat]) (b :: [r]) :: [Nat] where
+        BitSizeUnion xs  '[]      = xs
+        BitSizeUnion xs  (y : ys) = BitSizeUnion (Difference xs (BitSizes (EltR y))) ys
 \end{verbatim}
 
 While strictly speaking the representation is compact, it deduplicates when the bit size of the primitive type is of equal size.
 This is very safe, as there is no inherit performance cost to operating on types with the same size.
 This is not necessarily the case for types stored in a larger type, or even a type spread out over multiple types.
 In some memory-bound cases this approach can still be preferable.
-An efficient implementations requires type-level sorting, to avoid a scenario where the smallest type is inserted into the largest type.
+An efficient implementation requires type-level sorting, to avoid a scenario where the smallest type is inserted into the largest type.
+A naive sorting algorithm is quite trivial to implement, by inserting all elements into their respective position. 
 
 \begin{verbatim}
-    quick sort algorithm
+    type family Sort (types :: [Nat]) :: [Nat] where
+        Sort '[]      = '[]
+        Sort (x : xs) = Insert x (Sort xs)
 \end{verbatim}
 
 The derivation of such a compact layout is not particularly complex, as it is similar to the deduplication approach but with multiple stages.
 Each step increasing the perceived performance cost of the merge and avoiding a local optimum solution by unifying large datatypes first. 
-The complexities of such layout exist within generically operating on such a layout. 
+The complexities of such layout exist with generically operating on such a layout. 
 
 \newpage
 
@@ -920,7 +937,7 @@ This can be done through datatype-generic programming, which parametrizes on the
 A mapping must be isomorphic, such that all information is preserved between construction and deconstruction of the union.
 This is not possible for all possible pairings, as the variant must be smaller or equal to the size of the representation.
 Within the first section a type-level way to prove valid pairings is explored, essential for supporting user-defined datatypes.
-The second section goes onto the theory of datatype-generic programming, which is used for an implementation in the third section.
+The second section goes onto the theory of datatype-generic programming, which is used for an implementation of a datatype-generic framework in the third section.
 
 \subsubsection{Verifying}
 
@@ -942,7 +959,8 @@ A relevant example is ensuring that our newly computed representation has a mapp
 
 In the type-level programming chapter we already achieved a way to determine the size of any type as kind \type{Nat}.
 Fortunately the native \type{Nat} type already has several comparison operators with the kind \type{Nat -> Nat -> Constraint}.
-A simple but functional constraint is the \type{<=} operator\footnote{It does omit any performance considerations which can be preferable in certain situations.}.
+A simple but functional constraint is the \type{<=} operator.
+While it does omit performance considerations, this is required to support a wide-range of representations.
 The \type{IsVariant} class has a default implementation but can be extended by the user to support unsafe variants, such as sentinel values.
 The data-type generic programming part pertains to implementing the default \type{construct} and \type{destruct} functions.
 
@@ -960,15 +978,18 @@ The data-type generic programming part pertains to implementing the default \typ
 
 \subsubsection{Theory}
 
-Before looking into how \type{Construct} and \type{Destruct} are implemented concretely, it is essential to understand the problem datatype-generic programming is attempting to solve. 
+Before looking into how \type{construct} and \type{destruct} are implemented concretely, it is essential to understand the problem datatype-generic programming is attempting to solve. 
 Paradoxically variant types are best to illustrate the problem, coined the {\it expression problem}\cite{expression-problem}.
 Extending the variants within the \type{Color} type means all functions that pattern match on \type{Color} must be changed. 
 This can be resolved by having a general interface, but extending the behavior of this interface requires all types that implement the interface to change. 
 
 \begin{verbatim}
-    data Color = Red | Green | Blue
-
-    class ColorInterface a  
+    data Color = Red | Green | Blue             class ColorInterface a  
+                                                    transform :: a -> a
+    transform :: Color -> Color
+    transform Red   = ...                       instance ColorInterface Red where
+    transform Green = ...                           transform :: Red -> Red
+    transform Blue  = ...                           transform = ...
 \end{verbatim}
 
 The impact of the {\it expression problem} can be minimized through several methods. 
@@ -977,22 +998,19 @@ In our case we have chosen for the representations to be extensible, which requi
 Both constructing and deconstructing the variant type into a specific variant.
 The possible datatypes is an infinite domain, which can be made finite by considering that all composite types can be reduced to primitive types.
 Datatype-generic programming utilizes the inherit concept of composition in programming languages to operate on any type.
-
-\begin{verbatim}
-    image composite type operating
-\end{verbatim}
-
 This is sufficient to generically operate on the multiple representations, as the semantics of the type are irrelevant for constructing and deconstructing the variant type.
 It requires access to the composition of a type, which is often not natively supported in programming languages.
-While Haskell does support datatype-generic programming through many libraries, we do not operate directly on native Haskell types.
+While Haskell does support datatype-generic programming, we do not operate directly on native Haskell types.
 An implementation through native Haskell types, which Accelerate currently uses for sum types, is restrictive.
-This is apparent when attempting to implement structurally typed sum types or more complex representations\cite{accelerate-sum-types}.
+This is apparent when attempting to implement structurally typed sum types or more complex representations generically\cite{accelerate-sum-types}.
+This is caused due to the \type{Elt} class requiring a direct mapping to the Haskell equivalent. 
 The translation layer remains essential, but can be implemented with the help of the standalone implementation.
 Operating directly on embedded types results in a more targeted and adaptable implementation. 
 
-\begin{verbatim}
-    image separation of concerns
-\end{verbatim}
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=0.15]{framework.png}
+\end{figure}
 
 \newpage
 
@@ -1008,7 +1026,7 @@ This is possible in most embedded languages, as the abstract syntax tree itself 
 A generic way to apply a function on each primitive type is hard to define.
 Each pattern match will refine the type further, which means we need a function that operates on multiple types.
 When passing a polymorphic function to a higher-order function it is not instantiated on the refined type, which means we cannot apply it.
-A solution is to explicitly limit the scope of type variables\footnote{Extension}, such that it is local to the function.
+A solution is to explicitly limit the scope of type variables, such that it is local to the function.
 
 \begin{verbatim}
     traverse :: Monoid r => (forall v. Type v -> r) -> Structure e -> r
@@ -1094,211 +1112,17 @@ In general the implementation should be tailored to the implementation language.
 
 \section{Implementation}
 
-\paragraph{Structural}
+accelerate specific
 
-\paragraph{Nominal}
+\section{Benchmarks}
+
+optional benchmarking of different options
 
 \section{Future work}
 
 \section{Conclusion}
 
-\section{Extra}
-
-\paragraph{Implementation}
-
-Accelerate\cite{accelerate-sum-types} and Futhark\cite{futhark-sum-types} are functional array languages that support 
-
-\paragraph{C/C++}
-
-An union is a structure identical to the largest member of the union.
-Accessing a member of the union extracts the raw value out of the union, independent of the last assigned variant.
-This makes using unions inherently not type-safe to use.
-The variant class template partly solves this by attaching a tag and throwing a runtime error when accessing a variant that was not assigned.
-
-\paragraph{Haskell}
-
-sum type / instances
-
-\paragraph{Dynamic programming languages}
-
-\paragraph{Entity-Component-System}
-
-Systems are top-level functions that operate on all entities that contain a set of components. 
-An entity is idiomatically a set of components, but instantiated as a globally unique index that can identify the associated data components.
-Rather than iterating with this index, systems utilize the implicit structure of an entity to directly iterate on the data components.  
-The 'type' of an entity can be modified by removing or adding components.
-
-The ECS pattern is arguably a reaction to the prevalence of object-oriented languages within game engines.
-The premise is to organizes game-logic within systems rather than components, where the relation between components is flexible\cite{ecs-origin}.
-In contrast to inheritance, where relations are statically determined and game-logic is embedded within an hierarchy.
-In this chapter the type interpretation of entities is discussed, and linked to functional languages.
-
-An entity is fundamentally a composition of components, irrespective of which components can be combined.
-As many object-oriented languages are nominally typed, an entity is often implemented to only have one component of each.
-This means an entity is effectively a {\it set} of components.
-Systems operate on all entities that contain such a set of components, where components are {\it mutated}.
-Structural changes to entities are invoked through statements.
-
-\begin{figure}[ht]
-    \centering
-    \includegraphics[scale=0.2]{ecs}
-    \caption{ conceptual entity-component-system representation of systems }
-\end{figure}
-
-The ECS design pattern is arguably inherently imperative, due to prevalence of mutating state. 
-Apecs, an ECS implementation in Haskell, achieves this imperative style through monads\cite{ecs-apecs}.
-All these considerations are related to the interpretation of the relation between components, in essence the {\it type} of an entity. 
-Rather than emulating ECS, existing type systems can be used to handle the relation between data.
-
-Apecs\cite{ecs-apecs} is an ECS library in Haskell, with experimental support for concurrency through the Software Transactional Memory (STM) monad\cite{STM-monad}.
-The STM monad utilizes atomic instructions to achieve concurrency within a monadic context.
-Entities are stored with an integer dictionary, but can be explicitly stored in a sparse fixed size {\it cache} which allows for constant access time. 
-
-Specs is an ECS library in Rust\cite{ecs-specs}, with native support for parallelism.
-It supports several storages such as: a tree data structure, dense vector, sparse vector and an hashmap.
-Iteration on entities is done by specifying the relation between the components: join, optional and excluded.
-An entity can be {\it flagged} (tag) to denote events such as the destruction of the entity.
-
-Unity is a game-engine which released their production ready Data-Oriented-Tech-Stack (DOTS) in 2022, which centres around an ECS implementation which they have patented\cite{unity-ecs-patent}.
-It uses LLVM to optimize and vectorize C\# code (burst compiler) and has access to their internal c++ library for parallel and concurrent tasks (job system).
-The ECS implementation heavily employs the .NET Compiler Platform Roslyn to generate source-code for iterations on user-defined datatypes.
-An \type{Entity} is idiomatically a composite datatype but implemented as an \type{identifier} with a \type{version}\footnote{Destroying an entity increments the \type{version}, which means copies of entities know they are destroyed and the \type{identifier} can be reused at a later point.}.
-A single array keeps track of all entities, without data components.
-Each \type{Entity} and related data components are stored in a \type{Chunk}, a fixed size buffer of 16000 bytes, alongside other entities with the same \type{Archetype}\footnote{An \type{ISharedComponent} extends this to the value of a component, which means each value has a unique \type{Chunk} and the value can be stored within the \type{Chunk} header. }.
-Instead of pattern matching, a \type{Query} matches on certain properties of entities, such as containing a certain component.
-Collective operations, such as a \type{Job}, operate on a \type{Chunk} directly.
-Structural changes can be queued in parallel, but create a sync-point when executed and involves entities to be moved between chunks.
-This is not required for an \type{IEnableComponent}, which functions as an tagged component akin to the \type{Maybe a} type. 
-A notable observation is that delaying structural changes has side-effects as queued structural changes are not taking in account.
-
-paragraph{Code Generation}
-
-A common factor with data type representation is that they are understandably heavily ingrained within a compiler. 
-This can make an ergonomic and zero-cost abstraction problematic as a compiler will treat the functionally identical types as distinct.
-This can be resolved by generating code dependent on the concrete instantiation of the type. 
-
-\paragraph{Algebraic Data Type}
-
-\paragraph{Accelerate}
-
-Accelerate is a data-parallel array language deeply embedded within Haskell.
-An abstract syntax tree (AST) is created and optimized by Accelerate within Haskell's runtime system.
-This greatly improves useability, as it can function as an Haskell library, at the cost of executing code within another runtime system.
-The garbage collection of the Haskell runtime system is speculated to hinder performance\cite{accelerate-performance}. 
-A type-safe interface to the compiler infrastructure LLVM enabled the creation of two backends: GPU and multi-core CPU's\cite{accelerate-llvm}. 
-These backends can be used to execute a small set of collective operators in parallel; such as \type{map}, \type{fold} and \type{stencil}. 
-
-\begin{verbatim}
-
-dotp :: Acc (Vector Float) -> Acc (Vector Float) -> Acc (Scalar Float)
-dotp xs ys = fold (+) 0 (zipWith (*) xs ys)
-
-\end{verbatim}
-
-The inherit thread-safety and fixed set of collective operators guarantee a consistent application of data-level parallelization.
-It in addition allows for these collective operators to be heavily optimized in isolation, but also in relation to other collective operators.
-A naive implementation of \type{dotp} would create an intermediate array for the results of the \type{zipWith} function\cite{accelerate-array-fusion}.
-Fusing these operations would eliminate an iteration and the intermediate array, at the cost of potential register pressure. 
-Accelerate fuses these collective operations, unless the fusion introduces duplicate work or the \type{compute} function is explicitly called.  
-
-As Accelerate is embedded within Haskell, it uses algebraic data types and tuples for composite datatypes.
-Datatypes must be {\it lifted} into the abstract syntax tree of Accelerate, which is implemented for all native types.
-As algebraic data types are not native, pattern synonyms are used to create an isomorphic mapping {\it at compile-time} between the Haskell and the Accelerate datatype.
-As pattern matching cannot be overloaded in Haskell, the \type{match} operator is used to inject the required branching\cite{accelerate-pattern-matching}.
-
-\begin{verbatim}
-    
-    mkPattern ''Maybe
-
-    apply :: (a -> b) -> Maybe a -> Maybe b
-    apply f = match (fmap f)
-
-    fmap :: (a -> b) -> Maybe a -> Maybe b
-    fmap f (Just_ a) = Just_ (f a)
-    fmap f Nothing_  = Nothing_
-    
-\end{verbatim}
-
-Currently Accelerate uses a non-compact tagged union representation for sum types.
-Research has been done on a compact tagged union representation for parallel arrays, which has been named a {\it Recursive Tagged Union}\cite{accelerate-sum-types}.
-The representation uses a unified tag for nested sum types, which optimizes memory usage at the cost of tag (de-)construction.  
-It has been partly implemented in Accelerate, and has not yet been benchmarked.
-
-An {\it embedded} language defines its terms and values in a {\it host language}.
-\\
-There are various degrees of embedding... shallow, deep, combinator, meta, compiler
-\\
-A problem is embedded pattern matching... as choice elements are evaluated in the host.
-
-\paragraph{C$\lambda$aSH}
-
-A domain-specific language for circuit design that is embedded within Haskell.
-Choice elements, such as algebraic data types, only exist as functions outside the syntactic elements of the language.
-User-defined types are thus restricted to product types and enumeration types, i.e. a sum type without any fields. \cite{clash}
-
-\paragraph{Lava}
-
-Another domain-specific language for circuit design that is embedded within Haskell.
-
-https://www.haskell.org/haskell-symposium/1999/1999-28.pdf
-$https://www.researchgate.net/publication/221562984_Type-safe_observable_sharing_in_Haskell$
-
-
-\paragraph{Accelerate}
-
-Accelerate is a data-parallel array language deeply embedded within Haskell.
-Accelerate internally uses tuples to represent types, which are stored in an struct-of-array fashion.
-Sum types are currently represented as a non-compact tagged union.
-Research has been done on a compact tagged union representation for parallel arrays, which has been named a {\it Recursive Tagged Union}\cite{accelerate-sum-types}.
-The representation uses a unified tag for nested sum types, which optimizes memory usage at the cost of tag (de-)construction.  
-It has not yet been implemented in Accelerate.
-
-Futhark is a functional structurally typed data-parallel array language.
-Research has been done on including structural sum types to the Futhark compiler\cite{futhark-sum-types}, which has been implemented.
-A sum type is flattened to a tuple, which is stored as a struct-of-arrays. 
-Identical primitive types are {\it deduplicated} and share the same tuple slot.
-
-
-As Accelerate is a domain-specific-language within Haskell...
-
-The \type{Elt} type-class (Extract, Load, Transform) defines a mapping between the Haskell and the Accelerate datatype.
-This process has been streamlined through a {\it generic} default implementation, which utilizes a standardized mapping.
-Functions do not use this process, and instead operate directly on the corresponding datatype.
-
-The ECS design pattern is arguably inherently imperative, due to prevalence of mutating state. 
-Apecs, an ECS implementation in Haskell, achieves this imperative style through monads\cite{ecs-apecs}.
-All these considerations are related to the interpretation of the relation between components, in essence the {\it type} of an entity. 
-Rather than emulating ECS, existing type systems can be used to handle the relation between data.
-
-Apecs\cite{ecs-apecs} is an ECS library in Haskell, with experimental support for concurrency through the Software Transactional Memory (STM) monad\cite{STM-monad}.
-The STM monad utilizes atomic instructions to achieve concurrency within a monadic context.
-Entities are stored with an integer dictionary, but can be explicitly stored in a sparse fixed size {\it cache} which allows for constant access time. 
-
-Specs is an ECS library in Rust\cite{ecs-specs}, with native support for parallelism.
-It supports several storages such as: a tree data structure, dense vector, sparse vector and an hashmap.
-Iteration on entities is done by specifying the relation between the components: join, optional and excluded.
-An entity can be {\it flagged} (tag) to denote events such as the destruction of the entity.
-
-Unity is a game-engine which released their production ready Data-Oriented-Tech-Stack (DOTS) in 2022, which centres around an ECS implementation which they have patented\cite{unity-ecs-patent}.
-It uses LLVM to optimize and vectorize C\# code (burst compiler) and has access to their internal c++ library for parallel and concurrent tasks (job system).
-The ECS implementation heavily employs the .NET Compiler Platform Roslyn to generate source-code for iterations on user-defined datatypes.
-An \type{Entity} is idiomatically a composite datatype but implemented as an \type{identifier} with a \type{version}\footnote{Destroying an entity increments the \type{version}, which means copies of entities know they are destroyed and the \type{identifier} can be reused at a later point.}.
-A single array keeps track of all entities, without data components.
-Each \type{Entity} and related data components are stored in a \type{Chunk}, a fixed size buffer of 16000 bytes, alongside other entities with the same \type{Archetype}\footnote{An \type{ISharedComponent} extends this to the value of a component, which means each value has a unique \type{Chunk} and the value can be stored within the \type{Chunk} header. }.
-Instead of pattern matching, a \type{Query} matches on certain properties of entities, such as containing a certain component.
-Collective operations, such as a \type{Job}, operate on a \type{Chunk} directly.
-Structural changes can be queued in parallel, but create a sync-point when executed and involves entities to be moved between chunks.
-This is not required for an \type{IEnableComponent}, which functions as an tagged component akin to the \type{Maybe a} type. 
-A notable observation is that delaying structural changes has side-effects as queued structural changes are not taking in account.
-
-\paragraph{Motivation}
-
-A generic performant implementation is explored, which can alter between the representations.
-An implementation will be done in Accelerate, a data-parallel language embedded within Haskell.
-
-\paragraph{Contributions}
-
-
+\newpage
 
 \bibliographystyle{plain}
 \bibliography{refs}

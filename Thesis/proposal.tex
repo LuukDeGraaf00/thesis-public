@@ -64,20 +64,47 @@ A data-parallel \type{map} and \type{fold} function is sufficient to cover a wid
 A naive intersection algorithm for a raytracer can be defined incredibly concisely compared to a manually vectorized c++ implementation.
 
 \begin{verbatim}
-    nearest :: Ray -> Objects -> Distance
+    nearest :: Ray -> [Triangle] -> Distance
     nearest ray = fold min 1e30f . map (intersect ray)
 
-    float minDistance = 1e30f;
-    for (int i = 0; i < objects.Length; i++)
+    float nearest(Ray ray, Triangle triangles)
     {
-        float distance = intersect(ray, objects[i]);
-        minDistance = min(minDistance, distance);
+        float minDistance = 1e30f;
+        for (int i = 0; i < objects.Length; i++)
+        {
+            float distance = intersect(ray, triangles[i]);
+            minDistance = min(minDistance, distance);
+        }
     }
 \end{verbatim}
 
-An obvious limitation is the lack of low-level control, which is apparent 
+A consideration for working on a higher-abstraction level is the lack of low-level control, which can be crucial in performance sensitive cases.
+Sometimes it is trivial to incorporate low-level optimizations, with the example of the \type{nearest} function using the sentinel value \type{1e30f} to avoid an explicit failure state\footnote{A tag would require branching on the result, which hinders data-parallelism in the general case.}.
+In other cases this is significantly harder, such as low-level optimizations around memory representation and cache efficiency.
+This is made apparent when attempting to extend the intersection code to operate on multiple primitives, such as spheres.
+An initial consideration is whether triangles and spheres are handled on a by element-basis or if they are treated as a separate collection.
 
+\begin{verbatim}
+    data Object = Triangle .. | Sphere ...
 
+    nearest :: Ray -> [Object] -> Distance
+    nearest ray = fold min 1e30f . map (intersect ray)
+
+    
+    class Object a where
+        intersect :: Ray -> a -> Distance
+
+    nearest :: (Object a) => Ray -> [a] -> Distance
+    nearest ray = fold min 1e30f . fold (map (intersect ray)) 1e30
+\end{verbatim}
+
+From a performance standpoint the collection approach appears\footnote{This is by no means absolute, as it scales poorly with the amount of primitives and a GPU would have very little overhead operating on a sorted primitive list due to non-diverging branches. } to maximize opportunities for both data-parallelism and task-parallelism.
+An initial issue arises when we want to know which primitive has been hit, which can be resolved by creating a datatype that either holds a triangle or a sphere. 
+To improve our naive O(n) implementation we can use an Acceleration Structure to eliminate primitives prematurely based on their spatial properties.
+The intersections will be performed in smaller batches which reduces the viability of separating the primitives, unless an Acceleration Structure is made for each primitive type.
+Benchmarking requires both approaches to be maintained, but the dissimilarity between them make it ergonomically uncomfortable.
+From a semantic perspective this is odd due to the approaches being effectively interchangeable.
+The disconnect can be explained by the inability to abstract over both value-level variants and type-level variants.
 
 
 

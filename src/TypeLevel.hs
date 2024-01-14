@@ -5,7 +5,6 @@
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE TypeApplications      #-}
 {-# LANGUAGE ExistentialQuantification #-}
 
 module TypeLevel where
@@ -16,9 +15,6 @@ import GHC.TypeLits
 import GHC.TypeNats
 import Data.Array.Accelerate.Representation.Type
 import Data.Data
-
--- | compact representation akin to a traditional union type (largest variant)
-type Compact (types :: [r]) = NatType (MaximumBitSize 0 types)
 
 -- | preserving representation that ensures no truncating happens
 type Preserving (types :: [r]) = NatTypes (SplitBitSize '[] types)
@@ -196,8 +192,6 @@ type family IX (index :: Nat) (types :: [t]) :: t where
     IX 0 (x : xs) = x
     IX n (x : xs) = IX (n - 1) xs
     IX n '[]      = TypeError (Text "Index out of range!")
-
-
 
 type family Sort (types :: [Nat]) :: [Nat] where
   Sort '[]      = '[]

@@ -23,7 +23,7 @@ import Data.Array.Accelerate.Representation.Type
 import Data.Array.Accelerate.Smart
 import Data.Array.Accelerate.Sugar.Elt
 
-import Types
+import Generics
 
 import Data.Type.Equality ( type (:~:)(..) )
 

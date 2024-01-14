@@ -34,39 +34,22 @@ import Data.Array.Accelerate.Representation.Type
 import Data.Array.Accelerate.Type
 import Data.Typeable
 import Transform
-import Types
+import Generics
 import TypeLevel
 import qualified GHC.TypeLits as NAT
 import Data.Dynamic
 
--- | legacy change later
-newtype V (types :: [t]) = Var (EltR (V types))
+-- | useful variant type that constructs the representation
+type V value (variants :: [variant]) = Variant (Constructor value) variants
 
-
-
-
+-- | generic variant type
 data Variant (function :: [variant] -> *) (variants :: [variant])
 
-
-
-
-type VariantS value (variants :: [variant]) = Variant (Constructor value) variants
-
-
-type Example types = VariantS Int types
-
-
-data CompactArgument :: *
+-- | constructor data family that creates a representation constructor
 data family Constructor argument :: [variant] -> *
 
-
-newtype instance Constructor CompactArgument types = Compact (Compact types)
-
-
---type Test (variants :: [variant]) = Variant Preserving variants
-
--- | Accelerate instance
-instance (Elt (compact types), Tags (Variant compact types)) => Elt (Variant compact types) where
+-- | generic sum type implementation
+instance Elt (compact types) => Elt (Variant compact types) where
 
     -- | tag with a compact representation
     type EltR (Variant compact types) = (TAG, EltR (compact types))
@@ -78,7 +61,7 @@ instance (Elt (compact types), Tags (Variant compact types)) => Elt (Variant com
     -- | linear creation of tags (no nested pattern matching)
     tagsR :: [TagR (EltR (Variant compact types))]
     tagsR = [TagRtag n t | n <- [0..size - 1], t <- (tagsR @(compact types))]
-      where size = P.fromIntegral (P.length (tags @(Variant compact types) 0))
+      where size = 10 -- change later
     
     -- | raw data
     toElt :: EltR (Variant compact types) -> Variant compact types
@@ -88,31 +71,83 @@ instance (Elt (compact types), Tags (Variant compact types)) => Elt (Variant com
     fromElt :: Variant compact types -> EltR (Variant compact types)
     fromElt = undefined
 
+-- | default relation between variants
+class (Elt t, Elt v) => Element t v where
 
--- | Accelerate instance
-instance (Elt (Preserving types), NAT.KnownNat (Length types), Tags (V types)) => Elt (V types) where
+  -- | insert variant
+  construct :: Exp v -> Exp t
+  construct = Construct
 
-    -- | tag with a compact representation
-    type EltR (V types) = (TAG, EltR (Preserving types))
+  -- | extract variant
+  destruct :: Exp t -> Exp v
+  destruct = Destruct
 
-    -- | borrow representation from the assumption we return a valid type
-    eltR :: TypeR (EltR (V types))
-    eltR = TupRpair (TupRsingle TW8) (eltR @(Preserving types))
-    
-    -- | linear creation of tags (no nested pattern matching)
-    tagsR :: [TagR (EltR (V types))]
-    tagsR = [TagRtag n t | n <- [0..size - 1], t <- (tagsR @(Preserving types))]
-      where size = P.fromIntegral (P.length (tags @(V types) 0))
-    
-    -- | raw data
-    toElt :: EltR (V types) -> V types
-    toElt = Var
-    
-    -- | raw data
-    fromElt :: V types -> EltR (V types)
-    fromElt (Var x) = x
+-- | generate pattern synonym for a variant
+pattern Variant :: forall t v. (Element t v) => Exp v -> Exp t
+pattern Variant t <- (matching -> (True, t))
+  where Variant v = construct @t @v v
+
+-- | generate pattern synonym for an untagged union
+pattern Union :: forall t v. (Element t v) => Exp v -> Exp t
+pattern Union t <- (destruct @t @v -> t)
+  where Union v = construct @t @v v
+
+-- | generate pattern synonym for any transform
+pattern Construct :: forall t v. (Elt t, Elt v) => Exp v -> Exp t
+pattern Construct value <- (P.snd (insert @v @t) -> value)
+  where Construct value = P.fst (insert @v @t) value
+
+-- | generate pattern synonym for any transform
+pattern Destruct :: forall t v. (Elt t, Elt v) => Exp v -> Exp t
+pattern Destruct value <- (P.fst (insert @t @v) -> value)
+  where Destruct value = P.snd (insert @t @v) value
+
+-- | generic constructor pattern synonym
+pattern Con :: forall n v vs f. (Elt (IX n vs), Elt (f vs), Typeable (EltR (IX n vs)), NAT.KnownNat n) => Exp (IX n vs) -> Exp (Variant f vs)
+pattern Con v <- (matchable (toWord @n) -> Just v)
+  where Con v = constructable (toWord @n) (Construct v :: Exp (f vs))
+
+-- | generic constructor pattern synonym for first element
+pattern Con0 :: forall v vs f. (Elt (IX 0 vs), Elt (f vs), Typeable (EltR (IX 0 vs))) => Exp (IX 0 vs) -> Exp (Variant f vs)
+pattern Con0 v <- (matchable 0 -> Just v)
+  where Con0 v = constructable 0 (Construct v :: Exp (f vs))
+
+-- | generic constructor pattern synonym for second element
+pattern Con1 :: forall v vs f. (Elt (IX 1 vs), Elt (f vs), Typeable (EltR (IX 1 vs))) => Exp (IX 1 vs) -> Exp (Variant f vs)
+pattern Con1 v <- (matchable 1 -> Just v)
+  where Con1 v = constructable 1 (Construct v :: Exp (f vs))
+
+-- | generic constructor pattern synonym for third element
+pattern Con2 :: forall v vs f. (Elt (IX 2 vs), Elt (f vs), Typeable (EltR (IX 2 vs))) => Exp (IX 2 vs) -> Exp (Variant f vs)
+pattern Con2 v <- (matchable 2 -> Just v)
+  where Con2 v = constructable 2 (Construct v :: Exp (f vs))
+
+-- | constructs a variant with the word
+constructable :: (EltR t ~ (Word8, EltR v)) => Word8 -> Exp v -> Exp t
+constructable word e = Exp (SmartExp (Pair (SmartExp (Const TW8 word)) (unExp e)))
+
+-- | use trace to identity if it matches constructor and the corresponding tag
+matchable :: forall v vs f. (Elt v, Typeable (EltR v), Elt (Variant f vs)) => Word8 -> Exp (Variant f vs) -> Maybe (Exp v)
+matchable constructor (Exp (SmartExp (Match trace e))) = case (constructor P.== tag0, fromDynamic d) of
+          (True, Just nested) -> Just (Exp (SmartExp (Match nested (unExp (Destruct (Exp e :: Exp (Variant f vs)) :: Exp v)))))
+          _                   -> Nothing
+
+      where (TagE tag0 d) = tags @(Variant f vs) 0 P.!! P.fromIntegral (getTag trace)
+matchable _ _                                           = Nothing
+
+
+tags :: forall v vs f. Word8 -> [TagE]
+tags n = undefined --P.map (TagE n . toDyn) (tagsR @v) P.++ tags @(V f vs) (n + 1)
+
+
+getTag :: TagR a -> TAG
+getTag (TagRtag w _) =  w
+getTag _ = error "oops"
 
 data TagE = forall a. TagE !Word8 !Dynamic
+
+
+{-
 
 instance Show TagE where
 
@@ -137,51 +172,25 @@ dah = tagsR @(V [Maybe Float, Int32])
 
 duh = tags @(V [Maybe Float, Int32]) 0
 
+
+
 test :: Exp (Maybe Float || Int32) -> Exp (Int32 || Float)
 test (Con0 Nothing_)  = Con0 5
 test (Con0 (Just_ f)) = Con1 f
 test (Con1 i)         = Con0 i
 test _                = Con0 0
 
--- | generic constructor that works on type level indices
-pattern Con :: forall n v vs. (Elt (IX n vs), Typeable (EltR (IX n vs)), Elt (V vs), Elt (Preserving vs), Tags (V vs), NAT.KnownNat n) => Exp (IX n vs) -> Exp (V vs)
-pattern Con v <- (matchable (toWord @n) -> Just v)
-  where Con v = constructable (toWord @n) (Construct v :: Exp (Preserving vs))
+-}
 
--- | 
-pattern Con0 :: forall v vs. (Elt (IX 0 vs), Elt (V vs), Elt (Preserving vs), Tags (V vs), Typeable (EltR (IX 0 vs))) => Exp (IX 0 vs) -> Exp (V vs)
-pattern Con0 v <- (matchable 0 -> Just v)
-  where Con0 v = constructable 0 (Construct v :: Exp (Preserving vs))
-
-pattern Con1 :: forall v vs. (Elt (IX 1 vs), Elt (V vs), Elt (Preserving vs), Tags (V vs), Typeable (EltR (IX 1 vs))) => Exp (IX 1 vs) -> Exp (V vs)
-pattern Con1 v <- (matchable 1 -> Just v)
-  where Con1 v = constructable 1 (Construct v :: Exp (Preserving vs))
-
-pattern Con2 :: forall v vs. (Elt (IX 2 vs), Elt (V vs), Elt (Preserving vs), Tags (V vs), Typeable (EltR (IX 2 vs))) => Exp (IX 2 vs) -> Exp (V vs)
-pattern Con2 v <- (matchable 2 -> Just v)
-  where Con2 v = constructable 2 (Construct v :: Exp (Preserving vs))
+{-
 
 
--- | constructs a variant with the word
-constructable :: (EltR t ~ (Word8, EltR v)) => Word8 -> Exp v -> Exp t
-constructable word e = Exp (SmartExp (Pair (SmartExp (Const TW8 word)) (unExp e)))
-
--- | use trace to identity if it matches constructor and the corresponding tag
-matchable :: forall v vs. (Elt v, Typeable (EltR v), Elt (V vs), Tags (V vs)) => Word8 -> Exp (V vs) -> Maybe (Exp v)
-matchable constructor (Exp (SmartExp (Match trace e))) = case (constructor P.== tag0, fromDynamic d) of
-          (True, Just nested) -> Just (Exp (SmartExp (Match nested (unExp (Destruct (Exp e :: Exp (V vs)) :: Exp v)))))
-          _                   -> Nothing
-      where (TagE tag0 d) = tags @(V vs) 0 P.!! P.fromIntegral (getTag trace)
-matchable _ _                                           = Nothing
+-}
 
 
 -- | function that generates all possible tags for a list of types (?) => use TagR, 
 finder :: forall v vs. TAG -> (TAG, TagR v)
 finder trace = undefined
-
--- 
---huh :: [Float, Int] -> ()
---huh = undefined
 
 
 -- | expects the match term generated by the 'match' function 
@@ -195,10 +204,6 @@ toWord :: forall n. (NAT.KnownNat n) => Word8
 toWord = P.fromIntegral (NAT.natVal (Proxy @n))
 
 
-getTag :: TagR a -> TAG
-getTag (TagRtag w _) =  w
-getTag _ = error "oops"
-
 
 isTag :: Word8 -> TagR a -> Bool
 isTag l TagRunit       = False
@@ -211,10 +216,8 @@ typeListLength :: forall t r. (NAT.KnownNat (Length t), P.Num r) => r
 typeListLength = P.fromIntegral (NAT.natVal (Proxy @(Length t)))
 
 
-toRep = tagsR @(V [Int, Float, Word8])
-
 -- | identifier of a particular variant
-data Identifier t = forall v. (VariantF t v) => V (TagR (EltR t))
+data Identifier t = forall v. (Element t v) => V (TagR (EltR t))
 
 instance Show (Identifier t) where
   show (V a) = P.show a
@@ -235,44 +238,10 @@ class (Sum t) => Storage t where
   -- | label
   rhs :: Identifier t -> TAG
 
--- | variant relation between types
-class (Typeable t, Typeable v, Elt t, Elt v, Sum t) => VariantF t v where
 
-  -- | insert variant
-  construct :: Exp v -> Exp t
-  construct = Construct
-
-  -- | extract variant
-  destruct :: Exp t -> Exp v
-  destruct = Destruct
-
-  -- |
-  identity :: (TypeRep, TypeRep)
-  identity = (typeRep (Proxy @t), typeRep (Proxy @v))
-
-
--- | generate pattern synonym for a variant
-pattern Variant :: forall t v. (VariantF t v) => Exp v -> Exp t
-pattern Variant t <- (matching -> (True, t))
-  where Variant v = construct @t @v v
-
--- | generate pattern synonym for an untagged union
-pattern Union :: forall t v. (VariantF t v) => Exp v -> Exp t
-pattern Union t <- (destruct @t @v -> t)
-  where Union v = construct @t @v v
-
--- | generate pattern synonym for any transform
-pattern Construct :: forall t v. (Elt t, Elt v) => Exp v -> Exp t
-pattern Construct value <- (P.snd (insert @v @t) -> value)
-  where Construct value = P.fst (insert @v @t) value
-
--- | generate pattern synonym for any transform
-pattern Destruct :: forall t v. (Elt t, Elt v) => Exp v -> Exp t
-pattern Destruct value <- (P.fst (insert @t @v) -> value)
-  where Destruct value = P.snd (insert @t @v) value
 
 -- | expects the match term generated by the 'match' function 
-matching :: forall t v. (VariantF t v) => Exp t -> (Bool, Exp v)
+matching :: forall t v. (Element t v) => Exp t -> (Bool, Exp v)
 matching (Exp (SmartExp (Match tag e))) = undefined --(create @t @v P.== tag, destruct @t @v (Exp e))
 matching _                              = error "Forgot the match!"
 

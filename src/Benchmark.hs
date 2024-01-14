@@ -20,8 +20,7 @@ import Data.Array.Accelerate.Data.Maybe as M
 import Data.Array.Accelerate.Data.Bits as B
 import Criterion.Main
 
-import Implementation.Chunk
-import Types
+import Generics
 
 
 -- | entry point for benchmarking

@@ -83,14 +83,14 @@ Sometimes it is trivial to incorporate low-level optimizations, with the example
 In other cases this is significantly harder, such as low-level optimizations around memory representation and cache efficiency.
 This is made apparent when attempting to extend the intersection code to operate on multiple primitives, such as spheres.
 An initial consideration is whether triangles and spheres are handled on a by element-basis or if they are treated as a separate collection.
+da
 
 \begin{verbatim}
     data Object = Triangle .. | Sphere ...
 
     nearest :: Ray -> [Object] -> Distance
     nearest ray = fold min 1e30f . map (intersect ray)
-
-    
+  
     class Object a where
         intersect :: Ray -> a -> Distance
 

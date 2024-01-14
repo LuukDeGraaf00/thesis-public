@@ -21,7 +21,7 @@ extra-source-files:
     CHANGELOG.md
 
 library
-    exposed-modules: Benchmark, Transform, Types, TypeLevel, Variant, Store, Minimal, Implementation.Map, Implementation.Chunk, Implementation.Type, Implementation.Conversion
+    exposed-modules: Implementation, Benchmark, Generics, Transform, TypeLevel, Variant
 
     -- Modules included in this library but not exported.
     -- other-modules:

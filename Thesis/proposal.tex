@@ -59,18 +59,18 @@
 
 \section{Introduction}
 
-Data-parallel array languages can operate on a higher abstraction level by distributing instructions over multiple elements. 
+Array languages can operate on a higher abstraction level and implicitly execute instruction in parallel. 
 A data-parallel \type{map} and \type{fold} function is sufficient to cover a wide range of high-performance applications.
 A naive intersection algorithm for a raytracer can be defined incredibly concisely compared to a manually vectorized c++ implementation.
 
 \begin{verbatim}
-    nearest :: Ray -> [Triangle] -> Distance
+    nearest :: Ray -> [Triangle] -> Float
     nearest ray = fold min 1e30f . map (intersect ray)
 
-    float nearest(Ray ray, Triangle triangles)
+    float nearest(Ray ray, Triangle triangles) // find scary SIMD instructions
     {
         float minDistance = 1e30f;
-        for (int i = 0; i < objects.Length; i++)
+        for (int i = 0; i < objects.Length; i += 4)
         {
             float distance = intersect(ray, triangles[i]);
             minDistance = min(minDistance, distance);
@@ -79,36 +79,44 @@ A naive intersection algorithm for a raytracer can be defined incredibly concise
 \end{verbatim}
 
 A consideration for working on a higher-abstraction level is the lack of low-level control, which can be crucial in performance sensitive cases.
-Sometimes it is trivial to incorporate low-level optimizations, with the example of the \type{nearest} function using the sentinel value \type{1e30f} to avoid an explicit failure state\footnote{A tag would require branching on the result, which hinders data-parallelism in the general case.}.
+Sometimes it is possible to incorporate optimizations easily, with the example of the \type{nearest} function using the sentinel value \type{1e30f} to avoid an explicit failure state\footnote{A tag would require branching on the result, which hinders data-parallelism in the general case.}.
 In other cases this is significantly harder, such as low-level optimizations around memory representation and cache efficiency.
-This is made apparent when attempting to extend the intersection code to operate on multiple primitives, such as spheres.
-An initial consideration is whether triangles and spheres are handled on a by element-basis or if they are treated as a separate collection.
-da
+This is made apparent when attempting to extend the intersection code to operate on other primitives, such as spheres.
+The path of least resistance is to create a primitive datatype that can either be a triangle or a sphere.
 
 \begin{verbatim}
-    data Object = Triangle .. | Sphere ...
+    data Primitive = Triangle ... | Sphere ...
 
-    nearest :: Ray -> [Object] -> Distance
+    nearest :: Ray -> [Primitive] -> Float
     nearest ray = fold min 1e30f . map (intersect ray)
-  
-    class Object a where
-        intersect :: Ray -> a -> Distance
+\end{verbatim}
 
-    nearest :: (Object a) => Ray -> [a] -> Distance
+This can also be used to return the primitive that was hit. 
+In the general case\footnote{Branching that is not diverging is not problematic on the GPU, which is the case when the array is sorted.} this will hinder data-parallelism as it requires branching on the identity of the object.
+A solution is to handle primitives separately, which can be achieved nicely through an uniform interface to the primitive.
+
+\begin{verbatim}
+    class Primitive a where
+        intersect :: Ray -> a -> Float
+
+    nearest :: (Object a) => Ray -> [[a]] -> Float
     nearest ray = fold min 1e30f . fold (map (intersect ray)) 1e30
 \end{verbatim}
 
-From a performance standpoint the collection approach appears\footnote{This is by no means absolute, as it scales poorly with the amount of primitives and a GPU would have very little overhead operating on a sorted primitive list due to non-diverging branches. } to maximize opportunities for both data-parallelism and task-parallelism.
-An initial issue arises when we want to know which primitive has been hit, which can be resolved by creating a datatype that either holds a triangle or a sphere. 
-To improve our naive O(n) implementation we can use an Acceleration Structure to eliminate primitives prematurely based on their spatial properties.
-The intersections will be performed in smaller batches which reduces the viability of separating the primitives, unless an Acceleration Structure is made for each primitive type.
-Benchmarking requires both approaches to be maintained, but the dissimilarity between them make it ergonomically uncomfortable.
-From a semantic perspective this is odd due to the approaches being effectively interchangeable.
-The disconnect can be explained by the inability to abstract over both value-level variants and type-level variants.
-
-
+To improve our naive O(n) implementation we can use an acceleration structure to eliminate primitives prematurely based on their spatial properties.
+This means intersections will be performed in smaller batches, which reduces the opportunities for data-parallelism.
+From a performance standpoint it might be preferable to separate the primitives on a batch-level, requiring another datatype.
+Maintaining all approaches is ergonomically not viable, which is odd when considering that all approaches are interchangeable in their intent to operate on multiple variants of a type.
+The disconnect can be explained by the inability to abstract over both value-level variant types and type-level variant types.
+ Unification of these concepts would reformulate operating on non-uniform data to an optimization problem.
+Within this paper we propose a way to ergonomically switch between efficient representations of non-uniform data.
+We preserve type-safety by elevating the concept of a mutual exclusive datatype to the type-level, which is achieved through type-level and datatype-generic programming.
+An implementation can exist without it being natively supported as construct in the implementation language.
+Which can be utilized by libraries, frameworks and embedded domain-specific languages that exist in languages that facilitate type-level programming and datatype-generic programming, like Haskell.
 
 \newpage
+
+
 
 \section{Introduction}
 
@@ -134,11 +142,7 @@ The approaches are all similar in intent, to iterate on a variant of a type, but
 An ergonomic way to switch between these approaches can be essential for deducing the most performant option through benchmarking.
 An efficient and type-safe abstraction that encapsulates these approaches is non-trivial, as it involves both the value and type representation.
 This is apparent when attempting to define functions that can operate on both value-level variants (tagged unions) and type-level variants (types).
-Unification of these concepts would reformulate operating on non-uniform data to an optimization problem.
-Within this paper we propose a way to ergonomically switch between efficient representations of non-uniform data.
-We preserve type-safety by elevating the concept of a mutual exclusive datatype to the type-level, which is achieved through type-level and datatype-generic programming.
-An implementation can exist without it being natively supported as construct in the implementation language.
-Which can be utilized by libraries, frameworks and embedded domain-specific languages that exist in languages that facilitate type-level programming and datatype-generic programming, like Haskell.
+
 
 \newpage
 

@@ -59,29 +59,37 @@
 
 \section{Introduction}
 
-Array languages can operate on a higher abstraction level and implicitly execute instruction in parallel. 
+Array languages can operate on a higher abstraction level and implicitly execute instructions in parallel. 
 A data-parallel \type{map} and \type{fold} function is sufficient to cover a wide range of high-performance applications.
 A naive intersection algorithm for a raytracer can be defined incredibly concisely compared to a manually vectorized c++ implementation.
+It requires the intersection function to have a vectorized version and the remaining scalar loop to be handled.
 
 \begin{verbatim}
     nearest :: Ray -> [Triangle] -> Float
     nearest ray = fold min 1e30f . map (intersect ray)
 
-    float nearest(Ray ray, Triangle triangles) // find scary SIMD instructions
+    float nearest(Ray ray, Triangle tri)
     {
-        float minDistance = 1e30f;
-        for (int i = 0; i < objects.Length; i += 4)
+        float4 minimum4 = float4(1e30f, 1e30f, 1e30f, 1e30f);
+        for (int i = 0; i < objects.Length / 4; i += 4)
         {
-            float distance = intersect(ray, triangles[i]);
-            minDistance = min(minDistance, distance);
+            float4 dist4 = intersect(ray, tri[i], tri[i + 1], tri[i + 2], tri[i + 3]);
+            minimum4 = min(minimum4, dist4);
         }
+        float minimum = min(min(minimum4.x, minimum4.y), min(minimum4.y, minimum4.z))
+        for (int i = 0; i < objects.Length % 4; i++)
+        {
+            float distance = intersect(ray, tri[objects.Length + i]);
+            minimum = min(minimum, distance);
+        }
+        return minimum;
     }
 \end{verbatim}
 
 A consideration for working on a higher-abstraction level is the lack of low-level control, which can be crucial in performance sensitive cases.
-Sometimes it is possible to incorporate optimizations easily, with the example of the \type{nearest} function using the sentinel value \type{1e30f} to avoid an explicit failure state\footnote{A tag would require branching on the result, which hinders data-parallelism in the general case.}.
+Sometimes it is possible to easily incorporate optimizations, with the example of the \type{nearest} function using the sentinel value \type{1e30f} to avoid an explicit failure state\footnote{A tag would require branching on the result, which hinders data-parallelism in the general case.}.
 In other cases this is significantly harder, such as low-level optimizations around memory representation and cache efficiency.
-This is made apparent when attempting to extend the intersection code to operate on other primitives, such as spheres.
+This is made apparent when attempting to extend the intersection function to operate on other primitives, such as spheres.
 The path of least resistance is to create a primitive datatype that can either be a triangle or a sphere.
 
 \begin{verbatim}
@@ -91,9 +99,9 @@ The path of least resistance is to create a primitive datatype that can either b
     nearest ray = fold min 1e30f . map (intersect ray)
 \end{verbatim}
 
-This can also be used to return the primitive that was hit. 
-In the general case\footnote{Branching that is not diverging is not problematic on the GPU, which is the case when the array is sorted.} this will hinder data-parallelism as it requires branching on the identity of the object.
-A solution is to handle primitives separately, which can be achieved nicely through an uniform interface to the primitive.
+Such datatype can also be used to return the specific primitive that was hit. 
+In the general case\footnote{Branching that is not diverging is not problematic on the GPU, which is the case when the array is sorted.} this will unfortunately hinder data-parallelism as it requires branching on the identity of the object.
+A solution is to handle primitives as separate types, which can be achieved nicely through an uniform interface to the primitive.
 
 \begin{verbatim}
     class Primitive a where
@@ -107,44 +115,11 @@ To improve our naive O(n) implementation we can use an acceleration structure to
 This means intersections will be performed in smaller batches, which reduces the opportunities for data-parallelism.
 From a performance standpoint it might be preferable to separate the primitives on a batch-level, requiring another datatype.
 Maintaining all approaches is ergonomically not viable, which is odd when considering that all approaches are interchangeable in their intent to operate on multiple variants of a type.
-The disconnect can be explained by the inability to abstract over both value-level variant types and type-level variant types.
- Unification of these concepts would reformulate operating on non-uniform data to an optimization problem.
-Within this paper we propose a way to ergonomically switch between efficient representations of non-uniform data.
-We preserve type-safety by elevating the concept of a mutual exclusive datatype to the type-level, which is achieved through type-level and datatype-generic programming.
+The inability to abstract over both value-level variant types and type-level variant types prevent an higher level abstraction from taking form.
+Within this paper we propose a way to ergonomically switch between efficient representations for collections of variant types.
+Type-safety is preserved by elevating the concept of a mutual exclusive datatype to the type-level, which is achieved through type-level and datatype-generic programming.
 An implementation can exist without it being natively supported as construct in the implementation language.
-Which can be utilized by libraries, frameworks and embedded domain-specific languages that exist in languages that facilitate type-level programming and datatype-generic programming, like Haskell.
-
-\newpage
-
-
-
-\section{Introduction}
-
-Abstractions in programming languages simplify code and allow for implicit exploitation of arising properties.
-Pure functional array languages utilize the independence between computations to implicitly parallelize array operations.
-This is complicated in languages that are not inherently thread-safe.
-Many high-performance applications adopt a data-oriented design, which centres around data transformations and avoiding abstractions around data. 
-Both parallelization opportunities and cache efficiency are focal points of the data-oriented design paradigm.
-A challenge with data-oriented design is representing non-uniform data efficiently while preserving vectorization opportunities and type safety. 
-
-The issue can be illustrated through raytracing, an embarrassingly parallel problem with several instances of non-uniform data.
-The main instance occurs when recursively intersecting geometry.
-The exception state of a ray not intersection with any geometry is propagated along, which prevents any vectorization attempts of subsequent rays. 
-In practice this is solved by either unconditionally executing subsequent rays or reordering the rays for each recursive step.
-These considerations also exist outside exception states, such as handling multiple shapes of geometry efficiently in data-parallel context.  
-
-\begin{figure}[ht]
-    \centering
-    \includegraphics[scale=0.3]{introduction.drawio.png}
-\end{figure}
-
-The approaches are all similar in intent, to iterate on a variant of a type, but can have significant runtime performance implications.
-An ergonomic way to switch between these approaches can be essential for deducing the most performant option through benchmarking.
-An efficient and type-safe abstraction that encapsulates these approaches is non-trivial, as it involves both the value and type representation.
-This is apparent when attempting to define functions that can operate on both value-level variants (tagged unions) and type-level variants (types).
-
-
-\newpage
+This can be utilized by libraries, frameworks and embedded domain-specific languages that exist in languages that facilitate type-level programming and datatype-generic programming, like Haskell.
 
 \subsection{Related Work}
 

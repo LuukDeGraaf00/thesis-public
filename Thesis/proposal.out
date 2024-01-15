@@ -1,28 +1,27 @@
 \BOOKMARK [1][-]{section.1}{Introduction}{}% 1
-\BOOKMARK [1][-]{section.2}{Introduction}{}% 2
-\BOOKMARK [2][-]{subsection.2.1}{Related Work}{section.2}% 3
-\BOOKMARK [1][-]{section.3}{Performance}{}% 4
-\BOOKMARK [2][-]{subsection.3.1}{Optimizations}{section.3}% 5
-\BOOKMARK [2][-]{subsection.3.2}{Principles}{section.3}% 6
-\BOOKMARK [2][-]{subsection.3.3}{Data structures}{section.3}% 7
-\BOOKMARK [3][-]{subsubsection.3.3.1}{Element-wise}{subsection.3.3}% 8
-\BOOKMARK [3][-]{subsubsection.3.3.2}{Variant-wise}{subsection.3.3}% 9
-\BOOKMARK [2][-]{subsection.3.4}{Memory Representation}{section.3}% 10
-\BOOKMARK [1][-]{section.4}{Interface}{}% 11
-\BOOKMARK [2][-]{subsection.4.1}{Paradigm}{section.4}% 12
-\BOOKMARK [3][-]{subsubsection.4.1.1}{Entity-Component-System}{subsection.4.1}% 13
-\BOOKMARK [3][-]{subsubsection.4.1.2}{Algebraic Data Type}{subsection.4.1}% 14
-\BOOKMARK [2][-]{subsection.4.2}{Type-level programming}{section.4}% 15
-\BOOKMARK [3][-]{subsubsection.4.2.1}{Kinds}{subsection.4.2}% 16
-\BOOKMARK [3][-]{subsubsection.4.2.2}{Type Family}{subsection.4.2}% 17
-\BOOKMARK [3][-]{subsubsection.4.2.3}{Interface}{subsection.4.2}% 18
-\BOOKMARK [3][-]{subsubsection.4.2.4}{Type Structure}{subsection.4.2}% 19
-\BOOKMARK [3][-]{subsubsection.4.2.5}{Layout}{subsection.4.2}% 20
-\BOOKMARK [2][-]{subsection.4.3}{Datatype-Generic programming}{section.4}% 21
-\BOOKMARK [3][-]{subsubsection.4.3.1}{Verifying}{subsection.4.3}% 22
-\BOOKMARK [3][-]{subsubsection.4.3.2}{Theory}{subsection.4.3}% 23
-\BOOKMARK [3][-]{subsubsection.4.3.3}{Framework}{subsection.4.3}% 24
-\BOOKMARK [1][-]{section.5}{Implementation}{}% 25
-\BOOKMARK [1][-]{section.6}{Benchmarks}{}% 26
-\BOOKMARK [1][-]{section.7}{Future work}{}% 27
-\BOOKMARK [1][-]{section.8}{Conclusion}{}% 28
+\BOOKMARK [2][-]{subsection.1.1}{Related Work}{section.1}% 2
+\BOOKMARK [1][-]{section.2}{Performance}{}% 3
+\BOOKMARK [2][-]{subsection.2.1}{Optimizations}{section.2}% 4
+\BOOKMARK [2][-]{subsection.2.2}{Principles}{section.2}% 5
+\BOOKMARK [2][-]{subsection.2.3}{Data structures}{section.2}% 6
+\BOOKMARK [3][-]{subsubsection.2.3.1}{Element-wise}{subsection.2.3}% 7
+\BOOKMARK [3][-]{subsubsection.2.3.2}{Variant-wise}{subsection.2.3}% 8
+\BOOKMARK [2][-]{subsection.2.4}{Memory Representation}{section.2}% 9
+\BOOKMARK [1][-]{section.3}{Interface}{}% 10
+\BOOKMARK [2][-]{subsection.3.1}{Paradigm}{section.3}% 11
+\BOOKMARK [3][-]{subsubsection.3.1.1}{Entity-Component-System}{subsection.3.1}% 12
+\BOOKMARK [3][-]{subsubsection.3.1.2}{Algebraic Data Type}{subsection.3.1}% 13
+\BOOKMARK [2][-]{subsection.3.2}{Type-level programming}{section.3}% 14
+\BOOKMARK [3][-]{subsubsection.3.2.1}{Kinds}{subsection.3.2}% 15
+\BOOKMARK [3][-]{subsubsection.3.2.2}{Type Family}{subsection.3.2}% 16
+\BOOKMARK [3][-]{subsubsection.3.2.3}{Interface}{subsection.3.2}% 17
+\BOOKMARK [3][-]{subsubsection.3.2.4}{Type Structure}{subsection.3.2}% 18
+\BOOKMARK [3][-]{subsubsection.3.2.5}{Layout}{subsection.3.2}% 19
+\BOOKMARK [2][-]{subsection.3.3}{Datatype-Generic programming}{section.3}% 20
+\BOOKMARK [3][-]{subsubsection.3.3.1}{Verifying}{subsection.3.3}% 21
+\BOOKMARK [3][-]{subsubsection.3.3.2}{Theory}{subsection.3.3}% 22
+\BOOKMARK [3][-]{subsubsection.3.3.3}{Framework}{subsection.3.3}% 23
+\BOOKMARK [1][-]{section.4}{Implementation}{}% 24
+\BOOKMARK [1][-]{section.5}{Benchmarks}{}% 25
+\BOOKMARK [1][-]{section.6}{Future work}{}% 26
+\BOOKMARK [1][-]{section.7}{Conclusion}{}% 27

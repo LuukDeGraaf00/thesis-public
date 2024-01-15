@@ -90,7 +90,7 @@ A consideration for working on a higher-abstraction level is the lack of low-lev
 Sometimes it is possible to easily incorporate optimizations, with the example of the \type{nearest} function using the sentinel value \type{1e30f} to avoid an explicit failure state\footnote{A tag would require branching on the result, which hinders data-parallelism in the general case.}.
 In other cases this is significantly harder, such as low-level optimizations around memory representation and cache efficiency.
 This is made apparent when attempting to extend the intersection function to operate on other primitives, such as spheres.
-The path of least resistance is to create a primitive datatype that can either be a triangle or a sphere.
+The path of least resistance is to create a datatype that can either be a triangle or a sphere.
 
 \begin{verbatim}
     data Primitive = Triangle ... | Sphere ...
@@ -113,10 +113,13 @@ A solution is to handle primitives as separate types, which can be achieved nice
 
 To improve our naive O(n) implementation we can use an acceleration structure to eliminate primitives prematurely based on their spatial properties.
 This means intersections will be performed in smaller batches, which reduces the opportunities for data-parallelism.
-From a performance standpoint it might be preferable to separate the primitives on a batch-level, requiring another datatype.
-Maintaining all approaches is ergonomically not viable, which is odd when considering that all approaches are interchangeable in their intent to operate on multiple variants of a type.
+From a performance standpoint it might be preferable to separate the primitives on a batch-level, requiring even more datatypes.
+Maintaining all of them is ergonomically not viable, which is odd when considering that all approaches are interchangeable in their intent to operate on multiple variants of a type.
 The inability to abstract over both value-level variant types and type-level variant types prevent an higher level abstraction from taking form.
-Within this paper we propose a way to ergonomically switch between efficient representations for collections of variant types.
+
+Another symptom 
+
+Within this paper we propose a way to ergonomically switch between efficient variant type representations for data-parallel applications.
 Type-safety is preserved by elevating the concept of a mutual exclusive datatype to the type-level, which is achieved through type-level and datatype-generic programming.
 An implementation can exist without it being natively supported as construct in the implementation language.
 This can be utilized by libraries, frameworks and embedded domain-specific languages that exist in languages that facilitate type-level programming and datatype-generic programming, like Haskell.

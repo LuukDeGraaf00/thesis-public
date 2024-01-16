@@ -112,6 +112,24 @@ Deborah~T. Marr, Frank Binns, David~L. Hill, Glenn Hinton, David~A. Koufaty,
 Adam Martin.
 \newblock Entity systems are the future of mmog development, 2007.
 
+\bibitem{accelerate-llvm}
+Trevor~L. McDonell, Manuel M~T Chakravarty, Vinod Grover, and Ryan~R Newton.
+\newblock {Type-safe Runtime Code Generation: Accelerate to LLVM}.
+\newblock In {\em Haskell '15: The 8th ACM SIGPLAN Symposium on Haskell}, pages
+  201--212. ACM, September 2015.
+
+\bibitem{accelerate-array-fusion}
+Trevor~L. McDonell, Manuel M~T Chakravarty, Gabriele Keller, and Ben Lippmeier.
+\newblock {Optimising Purely Functional GPU Programs}.
+\newblock In {\em ICFP '13: The 18th ACM SIGPLAN International Conference on
+  Functional Programming}. ACM, September 2013.
+
+\bibitem{accelerate-pattern-matching}
+Trevor~L. McDonell, Joshua~D. Meredith, and Gabriele Keller.
+\newblock Embedded pattern matching.
+\newblock In {\em Proceedings of the 15th {ACM} {SIGPLAN} International Haskell
+  Symposium}. {ACM}, sep 2022.
+
 \bibitem{interleaved-SIMD}
 Dorit Nuzman, Ira Rosen, and Ayal Zaks.
 \newblock Auto-vectorization of interleaved data for {SIMD}.
@@ -158,5 +176,10 @@ Rick van Hoef.
 \bibitem{expression-problem}
 Philip Wadler.
 \newblock The expression problem, 1998.
+
+\bibitem{accelerate-performance}
+Bart Wijgers.
+\newblock Investigating the performance of the implementations of embedded
+  languages in haskell, 2022.
 
 \end{thebibliography}

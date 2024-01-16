@@ -43,6 +43,13 @@
 \contentsline {paragraph}{Isomorphism}{26}{section*.21}%
 \contentsline {paragraph}{Steps}{26}{section*.22}%
 \contentsline {section}{\numberline {4}Implementation}{27}{section.4}%
-\contentsline {section}{\numberline {5}Benchmarks}{27}{section.5}%
-\contentsline {section}{\numberline {6}Future work}{27}{section.6}%
-\contentsline {section}{\numberline {7}Conclusion}{27}{section.7}%
+\contentsline {subsection}{\numberline {4.1}Accelerate}{27}{subsection.4.1}%
+\contentsline {paragraph}{Pattern Synonymns}{28}{section*.23}%
+\contentsline {paragraph}{Pattern Matching}{28}{section*.24}%
+\contentsline {subsection}{\numberline {4.2}Examples}{28}{subsection.4.2}%
+\contentsline {paragraph}{Constructors}{28}{section*.25}%
+\contentsline {paragraph}{Unconditional}{28}{section*.26}%
+\contentsline {paragraph}{}{28}{section*.27}%
+\contentsline {subsection}{\numberline {4.3}Benchmarks}{28}{subsection.4.3}%
+\contentsline {section}{\numberline {5}Discussion}{29}{section.5}%
+\contentsline {section}{\numberline {6}Conclusion}{29}{section.6}%

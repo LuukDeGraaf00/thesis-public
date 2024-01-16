@@ -47,7 +47,7 @@
 
 \title{Accelerating Structural Sum Types}
 \author{Luuk de Graaf}
-\date{December 2023}
+\date{January 2024}
 
 \begin{document}
 
@@ -1060,7 +1060,7 @@ This is possible in most embedded languages, as the abstract syntax tree itself 
 A generic way to apply a function on each primitive type is hard to define.
 Each pattern match will refine the type further, which means we need a function that operates on multiple types.
 When passing a polymorphic function to a higher-order function it is not instantiated on the refined type, which means we cannot apply it.
-A solution is to explicitly limit the scope of type variables, such that it is local to the function.
+A solution is to explicitly limit the scope of type variables, such that it is local to each recursive call.
 
 \begin{verbatim}
     traverse :: Monoid r => (forall v. Type v -> r) -> Structure e -> r
@@ -1138,7 +1138,7 @@ To avoid a local optimum in the representation several iterations must be done w
 A matching function determines whether there exist a mapping between two fields, and returns the functions that transform between the two primitive types.
 This makes the decision function extensible, as long as the user specifies the relation between two fields.
 Matching functions can be provided in order of preference.
-An implementations can in some cases be made more efficient by sorting before matching, but this reduces the generality of the function. 
+An implementation can in some cases be made more efficient by sorting before matching, but this reduces the generality of the function. 
 Some cases might require a custom \type{decisions} function, such as inserting multiple fields into a single field.
 In general the implementation should be tailored to the implementation language.
 
@@ -1146,13 +1146,119 @@ In general the implementation should be tailored to the implementation language.
 
 \section{Implementation}
 
-accelerate specific
+Currently we established a way to generate efficient representations through type-level programming.
+Mapping between these representations are established generically through datatype-generic programming.
+This is sufficient to represent the initial sought after abstraction around variant types.
 
-\section{Benchmarks}
+\begin{verbatim}
+    data Collection (types :: [*]) = VariantWise (Storage types) 
+                                   | ElementWise [Variant Compact types]
+\end{verbatim}
 
-optional benchmarking of different options
 
-\section{Future work}
+While the implementation is heavily tailored to Haskell, it is not unfeasible to implement such a framework natively within a language.
+This chapter centres around implementation details specific to Haskell and Accelerate.
+In this first section Accelerate related details are explored, while the second section discusses the implementation of previously discussed (de)constructors.
+The third section recuperates on the initial performance considerations and benchmarks the different approaches on a raytracer.
+
+\subsection{Accelerate}
+
+Accelerate is a data-parallel array language deeply embedded within Haskell.
+An abstract syntax tree (AST) is created and optimized by Accelerate within Haskell's runtime system.
+This greatly improves useability, as it can function as an Haskell library, at the cost of executing code within another runtime system.
+The garbage collection of the Haskell runtime system is speculated to hinder performance\cite{accelerate-performance}. 
+A type-safe interface to the compiler infrastructure LLVM enabled the creation of two backends: GPU and multi-core CPU's\cite{accelerate-llvm}. 
+These backends can be used to execute a small set of collective operators in parallel; such as \type{map}, \type{fold} and \type{stencil}. 
+
+\begin{verbatim}
+dotp :: Acc (Vector Float) -> Acc (Vector Float) -> Acc (Scalar Float)
+dotp xs ys = fold (+) 0 (zipWith (*) xs ys)
+\end{verbatim}
+
+The inherit thread-safety and fixed set of collective operators guarantee a consistent application of data-level parallelization.
+It in addition allows for these collective operators to be heavily optimized in isolation, but also in relation to other collective operators.
+A naive implementation of \type{dotp} would create an intermediate array for the results of the \type{zipWith} function\cite{accelerate-array-fusion}.
+Fusing these operations would eliminate an iteration and the intermediate array, at the cost of potential register pressure. 
+Accelerate fuses these collective operations, unless the fusion introduces duplicate work or the \type{compute} function is explicitly called.  
+As Accelerate is embedded within Haskell, it uses algebraic data types and tuples for composite datatypes.
+Datatypes must be {\it lifted} into the abstract syntax tree of Accelerate, which is implemented for all native types.
+The \type{Exp} datatype represents the embedded representation.
+User-defined datatypes can also be lifted with the previously discussed \type{Elt} class.
+As functions are written on the embedded representation, there is no type-safety when working with Algebraic Data Types.
+
+\begin{verbatim}
+    data Maybe a = Just a | Nothing
+
+    instance Elt Maybe a where
+        type EltR Maybe a = (TAG, a)
+    
+    fmap :: (Exp a -> Exp b) -> Exp (Maybe a) -> Exp (Maybe b)
+    fmap (tag, value) = ...
+\end{verbatim}
+
+The function retrieves the embedded \type{(TAG, Float)} type, not the sum type \type{MaybeFloat}.
+Accelerate resolves this disconnection between surface and embedded representations through the use of {\it pattern synonyms}.
+
+\paragraph{Pattern Synonymns}
+
+A pattern synonym can be seen as an abstract constructor for a datatype.
+While it is possible to achieve the same through regular functions, pattern synonyms also have the opportunity to act as a deconstructor.
+Concretely it means pattern synonyms can been pattern matched against, and functions appear similar to their surface type equivalent.
+As pattern synonyms cannot share their name with their surface type an underscore is used to denote the difference. 
+
+\begin{verbatim}
+    pattern Just_ x <- (1, x)
+        where Just_ x  = (1, x)
+
+    pattern Nothing_ <- (0, _)
+        where Nothing_ = (0, undef)
+    
+    fmap :: (Exp a -> Exp b) -> Exp (Maybe a) -> Exp (Maybe b)
+    fmap f (Just_ a) = Just_ (f a)
+    fmap f Nothing_  = Nothing_
+\end{verbatim}
+
+It can be tedious to define pattern synonyms for all user defined datatypes, which is why Accelerate uses meta-programming to generate all constructors at compile-time.
+Pattern synonyms can be extremely powerful and can be used to create a polymorphic constructor for structural sum types. 
+Rather than a nominal constructor we use the position in the sum type, which can be statically constrained to the amount of variants.
+It can even be defined through a type-level natural number, but this requires type annotation for each use.
+For useability the pattern synonyms \type{Con0, Con1,...} are defined to avoid the need for explicit type annotations.
+
+\begin{verbatim}
+    pattern Con :: (Elt (IX n vs), Elt (f vs)) => Exp (IX n vs) -> Exp (V f vs)
+    pattern Con v <- (matchable (toWord @n) -> Just v)
+        where Con v = constructable (toWord @n) (construct v :: Exp (f vs))
+
+    type Maybe a = Variant Compact [a, ()]
+
+    fmap :: (Exp a -> Exp b) -> Exp (Maybe a) -> Exp (Maybe b)
+    fmap f (Con0 a)  = Con0 (f a)
+    fmap f (Con1 ()) = Con1 ()
+\end{verbatim}
+
+In some cases it might be preferable to be nominal, which is as trivial as \type{pattern Just a = Con0}.
+This will work on all sum types of \type{V [a, ()]} which one might consider to comprise type-safety in some cases.
+A solution is to define a new datatype which implements all functionality through the variant type.
+
+\paragraph{Pattern Matching}
+
+As pattern matching cannot be overloaded in Haskell, the \type{match} operator is used to inject the required branching\cite{accelerate-pattern-matching}.
+
+\subsection{Examples}
+
+\paragraph{Constructors}
+
+nominal implementation with pattern synonyms
+
+\paragraph{Unconditional}
+
+\paragraph{}
+
+\subsection{Benchmarks}
+
+raytracer transformation
+
+\section{Discussion}
 
 \section{Conclusion}
 

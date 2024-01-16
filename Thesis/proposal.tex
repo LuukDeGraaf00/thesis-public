@@ -90,7 +90,7 @@ A consideration for working on a higher-abstraction level is the lack of low-lev
 Sometimes it is possible to easily incorporate optimizations, with the example of the \type{nearest} function using the sentinel value \type{1e30f} to avoid an explicit failure state\footnote{A tag would require branching on the result, which hinders data-parallelism in the general case.}.
 In other cases this is significantly harder, such as low-level optimizations around memory representation and cache efficiency.
 This is made apparent when attempting to extend the intersection function to operate on other primitives, such as spheres.
-The path of least resistance is to create a primitive datatype that can either be a triangle or a sphere.
+The path of least resistance is to create a datatype that can either be a triangle or a sphere.
 
 \begin{verbatim}
     data Primitive = Triangle ... | Sphere ...

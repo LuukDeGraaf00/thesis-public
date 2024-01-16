@@ -101,7 +101,7 @@ The path of least resistance is to create a primitive datatype that can either b
 
 Such datatype can also be used to return the specific primitive that was hit. 
 In the general case\footnote{Branching that is not diverging is not problematic on the GPU, which is the case when the array is sorted.} this will unfortunately hinder data-parallelism as it requires branching on the identity of the object.
-A solution is to handle primitives as separate types, which can be achieved nicely through an uniform interface to the primitive.
+A solution is to handle primitives as separate types with their own collection, which can be achieved nicely through an uniform interface to the primitive.
 
 \begin{verbatim}
     class Primitive a where
@@ -114,12 +114,38 @@ A solution is to handle primitives as separate types, which can be achieved nice
 To improve our naive O(n) implementation we can use an acceleration structure to eliminate primitives prematurely based on their spatial properties.
 This means intersections will be performed in smaller batches, which reduces the opportunities for data-parallelism.
 From a performance standpoint it might be preferable to separate the primitives on a batch-level, requiring another datatype.
-Maintaining all approaches is ergonomically not viable, which is odd when considering that all approaches are interchangeable in their intent to operate on multiple variants of a type.
-The inability to abstract over both value-level variant types and type-level variant types prevent an higher level abstraction from taking form.
+Maintaining functions on all these different datatypes is ergonomically not viable and caused by our attempt to achieve low-level control.  
+The intent of all approaches remain interchangeable, which is to operate on multiple variants of a type. 
+A type-safe and generic implementation is often not possible, as types and interfaces must be defined at compile time.
+
+\begin{verbatim}
+    // tagged union with a closed system 
+    data Primitive = Triangle ... | Sphere ...
+
+    // polymorphic interface with an open system
+    class Primitive a where
+        intersect :: Ray -> a -> Float
+\end{verbatim}
+
+The inability to abstract over both value-level variant types and type-level variant types prevent a generic higher level abstraction from taking form.
+Unifying these concepts would allow a collection of primitives to be fully agnostic to the underlying representation.
 Within this paper we propose a way to ergonomically switch between efficient representations for collections of variant types.
-Type-safety is preserved by elevating the concept of a mutual exclusive datatype to the type-level, which is achieved through type-level and datatype-generic programming.
+Type-safety is preserved by elevating the concept of a mutually exclusive datatype to the type-level, which is achieved through type-level and datatype-generic programming.
 An implementation can exist without it being natively supported as construct in the implementation language.
 This can be utilized by libraries, frameworks and embedded domain-specific languages that exist in languages that facilitate type-level programming and datatype-generic programming, like Haskell.
+
+It also gives the opportunity to grant the programmer low-level control on both the memory representation and the (de)-construction of variant types. 
+Control over the memory representation is invaluable for adapting to cache behavior without having to change the architecture around it.
+In addition control over the deconstruction prevents the need to use an explicit sentinel value in our intersection algorithm.
+The explicit failure state \type{Nothing} can be used, which is internally represented as \type{1e30f}.
+The \type{min} function uses the value directly while other function must pattern match on the value \type{1e30f}.
+Within the context of raytracing this other function will spawn an extension ray that simulates the ray bouncing of a surface.
+Pattern matching on the result will limit data-parallelism for all subsequent extension rays.
+A solution is to either unconditionally execute like before or eliminate all rays that missed for each iterative step. 
+The latter can now be trivially represented as an internal reorganization in the proposed implementation, as it does not change the identity of the collection and thus no external changes are required.
+
+Within this paper ... explain when conclusion is done 
+
 
 \subsection{Related Work}
 
@@ -145,9 +171,11 @@ Constructors can be local to an unique ADT (nominally typed) or exist as indepen
 Deconstructing is done by pattern matching, where functions natively branch on the current active variant.
 In Haskell sum types are nominally typed, which means variants are not standalone types and cannot exist safely outside the ADT.
 Structural sum types are often called extensible or open sum types, as they do not have to be explicitly declared before use.
-In OCaml these are natively supported as polymorphic variants.
-In Haskell an efficient internal representation can be derived statically through associated types\cite{associated-types}.
-Datatype generic functions, which depend on the structure of a datatype, can be used to create isomorphic mappings between the computed representations.
+In OCaml these are natively supported as polymorphic variants, while Futhark is completely structurally typed and refers to them as sum types.
+Deriving an efficient internal representation for a non-native composite datatype can be done statically through associated types\cite{associated-types}.
+In c++ these are also called {\it traits} while Haskell also has {\it type families}.
+Some libraries create low-level abstractions which allow for custom memory representations and access patterns\cite{llama}.
+Datatype generic functions, which parametrize on the structure of a datatype, can be used to create mappings between the computed representations.
 Both concepts are used in highly generic libraries for a wide-range of applications\cite{generic-programming}. 
 
 \paragraph{Implementation}
@@ -167,7 +195,7 @@ There are several approaches, which have been subject to research in the domain 
 An observation is that user extendability is limited on deeply embedded constructs as execution models must be updated.
 A proposed approach is to have a small deeply embedded core language that only supports constructs that are relevant for combinatorial optimizations\cite{shallow-and-deep}. 
 The shallow embedding can be used to create an extensible and user-friendly interface to this core language.
-In the context of data-parallel applications and non-uniform data this leans itself to an implementation in the host-language.
+In the context of data-parallel applications and variants this leans itself to an implementation in the host-language.
 
 \newpage
 

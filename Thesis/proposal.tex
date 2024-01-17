@@ -61,8 +61,7 @@
 
 Array languages can operate on a higher abstraction level and implicitly execute instructions in parallel on multiple elements. 
 A data-parallel \type{map} and \type{fold} function is sufficient to cover a wide range of high-performance applications.
-A naive intersection algorithm for a raytracer can be defined incredibly concisely compared to a manually vectorized c++ implementation.
-It requires the intersection function to have a vectorized version and the remaining scalar loop to be handled.
+A naive intersection algorithm for a raytracer can be defined incredibly concisely compared to a handwritten c++ implementation.
 
 \begin{verbatim}
     nearest :: Ray -> [Triangle] -> Float
@@ -87,7 +86,7 @@ It requires the intersection function to have a vectorized version and the remai
 \end{verbatim}
 
 A consideration for working on a higher-abstraction level is the lack of low-level control, which can be crucial in performance sensitive cases.
-Sometimes it is possible to easily incorporate optimizations, with the example of the \type{nearest} function using the sentinel value \type{1e30f} to avoid an explicit failure state\footnote{A tag would require branching on the result, which hinders data-parallelism in the general case.}.
+Sometimes it is easy to incorporate optimizations, with the example of the \type{nearest} function using the sentinel value \type{1e30f} to avoid returning an explicit failure state\footnote{A tag would require branching on the result, which hinders data-parallelism in the general case.}.
 In other cases this is significantly harder, such as low-level optimizations around memory representation and cache efficiency.
 This is made apparent when attempting to extend the intersection function to operate on other primitives, such as spheres.
 The path of least resistance is to create a datatype that can either be a triangle or a sphere.
@@ -100,56 +99,70 @@ The path of least resistance is to create a datatype that can either be a triang
 \end{verbatim}
 
 Such datatype can also be used to return the specific primitive that was hit. 
-In the general case\footnote{Branching that is not diverging is not problematic on the GPU, which is the case when the array is sorted.} this will unfortunately hinder data-parallelism as it requires branching on the identity of the object.
-A solution is to handle primitives as separate types with their own collection, which can be achieved nicely through an uniform interface to the primitive.
+In the general case\footnote{When the branching does not diverge within a warp, which is the case when the array is sorted, a GPU will have very little overhead.} this will unfortunately hinder data-parallelism as it requires branching on the identity of the object.
+A solution is to handle primitives as standalone types with their own respective collection, which can be achieved nicely with an uniform interface.
 
 \begin{verbatim}
     class Primitive a where
         intersect :: Ray -> a -> Float
 
-    nearest :: (Object a) => Ray -> [[a]] -> Float
+    nearest :: (Primitive a) => Ray -> [[a]] -> Float
     nearest ray = fold min 1e30f . fold (map (intersect ray)) 1e30
 \end{verbatim}
 
+\newpage
+
+While we improved the possibility for data-parallelism, we still need to maintain the \type{Primitive} datatype when we want to explicitly return which primitive was hit.
 To improve our naive O(n) implementation we can use an acceleration structure to eliminate primitives prematurely based on their spatial properties.
-This means intersections will be performed in smaller batches, which reduces the opportunities for data-parallelism.
-From a performance standpoint it might be preferable to separate the primitives on a batch-level, requiring another datatype.
-Maintaining architecture around all these different datatypes is ergonomically not viable and caused by our attempt to achieve low-level control.  
-The intent of all approaches remain interchangeable, which is to operate on multiple variants of a type. 
-A type-safe and generic implementation is often not possible, as types and interfaces must be defined at compile time.
+This means intersections will be performed in smaller batches, to be able to exit early, which reduces the opportunities for data-parallelism.
+From a performance standpoint it might be preferable to separate the primitives on a batch-level, requiring even another datatype.
+Maintaining the architecture around all these different constructs is ergonomically not viable and caused by our attempt to achieve low-level control.  
+The intent of all approaches remains interchangeable, which is to operate on a collection with multiple variants of a type.
+A type-safe and generic implementation is often not possible, as datatypes and interfaces must be defined at compile time.
+It is also not feasible to manually define mappings between all these different representations.
 
 \begin{verbatim}
-    // tagged union with a closed system 
+    // value-level tagged union with a closed system 
     data Primitive = Triangle ... | Sphere ...
 
-    // polymorphic interface with an open system
+    // type-level interface with an open system
     class Primitive a where
         intersect :: Ray -> a -> Float
 \end{verbatim}
 
 The inability to abstract over both value-level variant types and type-level variant types prevent a generic higher level abstraction from taking form.
 Unifying these concepts would allow a collection of primitives to be fully agnostic to the underlying representation.
-Within this paper we propose a way to ergonomically switch between efficient representations for collections of variant types.
+Within this paper we propose a way to ergonomically switch between representations for collections of variant types.
 Type-safety is preserved by elevating the concept of a mutually exclusive datatype to the type-level, which is achieved through type-level and datatype-generic programming.
 An implementation can exist without it being natively supported as construct in the implementation language.
 This can be utilized by libraries, frameworks and embedded domain-specific languages that exist in languages that facilitate type-level programming and datatype-generic programming, like Haskell.
 
 \begin{verbatim}
-    image of value variant types and type variant types
+    image: explain type-level variant type
+
+
 \end{verbatim}
 
-It also gives the opportunity to grant the programmer low-level control on both the memory representation and the (de)-construction of variant types. 
+Such implementation also gives the opportunity to give low-level control on both the memory representation and the (de)-construction of variant types. 
 Control over the memory representation is invaluable for adapting to cache behavior without having to change the architecture around it.
-In addition control over the deconstruction prevents the need for an explicit sentinel value in our intersection algorithm.
-The explicit failure state \type{Nothing} can be used, which is internally represented as \type{1e30f}.
-The \type{min} function uses the value directly while other function must pattern match on the value \type{1e30f}.
-Within the context of raytracing this other function will spawn an extension ray that simulates the ray bouncing of a surface.
-Pattern matching on the result will limit data-parallelism for all subsequent extension rays.
-A solution is to either unconditionally execute like before or eliminate all rays that missed for each iterative step. 
-The latter can now be trivially represented as an internal reorganization in the proposed implementation, as it does not change the identity of the collection and thus no external changes are required.
+Manual control over the (de)-construction would also prevent the need for the explicit sentinel value in our intersection algorithm.
+The failure state \type{Nothing} can be used, which is internally represented as \type{1e30f}.
+The \type{min} function uses the value directly while other functions must pattern match on the value \type{1e30f}.
+Within the context of raytracing this other function might spawn an extension ray that simulates the ray bouncing of a surface.
+Pattern matching on the \type{1e30f} value will limit data-parallelism for all subsequent extension rays.
+A solution can be to unconditionally execute like with the \type{min} function or eliminate all rays that failed for each iterative step. 
+The latter can now be represented as an internal reorganization in the proposed implementation, as it does not change the identity of the collection but merely the layout and thus no architectural changes are required.
+To summarize, the goal of this paper is to improve the experience of operating on a collection of multiple variants.
+The primary question pertains to how variant types can be implemented with adaptability to low-level optimizations within a data-parallel context.
+The contribution of this paper includes:
 
-Within this paper ... explain when conclusion is done 
+\begin{itemize}
+    \item An extendable deduplication algorithm for variant types. 
+    \item Automatic derivation of an isomorphic mapping between any two datatypes. 
+    \item A collection of multiple variants that is completely agnostic to its internal representation.
+\end{itemize}
 
+\newpage
 
 \subsection{Related Work}
 
@@ -176,22 +189,22 @@ Deconstructing is done by pattern matching, where functions natively branch on t
 In Haskell sum types are nominally typed, which means variants are not standalone types and cannot exist safely outside the ADT.
 Structural sum types are often called extensible or open sum types, as they do not have to be explicitly declared before use.
 In OCaml these are natively supported as polymorphic variants, while Futhark is completely structurally typed and refers to them as sum types.
-Deriving an efficient internal representation for a non-native composite datatype can be done statically through associated types\cite{associated-types}.
-In c++ these are also called {\it traits} while Haskell also has {\it type families}.
-Some libraries create low-level abstractions which allow for custom memory representations and access patterns\cite{llama}.
-Datatype generic functions, which parametrize on the structure of a datatype, can be used to create mappings between the computed representations.
+Deriving an efficient internal representation for a user-defined datatype can be done statically by type-indexing types\cite{associated-types}, which are called {\it traits} in c++.
+Some libraries also create a low-level abstractions which allows for custom memory representations \cite{llama} or employ meta-programming to be flexible in the memory representation.
+Datatype-generic functions, which parametrize on the structure of a datatype, can be used to create mappings between these computed representations.
 Both concepts are used in highly generic libraries for a wide-range of applications\cite{generic-programming}. 
 
 \paragraph{Implementation}
 
 Variant types are rare in array languages, likely due to the infrequency of non-uniform data in data-parallel applications and the required low-level control in the instances they are needed.
-In functional languages such as Accelerate and Futhark they arguably only exist to complete the ADT.
+In functional languages such as Accelerate and Futhark they arguably only exist to complete the ADT archetype.
+Some implementation details are therefore primarily centered around these two languages.
 Accelerate is a data-parallel array language deeply embedded within Haskell, where sum types are currently represented as a non-compact tagged union.
 Research has been done on a compact tagged union representation for parallel arrays, which has been named a {\it Recursive Tagged Union}\cite{accelerate-sum-types}.
 The representation uses a unified tag for nested sum types, which optimizes memory usage at the cost of tag (de-)construction but has not yet been implemented. 
-Our paper looks beyond the sum type and establishes a modular interface to implementing representations, rather than a concrete optimal layout. 
+This paper fundamentally distinct itself by looking beyond the sum type and implementing an extendable and modular interface, rather than a single concrete layout. 
 Futhark is a functional structurally typed data-parallel array language, where only identical primitive types are deduplicated.
-The research has been done specifically on including structural sum types to the Futhark compiler\cite{futhark-sum-types}, which has been implemented.
+The research pertains primarily on including structural sum types to the Futhark compiler\cite{futhark-sum-types}.
 
 \newpage
 
@@ -1269,14 +1282,21 @@ mask vs without mask
 
 raytracer transformation
 
+\newpage
+
 \section{Discussion}
 
-\subsection{Framework}
+In this paper some fundamental choices have been made without extensive argumentation.
+This chapter is used to highlight these choices and provide further reasoning for the choices that have been made.
+It also highlights some limitations of the framework and ways these can be resolved.
+
+\subsection{Embedded Domain-Specific Language}
 
 Libraries and domain-specific languages that are embedded construct their user-defined-types through the host-language.
 A shallow embedding operates directly on types native to the host-language, while deep embeddings construct an abstract syntax tree that is later evaluated.
 The latter offers flexibility on how user-defined types are implemented, as types exist both on the surface level and as construct within the abstract syntax tree.   
 There are several approaches, which have been subject to research in the domain of circuit design.
+
 \begin{itemize}
     \setlength\itemsep{0em}
     \item {C$\lambda$aSH} is not deeply embedded and operates on user-defined types through generics\cite{clash}. 
@@ -1289,9 +1309,34 @@ An observation is that user extendability is limited on deeply embedded construc
 A proposed approach is to have a small deeply embedded core language that only supports constructs that are relevant for combinatorial optimizations\cite{shallow-and-deep}. 
 The shallow embedding can be used to create an extensible and user-friendly interface to this core language.
 In the context of data-parallel applications and variants this leans itself to an implementation in the host-language.
+This distinction is irrelevant for languages that are not embedded in other languages.
 
+\subsection{Datatype-generic programming in Haskell}
+
+Current Accelerate derives the \type{Elt} class generically through Haskell's native datatype-generic framework.
+It traverses the structure of the datatype, for each layer providing both the type and the transformation.
+As these are intrinsically linked, deduplication must be represented both on the value-level and type-level.
+The {\it Recursive Tagged Union}\cite{accelerate-sum-types} uses this approach, which proved to be problematic and complex.
+One concern was that replacing the \type{Elt} class was considered to be a too invasive of an operation\cite{accelerate-sum-types}.
+This means the \type{Elt} class must be derived from the implementation class, which limits user extendability. 
+It is also not possible to sort the types on the type-level, as closed type families do not have an intrinsic link to its value-level construct.
+An implementation that is fully modular and extendible on both the value-level and type-level prevent these complications.
+Explicit derivation of the \type{Elt} class is also not required, as the sum type itself is effectively a polymorphic datatype that implements the \type{Elt} class. 
+
+
+\subsection{Limitations}
+
+\subsubsection{Elt class}
+
+\subsubsection{Hierarchy pattern matching}
+
+\subsubsection{Unified tag}
+
+\subsubsection{Contigious representation}
 
 \section{Conclusion}
+
+\subsection{Future Work}
 
 \newpage
 

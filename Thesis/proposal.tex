@@ -59,7 +59,7 @@
 
 \section{Introduction}
 
-Array languages can operate on a higher abstraction level and implicitly execute instructions in parallel. 
+Array languages can operate on a higher abstraction level and implicitly execute instructions in parallel on multiple elements. 
 A data-parallel \type{map} and \type{fold} function is sufficient to cover a wide range of high-performance applications.
 A naive intersection algorithm for a raytracer can be defined incredibly concisely compared to a manually vectorized c++ implementation.
 It requires the intersection function to have a vectorized version and the remaining scalar loop to be handled.
@@ -76,7 +76,7 @@ It requires the intersection function to have a vectorized version and the remai
             float4 dist4 = intersect(ray, tri[i], tri[i + 1], tri[i + 2], tri[i + 3]);
             minimum4 = min(minimum4, dist4);
         }
-        float minimum = min(min(minimum4.x, minimum4.y), min(minimum4.y, minimum4.z))
+        float minimum = min(min(minimum4.x, minimum4.y), min(minimum4.z, minimum4.w))
         for (int i = 0; i < objects.Length % 4; i++)
         {
             float distance = intersect(ray, tri[objects.Length + i]);
@@ -114,7 +114,7 @@ A solution is to handle primitives as separate types with their own collection, 
 To improve our naive O(n) implementation we can use an acceleration structure to eliminate primitives prematurely based on their spatial properties.
 This means intersections will be performed in smaller batches, which reduces the opportunities for data-parallelism.
 From a performance standpoint it might be preferable to separate the primitives on a batch-level, requiring another datatype.
-Maintaining functions on all these different datatypes is ergonomically not viable and caused by our attempt to achieve low-level control.  
+Maintaining architecture around all these different datatypes is ergonomically not viable and caused by our attempt to achieve low-level control.  
 The intent of all approaches remain interchangeable, which is to operate on multiple variants of a type. 
 A type-safe and generic implementation is often not possible, as types and interfaces must be defined at compile time.
 
@@ -134,9 +134,13 @@ Type-safety is preserved by elevating the concept of a mutually exclusive dataty
 An implementation can exist without it being natively supported as construct in the implementation language.
 This can be utilized by libraries, frameworks and embedded domain-specific languages that exist in languages that facilitate type-level programming and datatype-generic programming, like Haskell.
 
+\begin{verbatim}
+    image of value variant types and type variant types
+\end{verbatim}
+
 It also gives the opportunity to grant the programmer low-level control on both the memory representation and the (de)-construction of variant types. 
 Control over the memory representation is invaluable for adapting to cache behavior without having to change the architecture around it.
-In addition control over the deconstruction prevents the need to use an explicit sentinel value in our intersection algorithm.
+In addition control over the deconstruction prevents the need for an explicit sentinel value in our intersection algorithm.
 The explicit failure state \type{Nothing} can be used, which is internally represented as \type{1e30f}.
 The \type{min} function uses the value directly while other function must pattern match on the value \type{1e30f}.
 Within the context of raytracing this other function will spawn an extension ray that simulates the ray bouncing of a surface.
@@ -180,22 +184,14 @@ Both concepts are used in highly generic libraries for a wide-range of applicati
 
 \paragraph{Implementation}
 
-Libraries and domain-specific languages that are embedded construct their user-defined-types through the host-language.
-A shallow embedding operates directly on types native to the host-language, while deep embeddings construct an abstract syntax tree that is later evaluated.
-The latter offers flexibility on how user-defined types are implemented, as types exist both on the surface level and as construct within the abstract syntax tree.   
-There are several approaches, which have been subject to research in the domain of circuit design.
-\begin{itemize}
-    \setlength\itemsep{0em}
-    \item {C$\lambda$aSH} is not deeply embedded and operates on user-defined types through generics\cite{clash}. 
-    \item Hydra has the deep embedding constructs nested into the shallow embedding constructs\cite{hydra}.
-    \item Kansas Lava has both embeddings exist in parallel under an encasing type\cite{kansas-lava}.
-    \item ForSyDe has both embeddings exist separately as standalone types\cite{forsyde}.
-\end{itemize}
-
-An observation is that user extendability is limited on deeply embedded constructs as execution models must be updated.
-A proposed approach is to have a small deeply embedded core language that only supports constructs that are relevant for combinatorial optimizations\cite{shallow-and-deep}. 
-The shallow embedding can be used to create an extensible and user-friendly interface to this core language.
-In the context of data-parallel applications and variants this leans itself to an implementation in the host-language.
+Variant types are rare in array languages, likely due to the infrequency of non-uniform data in data-parallel applications and the required low-level control in the instances they are needed.
+In functional languages such as Accelerate and Futhark they arguably only exist to complete the ADT.
+Accelerate is a data-parallel array language deeply embedded within Haskell, where sum types are currently represented as a non-compact tagged union.
+Research has been done on a compact tagged union representation for parallel arrays, which has been named a {\it Recursive Tagged Union}\cite{accelerate-sum-types}.
+The representation uses a unified tag for nested sum types, which optimizes memory usage at the cost of tag (de-)construction but has not yet been implemented. 
+Our paper looks beyond the sum type and establishes a modular interface to implementing representations, rather than a concrete optimal layout. 
+Futhark is a functional structurally typed data-parallel array language, where only identical primitive types are deduplicated.
+The research has been done specifically on including structural sum types to the Futhark compiler\cite{futhark-sum-types}, which has been implemented.
 
 \newpage
 
@@ -1159,7 +1155,7 @@ This is sufficient to represent the initial sought after abstraction around vari
 While the implementation is heavily tailored to Haskell, it is not unfeasible to implement such a framework natively within a language.
 This chapter centres around implementation details specific to Haskell and Accelerate.
 In this first section Accelerate related details are explored, while the second section discusses the implementation of previously discussed (de)constructors.
-The third section recuperates on the initial performance considerations and benchmarks the different approaches on a raytracer.
+The third section recuperates on the initial performance considerations and benchmarks the different approaches on an existing raytracer.
 
 \subsection{Accelerate}
 
@@ -1203,15 +1199,13 @@ Accelerate resolves this disconnection between surface and embedded representati
 
 A pattern synonym can be seen as an abstract constructor for a datatype.
 While it is possible to achieve the same through regular functions, pattern synonyms also have the opportunity to act as a deconstructor.
-Concretely it means pattern synonyms can been pattern matched against, and functions appear similar to their surface type equivalent.
+Concretely it means pattern synonyms can been pattern matched against, which mean they act interchangeably to a normal datatype.
 As pattern synonyms cannot share their name with their surface type an underscore is used to denote the difference. 
+A limitation is that the compiler cannot prove the cases to be exhaustive, but completeness can be annotated with a pragma.
 
 \begin{verbatim}
     pattern Just_ x <- (1, x)
-        where Just_ x  = (1, x)
-
-    pattern Nothing_ <- (0, _)
-        where Nothing_ = (0, undef)
+        where Just_ x = (1, x)
     
     fmap :: (Exp a -> Exp b) -> Exp (Maybe a) -> Exp (Maybe b)
     fmap f (Just_ a) = Just_ (f a)
@@ -1236,29 +1230,66 @@ For useability the pattern synonyms \type{Con0, Con1,...} are defined to avoid t
     fmap f (Con1 ()) = Con1 ()
 \end{verbatim}
 
-In some cases it might be preferable to be nominal, which is as trivial as \type{pattern Just a = Con0}.
-This will work on all sum types of \type{V [a, ()]} which one might consider to comprise type-safety in some cases.
-A solution is to define a new datatype which implements all functionality through the variant type.
+In some cases it might be preferable to have a descriptive name, which can be done by creating a new pattern such as \type{pattern Nothing = Con1 ()}.
+This will work on all sum types that have \type{()} as second data constructor, which one might consider to comprise type-safety.
+The type can be constrained to only work for \type{Variant Compact [a, ()]}, but there cannot be any distinction between types that are composed similarly due to structural typing.  
+A solution is to explicitly define a new datatype and derive all functionality through the variant type.
 
 \paragraph{Pattern Matching}
 
-As pattern matching cannot be overloaded in Haskell, the \type{match} operator is used to inject the required branching\cite{accelerate-pattern-matching}.
+Accelerate is deeply embedded within Haskell, which means a program effectively constructs an abstract syntax tree at the runtime of Haskell.
+Pattern matching occurs while constructing the abstract syntax tree, which means we are effectively trimming the tree rather than extending it.
+Stated more generally it is not possible to represent choice elements within a deeply embedded representation through the surface representation.
+Manual control flow is possible but Accelerate circumvents this restriction by explicitly defining all choice elements within a datatype.
+When encountering a datatype with multiple choices, the function is repeatedly evaluated on a dummy type which contains the corresponding choice element.
+Each deconstructor can therefore match only on the dummy type with the corresponding tag, which mean all possible branches can be obtained.
+This is possible as \type{pattern synonyms} do not have to be isomorphic and the stub type is ignored within the Accelerate compiler.
+As pattern matching cannot be overloaded in Haskell, the \type{match} operator is used to generate all choice elements recursively\cite{accelerate-pattern-matching}.
+
+\newpage
 
 \subsection{Examples}
 
-\paragraph{Constructors}
+\paragraph{Functions}
 
-nominal implementation with pattern synonyms
+generate functions
+
+\paragraph{Collection}
+
+ecs collection
 
 \paragraph{Unconditional}
+mask vs without mask
 
-\paragraph{}
+\paragraph{Sentinel 1e30f}
+
+\newpage
 
 \subsection{Benchmarks}
 
 raytracer transformation
 
 \section{Discussion}
+
+\subsection{Framework}
+
+Libraries and domain-specific languages that are embedded construct their user-defined-types through the host-language.
+A shallow embedding operates directly on types native to the host-language, while deep embeddings construct an abstract syntax tree that is later evaluated.
+The latter offers flexibility on how user-defined types are implemented, as types exist both on the surface level and as construct within the abstract syntax tree.   
+There are several approaches, which have been subject to research in the domain of circuit design.
+\begin{itemize}
+    \setlength\itemsep{0em}
+    \item {C$\lambda$aSH} is not deeply embedded and operates on user-defined types through generics\cite{clash}. 
+    \item Hydra has the deep embedding constructs nested into the shallow embedding constructs\cite{hydra}.
+    \item Kansas Lava has both embeddings exist in parallel under an encasing type\cite{kansas-lava}.
+    \item ForSyDe has both embeddings exist separately as standalone types\cite{forsyde}.
+\end{itemize}
+
+An observation is that user extendability is limited on deeply embedded constructs as execution models must be updated.
+A proposed approach is to have a small deeply embedded core language that only supports constructs that are relevant for combinatorial optimizations\cite{shallow-and-deep}. 
+The shallow embedding can be used to create an extensible and user-friendly interface to this core language.
+In the context of data-parallel applications and variants this leans itself to an implementation in the host-language.
+
 
 \section{Conclusion}
 

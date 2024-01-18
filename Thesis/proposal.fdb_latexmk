@@ -1,12 +1,12 @@
 # Fdb version 3
-["bibtex proposal"] 1705506562 "proposal.aux" "proposal.bbl" "proposal" 1705510028
+["bibtex proposal"] 1705537276 "proposal.aux" "proposal.bbl" "proposal" 1705537725
   "/usr/share/texlive/texmf-dist/bibtex/bst/base/plain.bst" 1292289607 20613 bd3fbfa9f64872b81ac57a0dd2ed855f ""
-  "proposal.aux" 1705510027 13637 f638de8c383de9c250206e68c4bf6fc6 "pdflatex"
+  "proposal.aux" 1705537719 13719 ba63ec08136c284b32e9d16c0c929573 "pdflatex"
   "refs.bib" 1705174790 10359 184cc9f3734d138d18cb9d5e43567cce ""
   (generated)
   "proposal.blg"
   "proposal.bbl"
-["pdflatex"] 1705510015 "/home/luukdegraaf00/ecs-accelerate-main/Thesis/proposal.tex" "/home/luukdegraaf00/ecs-accelerate-main/Thesis/proposal.pdf" "proposal" 1705510028
+["pdflatex"] 1705537705 "/home/luukdegraaf00/ecs-accelerate-main/Thesis/proposal.tex" "/home/luukdegraaf00/ecs-accelerate-main/Thesis/proposal.pdf" "proposal" 1705537725
   "./Images//branchcost.png" 1691590775 75768 d80dde9339001c91d859208cba78c3bd ""
   "./Images//cache.png" 1691590775 30087 9372a8423faae30e04a1ed6d52fa7b33 ""
   "./Images//framework.png" 1705174790 96838 d637c93fd7fa53e80c4e457542fc9bb7 ""
@@ -24,8 +24,8 @@
   "./Images//vectorization.png" 1691590776 23128 f4d07ab19c5121b064e7811a3caa818e ""
   "./Images//vectorvsthreads.png" 1691590776 70148 7b67bd169697f130b2203fdce31540fb ""
   "/etc/texmf/web2c/texmf.cnf" 1688133988 475 c0e671620eb5563b2130f56340a5fde8 ""
-  "/home/luukdegraaf00/ecs-accelerate-main/Thesis/proposal.aux" 1705510027 13637 f638de8c383de9c250206e68c4bf6fc6 ""
-  "/home/luukdegraaf00/ecs-accelerate-main/Thesis/proposal.tex" 1705510012 85239 ffdc4c5dd9c22c3eb63a4dbe9ed4c652 ""
+  "/home/luukdegraaf00/ecs-accelerate-main/Thesis/proposal.aux" 1705537719 13719 ba63ec08136c284b32e9d16c0c929573 ""
+  "/home/luukdegraaf00/ecs-accelerate-main/Thesis/proposal.tex" 1705537723 88468 03b58622f0abdd2e9d30faae96462062 ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/tcrm1000.tfm" 1136768653 1536 e07581a4bb3136ece9eeb4c3ffab8233 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmbx10.tfm" 1136768653 1328 c834bbb027764024c09d3d2bf908b5f0 ""
@@ -134,16 +134,16 @@
   "Images/Variant1.png" 1691590775 3755 2966b1a8202f2e812ca7f971e6865467 ""
   "Images/Variant2.png" 1691590775 3440 537b885959692b4615ee7abe51ecc8c1 ""
   "Images/Variant3.png" 1691590775 3965 5aeb921e1484917ef86694357bb8bd3a ""
-  "proposal.aux" 1705510027 13637 f638de8c383de9c250206e68c4bf6fc6 "pdflatex"
-  "proposal.bbl" 1705506562 6552 9385130086820984343b34093342f9d0 "bibtex proposal"
-  "proposal.out" 1705510027 2440 c0d962aff1e8e554dfc6167e4fef147e "pdflatex"
-  "proposal.tex" 1705510012 85239 ffdc4c5dd9c22c3eb63a4dbe9ed4c652 ""
-  "proposal.toc" 1705510027 4629 c65dec4a06a2084c46d83ca4157f3848 "pdflatex"
+  "proposal.aux" 1705537719 13719 ba63ec08136c284b32e9d16c0c929573 "pdflatex"
+  "proposal.bbl" 1705537277 6552 9385130086820984343b34093342f9d0 "bibtex proposal"
+  "proposal.out" 1705537719 2189 6b0bf747b3cfa5d5698de9e00699ebd2 "pdflatex"
+  "proposal.tex" 1705537723 88468 03b58622f0abdd2e9d30faae96462062 ""
+  "proposal.toc" 1705537719 4631 9cb0938f51f595ecc81cbdc46cd43909 "pdflatex"
   (generated)
-  "/home/luukdegraaf00/ecs-accelerate-main/Thesis/proposal.log"
   "proposal.aux"
+  "proposal.out"
   "proposal.log"
   "proposal.pdf"
-  "proposal.out"
-  "proposal.toc"
+  "/home/luukdegraaf00/ecs-accelerate-main/Thesis/proposal.log"
   "/home/luukdegraaf00/ecs-accelerate-main/Thesis/proposal.pdf"
+  "proposal.toc"

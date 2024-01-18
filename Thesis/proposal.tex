@@ -1290,6 +1290,10 @@ In this paper some fundamental choices have been made without extensive argument
 This chapter is used to highlight these choices and provide further reasoning for the choices that have been made.
 It also highlights some limitations of the framework and ways these can be resolved.
 
+\subsection{Benchmarks}
+
+
+
 \subsection{Embedded Domain-Specific Language}
 
 Libraries and domain-specific languages that are embedded construct their user-defined-types through the host-language.
@@ -1323,16 +1327,58 @@ It is also not possible to sort the types on the type-level, as closed type fami
 An implementation that is fully modular and extendible on both the value-level and type-level prevent these complications.
 Explicit derivation of the \type{Elt} class is also not required, as the sum type itself is effectively a polymorphic datatype that implements the \type{Elt} class. 
 
-
 \subsection{Limitations}
 
-\subsubsection{Elt class}
+\paragraph{Surface type}
 
-\subsubsection{Hierarchy pattern matching}
+As structural sum types do not exist in Haskell, it is not apparent what the corresponding surface type should be.
+Currently there exists no mapping from the variant type to a surface type, which might sound more problematic then it really is.
+It means (de)-constructing the variants must be done in the Accelerate code, rather than Haskell.
+A solution can also be to just use a dynamic type, or make a direct mapping to an existing open sum library.
 
-\subsubsection{Unified tag}
+\paragraph{Nested pattern matching}
 
-\subsubsection{Contigious representation}
+Since tags are statically determined for each type individually, nested pattern matching is not trivial. 
+Currently the datatype \type{TagR} is used, where \type{Just (Just a)} is represented as \type{TagRtag 1 (TagRtag 1 (TagRsingle a))}. 
+Pattern matching on the first \type{Just} would remove one layer, and the rest is propagated along.
+
+\begin{verbatim}
+    data TagR a where
+        TagRtag    :: TAG -> TagR a -> TagR (TAG, a)
+        TagRunit   :: TagR ()
+        TagRsingle :: ScalarType a -> TagR a
+        TagRpair   :: TagR a -> TagR b -> TagR (a, b)
+\end{verbatim}
+
+An important detail is that these tags are generated statically, for all possible permutations.
+In a type with deduplicated fields the {\it nested} datatype is not necessarily available, as it might be constructed through different fields.
+As the \type{TagR} is constrained to the same structure as the encapsulating type, it is not possible to list all possible permutations through the \type{TagR} type.
+A solution is to just lose the type-safety on the \type{TagR} type, and allow for more flexibility.
+As the \type{TagR} type is integrated with the \type{Elt} class, a change would require a lot of code changes within Accelerate.
+
+\paragraph{Unified tag}
+
+An extension of the previous discussion is the use of a single tag, for multiple nested tags.
+It involves operations to extract and construct the tag, which can be computationally expensive.
+Currently the deduplication algorithm has no knowledge of tags at all, and sees them as any other field.
+An implementation would complicate both the deduplication process and automatic derivation of (de)-constructors.
+A temporary solution would involve simply flattening the sum type, which would also be more performant in the general case.
+Another solution would be to change perspective and argue tags are datatypes with a statically determined size depending on the amount of choices they represent.
+Both the type-level and datatype-generic part would handle tags as any other fields, and can upscale them to an existing datatype.
+
+\paragraph{Struct}
+
+While it possible to derive struct-like memory representations, Accelerate does not (yet) have the instructions to insert and extract those values.
+As primitive types are implicitly distributed over multiple arrays, there is no need to operate on a type within a larger type. 
+It in addition does not allow types existing outside the predefined types, which means memory representation is limited to that set of types.
+A solution would be to add an (untyped) type with a variable size and corresponding instructions to extract (aligned) data.
+
+\paragraph{Flexible pattern matching}
+
+this can maybe still be resolved (?)
+make class with variable pattern match, and implement it for all types including the variant type specifically. 
+
+\newpage
 
 \section{Conclusion}
 

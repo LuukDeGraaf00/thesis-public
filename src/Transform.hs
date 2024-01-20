@@ -16,7 +16,6 @@ import qualified Data.Foldable as F
 import qualified Data.Array.Accelerate.AST as AST
 
 import Data.Array.Accelerate as A
-import Data.Array.Accelerate.Interpreter as I
 
 import Data.Array.Accelerate.Type
 import Data.Array.Accelerate.Representation.Type
@@ -25,7 +24,7 @@ import Data.Array.Accelerate.Sugar.Elt
 
 import Generics
 
-import Data.Type.Equality ( type (:~:)(..) )
+import Data.Type.Equality ( type (:~:)(..), type (==) )
 
 -- | get value from expression
 type Get value expression = SmartExp expression -> SmartExp value
@@ -118,7 +117,9 @@ equal (Field a l r) (Field b x y) = P.fmap (\Refl -> (\b a -> x (r a) b, \a b ->
 
 -- | equal size
 equalSize :: forall a b. Mapping a b
-equalSize l@(Field a _ _) r@(Field b _ _) = if sizeScalar a P.== sizeScalar b then coerceUnsafe l r else Nothing
+equalSize (Field l setA getA) (Field r setB getB) = case equalScalarSize l r of
+  Just (Refl, Refl) -> Just (example l getA r setB, example r getB l setA) 
+  Nothing           -> Nothing
 
 -- | larger size (loss of data only for returning function)
 largerSize :: forall a b. Mapping a b
@@ -132,8 +133,10 @@ coerceUnsafe (Field (SingleScalarType (NumSingleType a)) setA getA) (Field (Sing
           (FloatingNumType a1, IntegralNumType b1) -> Just (fromFloat a1 getA b1 setB, toFloat   b  getB a1 setA)
           (FloatingNumType a1, FloatingNumType b1) -> Just (toFloat   a  getA b1 setB, toFloat   b  getB a1 setA)
 coerceUnsafe _ _ = Nothing
-    
+
 -- helper functions
+example :: (BitSizeEq v r) => ScalarType v -> Get v a -> ScalarType r -> Set r b -> SmartExp b -> SmartExp a -> SmartExp b
+example v get r set b a = set (SmartExp (Coerce v r (get a))) b
 
 fromInt :: IntegralType v -> Get v a -> NumType r -> Set r b -> SmartExp b -> SmartExp a -> SmartExp b
 fromInt v get r set b a = set (SmartExp (PrimApp (AST.PrimFromIntegral v r) (get a))) b
@@ -192,6 +195,63 @@ equalScalar TF16 TF16 = Just Refl
 equalScalar TF32 TF32 = Just Refl
 equalScalar TF64 TF64 = Just Refl
 equalScalar _ _       = Nothing
+
+-- | unsafe to avoid expensive pattern matching
+equalScalarSize :: forall a b. ScalarType a -> ScalarType b -> Maybe ((BitSize a == BitSize b) :~: 'True, (BitSize b == BitSize a) :~: 'True)
+equalScalarSize TI8 v = case v of 
+  TI8 -> Just (Refl, Refl)
+  TW8 -> Just (Refl, Refl)
+  _   -> Nothing
+equalScalarSize TW8 v = case v of 
+  TI8 -> Just (Refl, Refl)
+  TW8 -> Just (Refl, Refl)
+  _   -> Nothing
+equalScalarSize TI16 v = case v of 
+  TI16 -> Just (Refl, Refl)
+  TW16 -> Just (Refl, Refl)
+  TF16 -> Just (Refl, Refl)
+  _    -> Nothing
+equalScalarSize TW16 v = case v of 
+  TI16 -> Just (Refl, Refl)
+  TW16 -> Just (Refl, Refl)
+  TF16 -> Just (Refl, Refl)
+  _    -> Nothing
+equalScalarSize TF16 v = case v of 
+  TI16 -> Just (Refl, Refl)
+  TW16 -> Just (Refl, Refl)
+  TF16 -> Just (Refl, Refl)
+  _    -> Nothing
+equalScalarSize TI32 v = case v of 
+  TI32-> Just (Refl, Refl)
+  TW32 -> Just (Refl, Refl)
+  TF32 -> Just (Refl, Refl)
+  _    -> Nothing
+equalScalarSize TW32 v = case v of 
+  TI32 -> Just (Refl, Refl)
+  TW32 -> Just (Refl, Refl)
+  TF32-> Just (Refl, Refl)
+  _    -> Nothing
+equalScalarSize TF32 v = case v of 
+  TI32 -> Just (Refl, Refl)
+  TW32 -> Just (Refl, Refl)
+  TF32 -> Just (Refl, Refl)
+  _    -> Nothing
+equalScalarSize TI64 v = case v of 
+  TI64 -> Just (Refl, Refl)
+  TW64 -> Just (Refl, Refl)
+  TF64 -> Just (Refl, Refl)
+  _    -> Nothing
+equalScalarSize TW64 v = case v of 
+  TI64 -> Just (Refl, Refl)
+  TW64 -> Just (Refl, Refl)
+  TF64-> Just (Refl, Refl)
+  _    -> Nothing
+equalScalarSize TF64 v = case v of 
+  TI64 -> Just (Refl, Refl)
+  TW64 -> Just (Refl, Refl)
+  TF64 -> Just (Refl, Refl)
+  _    -> Nothing
+equalScalarSize a b = Nothing
 
 instance Show (Field e) where
 

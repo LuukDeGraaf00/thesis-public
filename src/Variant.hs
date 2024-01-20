@@ -17,6 +17,7 @@
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE TypeFamilies        #-}
 {-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE EmptyDataDeriving #-}
 
 module Variant where
 
@@ -43,13 +44,13 @@ import Data.Dynamic
 type V value (variants :: [variant]) = Variant (Constructor value) variants
 
 -- | generic variant type
-data Variant (function :: [variant] -> *) (variants :: [variant])
+data Variant (function :: [variant] -> *) (variants :: [variant]) = VarUnion TAG (EltR (function variants))
 
 -- | constructor data family that creates a representation constructor
 data family Constructor argument :: [variant] -> *
 
 -- | generic sum type implementation
-instance Elt (compact types) => Elt (Variant compact types) where
+instance (Elt (compact types), NAT.KnownNat (Length types)) => Elt (Variant compact types) where
 
     -- | tag with a compact representation
     type EltR (Variant compact types) = (TAG, EltR (compact types))
@@ -60,16 +61,15 @@ instance Elt (compact types) => Elt (Variant compact types) where
     
     -- | linear creation of tags (no nested pattern matching)
     tagsR :: [TagR (EltR (Variant compact types))]
-    tagsR = [TagRtag n t | n <- [0..size - 1], t <- (tagsR @(compact types))]
-      where size = 10 -- change later
+    tagsR = [TagRtag n t | n <- [0..typeListLength @types - 1], t <- (tagsR @(compact types))]
     
     -- | raw data
     toElt :: EltR (Variant compact types) -> Variant compact types
-    toElt = undefined
+    toElt (t, v) = VarUnion t v
     
     -- | raw data
     fromElt :: Variant compact types -> EltR (Variant compact types)
-    fromElt = undefined
+    fromElt (VarUnion t v) = (t, v)
 
 -- | default relation between variants
 class (Elt t, Elt v) => Element t v where
@@ -81,6 +81,12 @@ class (Elt t, Elt v) => Element t v where
   -- | extract variant
   destruct :: Exp t -> Exp v
   destruct = Destruct
+
+
+instance Show (EltR (f vs)) => Show (Variant f vs) where
+
+  show :: Variant f vs -> P.String
+  show (VarUnion t v) = P.show t P.++ ":" P.++ P.show v
 
 -- | generate pattern synonym for a variant
 pattern Variant :: forall t v. (Element t v) => Exp v -> Exp t
@@ -103,22 +109,22 @@ pattern Destruct value <- (P.fst (insert @t @v) -> value)
   where Destruct value = P.snd (insert @t @v) value
 
 -- | generic constructor pattern synonym
-pattern Con :: forall n v vs f. (Elt (IX n vs), Elt (f vs), Typeable (EltR (IX n vs)), NAT.KnownNat n) => Exp (IX n vs) -> Exp (Variant f vs)
+pattern Con :: forall n v vs f. (Elt (IX n vs), Elt (f vs), Typeable (EltR (IX n vs)), NAT.KnownNat n, NAT.KnownNat (Length vs)) => Exp (IX n vs) -> Exp (Variant f vs)
 pattern Con v <- (matchable (toWord @n) -> Just v)
   where Con v = constructable (toWord @n) (Construct v :: Exp (f vs))
 
 -- | generic constructor pattern synonym for first element
-pattern Con0 :: forall v vs f. (Elt (IX 0 vs), Elt (f vs), Typeable (EltR (IX 0 vs))) => Exp (IX 0 vs) -> Exp (Variant f vs)
+pattern Con0 :: forall v vs f. (Elt (IX 0 vs), Elt (f vs), Typeable (EltR (IX 0 vs)), NAT.KnownNat (Length vs)) => Exp (IX 0 vs) -> Exp (Variant f vs)
 pattern Con0 v <- (matchable 0 -> Just v)
   where Con0 v = constructable 0 (Construct v :: Exp (f vs))
 
 -- | generic constructor pattern synonym for second element
-pattern Con1 :: forall v vs f. (Elt (IX 1 vs), Elt (f vs), Typeable (EltR (IX 1 vs))) => Exp (IX 1 vs) -> Exp (Variant f vs)
+pattern Con1 :: forall v vs f. (Elt (IX 1 vs), Elt (f vs), Typeable (EltR (IX 1 vs)), NAT.KnownNat (Length vs)) => Exp (IX 1 vs) -> Exp (Variant f vs)
 pattern Con1 v <- (matchable 1 -> Just v)
   where Con1 v = constructable 1 (Construct v :: Exp (f vs))
 
 -- | generic constructor pattern synonym for third element
-pattern Con2 :: forall v vs f. (Elt (IX 2 vs), Elt (f vs), Typeable (EltR (IX 2 vs))) => Exp (IX 2 vs) -> Exp (Variant f vs)
+pattern Con2 :: forall v vs f. (Elt (IX 2 vs), Elt (f vs), Typeable (EltR (IX 2 vs)), NAT.KnownNat (Length vs)) => Exp (IX 2 vs) -> Exp (Variant f vs)
 pattern Con2 v <- (matchable 2 -> Just v)
   where Con2 v = constructable 2 (Construct v :: Exp (f vs))
 
@@ -128,16 +134,16 @@ constructable word e = Exp (SmartExp (Pair (SmartExp (Const TW8 word)) (unExp e)
 
 -- | use trace to identity if it matches constructor and the corresponding tag
 matchable :: forall v vs f. (Elt v, Typeable (EltR v), Elt (Variant f vs)) => Word8 -> Exp (Variant f vs) -> Maybe (Exp v)
-matchable constructor (Exp (SmartExp (Match trace e))) = case (constructor P.== tag0, fromDynamic d) of
-          (True, Just nested) -> Just (Exp (SmartExp (Match nested (unExp (Destruct (Exp e :: Exp (Variant f vs)) :: Exp v)))))
-          _                   -> Nothing
-
-      where (TagE tag0 d) = tags @(Variant f vs) 0 P.!! P.fromIntegral (getTag trace)
+matchable constructor (Exp (SmartExp (Match trace e))) = if constructor P.== getTag trace 
+          then Just (Exp (SmartExp (Match (tagsR @v P.!! 0) (unExp (Destruct (Exp e :: Exp (Variant f vs)) :: Exp v)))))
+          else Nothing
 matchable _ _                                           = Nothing
 
+typeListLength :: forall t r. (NAT.KnownNat (Length t), P.Num r) => r
+typeListLength = P.fromIntegral (NAT.natVal (Proxy @(Length t)))
 
-tags :: forall v vs f. Word8 -> [TagE]
-tags n = undefined --P.map (TagE n . toDyn) (tagsR @v) P.++ tags @(V f vs) (n + 1)
+setTagN :: forall a f vs. (Elt a, Elt (f vs)) => Word8 -> Exp a -> Exp (Variant f vs)
+setTagN n v = constructable n (Construct v :: Exp (f vs))
 
 
 getTag :: TagR a -> TAG
@@ -188,10 +194,6 @@ test _                = Con0 0
 -}
 
 
--- | function that generates all possible tags for a list of types (?) => use TagR, 
-finder :: forall v vs. TAG -> (TAG, TagR v)
-finder trace = undefined
-
 
 -- | expects the match term generated by the 'match' function 
 onValue :: forall t v. (Elt t, Elt v) => Word8 -> Exp t -> Maybe (Exp v)
@@ -203,17 +205,12 @@ onValue l _                            = Nothing
 toWord :: forall n. (NAT.KnownNat n) => Word8
 toWord = P.fromIntegral (NAT.natVal (Proxy @n))
 
-
-
 isTag :: Word8 -> TagR a -> Bool
 isTag l TagRunit       = False
 isTag l (TagRsingle _) = False
 isTag l (TagRundef  _) = False
 isTag l (TagRpair _ _) = False
 isTag l (TagRtag r _)  = l P.== r
-
-typeListLength :: forall t r. (NAT.KnownNat (Length t), P.Num r) => r
-typeListLength = P.fromIntegral (NAT.natVal (Proxy @(Length t)))
 
 
 -- | identifier of a particular variant

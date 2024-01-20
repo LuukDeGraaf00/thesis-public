@@ -118,10 +118,12 @@ onTrue = binaryF (\(SingleScalarType (NumSingleType (IntegralNumType v))) -> AST
 onFalse :: forall e. (Elt e) => Exp e -> Exp e -> Exp e
 onFalse (Exp mask) (Exp value) = Exp $ binary (\(SingleScalarType (NumSingleType (IntegralNumType v))) a b -> SmartExp (PrimApp (AST.PrimBAnd v) (SmartExp (Pair (SmartExp (PrimApp (AST.PrimBNot v) a)) b)))) mask value (eltR @e)
 
-example5 :: Exp (Int, Word)
-example5 = uncond False_ (T2 3 1) (T2 5 5)
-
-
+-- | retrieves tag
+unsafeToTag :: forall e. (Elt e) => Exp e -> Exp TAG
+unsafeToTag (Exp e) = go (eltR @e) e
+  where go :: TypeR (EltR e) -> SmartExp (EltR e) -> Exp TAG
+        go (TupRsingle TW8) a = Exp a
+        go _ _                = error "no tag!"
 -- | construct a scalar
 scalarF :: (SingleType a -> a) -> (VectorType a -> a) -> ScalarType a -> a
 scalarF a _ (SingleScalarType r) = a r

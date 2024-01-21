@@ -6,6 +6,7 @@
 \usepackage{hyperref}
 \usepackage{listings}
 \usepackage{color}
+\usepackage{lipsum}
 
 \definecolor{codegray}{gray}{0.9}
 \definecolor{mygreen}{rgb}{0,0.6,0}
@@ -44,14 +45,40 @@
 \newcommand{\type}[1]{\smash{\colorbox{codegray}{\texttt{#1}}}}
 \graphicspath{ {./Images/} }
 
-
 \title{Accelerating Structural Sum Types}
-\author{Luuk de Graaf}
-\date{January 2024}
+\author{Luuk de Graaf, 6577830.}
+\date{\today}
 
 \begin{document}
+\begin{titlepage}
 
-\maketitle
+    \centering
+    
+    \hspace{2cm}\includegraphics[scale=1.0]{uulogo.png}
+
+	\vspace{1cm}
+	{\Large \textsc{Computing Science Master Thesis}\par}
+	\vspace{1.0cm}
+	{\huge\bfseries Accelerating Structural Sum Types\par}
+	\vspace{1.5cm}
+
+    \begin{abstract}
+        \lipsum[1]
+    \end{abstract}
+
+	\vspace{5.0cm}
+
+    %\raggedright
+    {\Large Luuk de Graaf \\ 66577830 \par}
+
+    \vspace{0.5cm}
+    {\normalsize First supervisor   : Gabriele Keller \par}
+    {\normalsize Second supervisor  : Wouter Swierstra \par}
+
+
+\end{titlepage}
+
+\newpage
 
 \tableofcontents
 
@@ -1164,7 +1191,6 @@ This is sufficient to represent the initial sought after abstraction around vari
                                    | ElementWise [Variant Compact types]
 \end{verbatim}
 
-
 While the implementation is heavily tailored to Haskell, it is not unfeasible to implement such a framework natively within a language.
 This chapter centres around implementation details specific to Haskell and Accelerate.
 In this first section Accelerate related details are explored, while the second section discusses the implementation of previously discussed (de)constructors.
@@ -1261,20 +1287,47 @@ As pattern matching cannot be overloaded in Haskell, the \type{match} operator i
 
 \newpage
 
-\subsection{Examples}
+\subsection{Result}
 
-\paragraph{Functions}
+There are no setup requirements for using the variant type within Accelerate code.
+Concretely, it is sufficient to use the \type{Variant} type constructor and the \type{Con0, Con1, Con2...} data constructors.
+The expected behavior is that of a traditional sum type, where pattern matching happens on the current active variant. 
+The intersect function discussed within the introduction only has to be written once, irregardless of any low level optimizations.
+These optimizations include a variant type collection with multiple representations, multiple memory representations and efficient (de)-constructor of variant types.
 
-generate functions
+\begin{verbatim}
+    type Primitive = V Compact [Sphere, Plane]
+
+    intersect :: Exp Pos -> Exp Dir -> Exp Primitives -> Exp Distance
+    intersect p d (Con0 sphere) = sphereIntersect p d sphere
+    intersect p d (Con1 plane)  = planeIntersect p d plane
+\end{verbatim}
+
+\paragraph{Memory Representation}
+
+The \type{Compact} type already deduplicates primitive types of the same size, which makes the memory representation of \type{Primitive} already quite compact.
+A more aggressive approach is to deduplicate on larger fields, which requires defining a type with the same kind \type{[*] -> r}. 
+Such type can be defined through pre-existing type-level functions, which can then be used as layout for all variant types.
+The datatype-generic constructors adapt independently to the derived type and resort to truncation when deconstructing these fields.
+As such, the \type{intersect} function does not have to adapt to a memory representation optimization.
+
+\paragraph{(De)constructor}
+
+The \type{Variant} type uses a single tag to represent the active variant, which is used by the \type{Case} operator to pattern match.
+This is often quite performant, but in some cases it can be preferable to unconditionally execute a function.
+The \type{Maybe} type can always unconditionally execute, as the \type{Nothing} constructor does not have any fields.
+This is impossible with variant types that deduplicate fields, as unconditionally executing would impact the correctness.
+With the datatype-generic functions a bitmask can be unconditionally generated, which masks side-effects of all unconditionally executed functions.  
+Rather than integrating this within the \type{Variant} type, it can be used as replacement for the pattern matching \type{match} operator.
 
 \paragraph{Collection}
 
-ecs collection
-
-\paragraph{Unconditional}
-mask vs without mask
-
-\paragraph{Sentinel 1e30f}
+The datatype-generic functions allow for a collection of \type{Primitives} to be completely agnostic to the representation.
+For a variant-wise collection pattern matching is redundant, which means to be effective all control-flow paths of the \type{intersect} function must be extracted. 
+Pattern matching will effectively occur on the Haskell side, which is trivial due to embedded pattern matching already making choice elements explicit.
+Distributing the \type{intersect} function over multiple arrays, within a collection of \type{Primitives}, can therefore be done.
+With this many collective operations can be supported, including ones that modify the identity of such a collection.
+These collective operators are currently not implemented beyond the necessary operators to support benchmarking.
 
 \newpage
 

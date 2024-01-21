@@ -46,21 +46,20 @@
 \contentsline {subsection}{\numberline {4.1}Accelerate}{27}{subsection.4.1}%
 \contentsline {paragraph}{Pattern Synonymns}{28}{section*.23}%
 \contentsline {paragraph}{Pattern Matching}{28}{section*.24}%
-\contentsline {subsection}{\numberline {4.2}Examples}{29}{subsection.4.2}%
-\contentsline {paragraph}{Functions}{29}{section*.25}%
-\contentsline {paragraph}{Collection}{29}{section*.26}%
-\contentsline {paragraph}{Unconditional}{29}{section*.27}%
-\contentsline {paragraph}{Sentinel 1e30f}{29}{section*.28}%
+\contentsline {subsection}{\numberline {4.2}Result}{29}{subsection.4.2}%
+\contentsline {paragraph}{Memory Representation}{29}{section*.25}%
+\contentsline {paragraph}{(De)constructor}{29}{section*.26}%
+\contentsline {paragraph}{Collection}{29}{section*.27}%
 \contentsline {subsection}{\numberline {4.3}Benchmarks}{30}{subsection.4.3}%
 \contentsline {section}{\numberline {5}Discussion}{31}{section.5}%
 \contentsline {subsection}{\numberline {5.1}Benchmarks}{31}{subsection.5.1}%
 \contentsline {subsection}{\numberline {5.2}Embedded Domain-Specific Language}{31}{subsection.5.2}%
 \contentsline {subsection}{\numberline {5.3}Datatype-generic programming in Haskell}{31}{subsection.5.3}%
 \contentsline {subsection}{\numberline {5.4}Limitations}{31}{subsection.5.4}%
-\contentsline {paragraph}{Surface type}{31}{section*.29}%
-\contentsline {paragraph}{Nested pattern matching}{32}{section*.30}%
-\contentsline {paragraph}{Unified tag}{32}{section*.31}%
-\contentsline {paragraph}{Struct}{32}{section*.32}%
-\contentsline {paragraph}{Flexible pattern matching}{32}{section*.33}%
+\contentsline {paragraph}{Surface type}{31}{section*.28}%
+\contentsline {paragraph}{Nested pattern matching}{32}{section*.29}%
+\contentsline {paragraph}{Unified tag}{32}{section*.30}%
+\contentsline {paragraph}{Struct}{32}{section*.31}%
+\contentsline {paragraph}{Flexible pattern matching}{32}{section*.32}%
 \contentsline {section}{\numberline {6}Conclusion}{33}{section.6}%
 \contentsline {subsection}{\numberline {6.1}Future Work}{33}{subsection.6.1}%

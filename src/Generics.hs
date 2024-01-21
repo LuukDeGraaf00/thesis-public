@@ -124,6 +124,7 @@ unsafeToTag (Exp e) = go (eltR @e) e
   where go :: TypeR (EltR e) -> SmartExp (EltR e) -> Exp TAG
         go (TupRsingle TW8) a = Exp a
         go _ _                = error "no tag!"
+        
 -- | construct a scalar
 scalarF :: (SingleType a -> a) -> (VectorType a -> a) -> ScalarType a -> a
 scalarF a _ (SingleScalarType r) = a r

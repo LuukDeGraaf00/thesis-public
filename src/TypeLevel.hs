@@ -19,6 +19,8 @@ import Data.Data
 -- | preserving representation that ensures no truncating happens
 type Preserving (types :: [r]) = NatTypes (SplitBitSize '[] types)
 
+type Naive (types :: [r]) = NatTypes (NormalBitSize types)
+
 -- | Higher order map function
 type family Map (f :: * -> *) xs :: [*] where
 
@@ -179,6 +181,12 @@ type family SplitBitSize (a :: [Nat]) (b :: [r]) :: [Nat] where
 
     SplitBitSize xs  '[]      = xs
     SplitBitSize xs  (y : ys) = SplitBitSize (Difference xs (FieldsSize (EltR y))) ys
+
+
+type family NormalBitSize (a :: [r]) :: [Nat] where
+
+    NormalBitSize '[]      = '[]
+    NormalBitSize (x : xs) = FieldsSize (EltR x) ++ NormalBitSize xs
 
 
 type family Length (xs :: [r]) :: Nat where

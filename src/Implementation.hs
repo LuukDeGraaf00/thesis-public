@@ -35,15 +35,19 @@ import qualified GHC.TypeNats
 
 -- | compact sum type representation
 type CV (types :: [r]) = Variant (Constructor CRep) types
+type NV (types :: [r]) = Variant (Constructor NRep) types
 
 -- | compact representation
 type Compact (types :: [r]) = NatTypes (SplitBitSize '[] types)
 
 -- | key used for dictionary
 data CRep
+data NRep
 
 -- | dictionary instance for application of a compact representation
 newtype instance Constructor CRep types = CRep (Compact types)
+newtype instance Constructor NRep types = NRep (Compact types)
+
 
 -- | elt instance
 instance (Elt (Compact types)) => Elt (Constructor CRep types) where
@@ -88,7 +92,8 @@ extract (VariantWise vs) = extract (sortedWise (VariantWise vs))
 -- | operates on all variants
 map :: (Elt (CV vs), Elt r) => (Exp (CV vs) -> Exp r) -> Collection vs -> Acc (Vector r)
 map fs (VariantWise vs) = P.foldl1 (A.++) (P.zipWith (\(VariantOf v) f -> A.map (f . Construct) v) vs (functions fs))
-map _ _                = error "not yet supported: first sort"
+map f  (SortedWise  vs) = A.map (match f) vs
+map f  (ElementWise vs) = A.map (match f) vs
 
 -- | force variant-wise collection
 variantWise :: (Elt (CV vs), Elt (Compact vs)) => Collection vs -> Collection vs

@@ -145,7 +145,6 @@ typeListLength = P.fromIntegral (NAT.natVal (Proxy @(Length t)))
 setTagN :: forall a f vs. (Elt a, Elt (f vs)) => Word8 -> Exp a -> Exp (Variant f vs)
 setTagN n v = constructable n (Construct v :: Exp (f vs))
 
-
 getTag :: TagR a -> TAG
 getTag (TagRtag w _) =  w
 getTag _ = error "oops"

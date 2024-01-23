@@ -49,8 +49,6 @@
 \newcommand{\type}[1]{\smash{\colorbox{codegray}{\texttt{#1}}}}
 \graphicspath{ {./Images/} }
 
-\title{Accelerating Structural Sum Types}
-\author{Luuk de Graaf, 6577830.}
 \date{\today}
 
 \begin{document}
@@ -63,22 +61,30 @@
 	\vspace{1cm}
 	{\Large \textsc{Computing Science Master Thesis}\par}
 	\vspace{1.0cm}
-	{\huge\bfseries Accelerating Structural Sum Types\par}
+	{\huge\bfseries Polymorphic Variant Types in Data-Parallel Languages \par}
 	\vspace{1.5cm}
 
     \begin{abstract}
-        \lipsum[1]
+        Data-parallelism uses the uniformity between multiple data elements to accelerate the process of operating on large collections of data.
+        Variant types constrain the ability to operate uniformly, which therefore limit data-parallelism opportunities in the general case.
+        In the situations where non-uniformity is inherit to the algorithm low-level optimizations are used to mitigate the heterogeneity.
+        In this paper a higher abstraction level variant type is explored which can capture the required low-level control to be able to represent these optimizations in data-parallel languages.
+        A polymorphic variant type is used to represent variability on the type-level, which is used by data structures to adapt to the identity of the variant type.
+        Type-level programming is used to derive memory efficient representation for user-defined datatypes.
+        (De)construction of variant types is automated through datatype-generic programming, which means custom memory representations can be provided seamlessly.
+        It results in a fully modular variant type that can exercise low-level control while preserving the type identity of variant.
+        An implementation is provided in the data-parallel language {\it Accelerate}, which demonstrates the viability of variant types in a data-parallel context.
+
     \end{abstract}
 
-	\vspace{5.0cm}
+	\vfill
 
     %\raggedright
-    {\Large Luuk de Graaf \\ 66577830 \par}
+    {\Large Luuk de Graaf, 66577830. \par}
 
     \vspace{0.5cm}
     {\normalsize First supervisor   : Gabriele Keller \par}
     {\normalsize Second supervisor  : Wouter Swierstra \par}
-
 
 \end{titlepage}
 
@@ -1267,7 +1273,7 @@ As functions are written on the embedded representation, there is no type-safety
         type EltR Maybe a = (TAG, a)
     
     fmap :: (Exp a -> Exp b) -> Exp (Maybe a) -> Exp (Maybe b)
-    fmap (tag, value) = ...
+    fmap f (tag, value) = ...
 \end{verbatim}
 
 The function retrieves the embedded \type{(TAG, Float)} type, not the sum type \type{MaybeFloat}.
@@ -1333,13 +1339,14 @@ Concretely, it is sufficient to use the \type{Variant} type constructor and the 
 The expected behavior is that of a traditional sum type, where pattern matching happens on the current active variant. 
 The intersect function discussed within the introduction only has to be written once, irregardless of any low level optimizations.
 These optimizations include a variant type collection with multiple representations, multiple memory representations and efficient (de)-constructor of variant types.
+The previously discussed \type{Primitive} and \type{Intersect} function can now be defined.
 
 \begin{verbatim}
     type Primitive = V Compact [Sphere, Plane]
 
-    intersect :: Exp Pos -> Exp Dir -> Exp Primitives -> Exp Distance
-    intersect p d (Con0 sphere) = sphereIntersect p d sphere
-    intersect p d (Con1 plane)  = planeIntersect p d plane
+    intersect :: Exp Primitives -> Exp Pos -> Exp Dir -> Exp Distance
+    intersect (Con0 sphere) = sphereIntersect sphere
+    intersect (Con1 plane)  = planeIntersect plane
 \end{verbatim}
 
 \paragraph{Memory Representation}
@@ -1368,11 +1375,71 @@ Distributing the \type{intersect} function over multiple arrays, within a collec
 With this many collective operations can be supported, including ones that modify the identity of such a collection.
 These collective operators are currently not implemented beyond the necessary operators to support benchmarking.
 
+\begin{verbatim}
+    example of some collection functions
+\end{verbatim}
+
+
 \newpage
 
 \subsection{Benchmarks}
 
-raytracer transformation
+A concrete performant way to operate on multiple variants was not an objective in its own right, due the nature of many components being able to influence the performance of an application.
+In this section previously discussed optimizations are applied while preserving the type identity of the functions.
+The \type{nearest} function is used as example, which computes the nearest primitive intersection of ray.
+This is fused into a single traversal, which ..
+
+\begin{verbatim}
+-- | nearest primitive that intersects with a ray
+nearest :: Exp Pos -> Exp Dir -> Collection [Sphere, Plane] -> Acc (Scalar Distance)
+nearest position direction = fold min Miss . map (intersect position direction)
+\end{verbatim}
+
+Examples
+
+input size for cache : small, large
+memory representation : no deduplicate, deduplicate
+(de)-construction : match, conditional, unconditional
+input : split, sorted, grouped
+
+
+\begin{center}
+    \begin{tabular}{ | m{14em} | m{8em}| m{8em} | m{8em} | } 
+      \hline
+      {\bf Type} & {\bf Interpreter} & {\bf CPU} & {\bf GPU} \\ 
+      \hline
+      Variants         & 6.22ms & 9.54ms & 8.07ms\\ 
+      \hline
+      Elements         & 3.66ms & 5.50ms & 5.24ms\\ 
+      \hline
+      Sorted           & 3.79ms & 5.49ms & 5.28ms\\ 
+      \hline
+      Compact Elements & 5.09ms & 6.78ms & 6.60ms\\ 
+      \hline
+      Compact Sorted   & 4.97ms & 6.72ms & 6.91ms\\ 
+      \hline
+    \end{tabular}
+\end{center}
+
+scaling to larger size
+
+\begin{center}
+    \begin{tabular}{ | m{14em} | m{8em}| m{8em} | m{8em} | } 
+      \hline
+      {\bf Type} & {\bf Interpreter} & {\bf CPU} & {\bf GPU} \\ 
+      \hline
+      Variants         & 100.4ms & 9.66ms & 8.39ms \\ 
+      \hline
+      Elements         & 104.9ms & 5.45ms & 4.58ms \\ 
+      \hline
+      Sorted           & 101.3ms & 5.48ms & 4.89ms \\ 
+      \hline
+      Compact Elements & 119.4ms & 6.81ms & 6.64ms \\ 
+      \hline
+      Compact Sorted   & 97.90ms & 6.78ms & 6.71ms \\ 
+      \hline
+    \end{tabular}
+\end{center}
 
 \newpage
 

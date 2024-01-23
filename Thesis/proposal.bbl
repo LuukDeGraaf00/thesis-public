@@ -78,10 +78,6 @@ Bernhard~Manfred Gruber, Guilherme Amadio, Jakob Blomer, Alexander Matthes,
   Rene Widera, and Michael Bussmann.
 \newblock Llama: The low-level abstraction for memory access, 2022.
 
-\bibitem{programming-optimization}
-Paul Hsieh.
-\newblock Programming optimization, 2016.
-
 \bibitem{abstraction-vectorization}
 Sylvain Jubertie, Ian Masliah, and Joel Falcou.
 \newblock Data layout and simd abstraction layers: Decoupling interfaces from

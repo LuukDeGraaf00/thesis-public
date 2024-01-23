@@ -7,11 +7,15 @@
 \usepackage{listings}
 \usepackage{color}
 \usepackage{lipsum}
+\usepackage[margin=1cm]{caption}
 
 \definecolor{codegray}{gray}{0.9}
 \definecolor{mygreen}{rgb}{0,0.6,0}
 \definecolor{mygray}{rgb}{0.5,0.5,0.5}
 \definecolor{mymauve}{rgb}{0.58,0,0.82}
+\captionsetup{format=hang}
+\pagestyle{headings}
+\pagecolor{white}
 
 \lstset{ 
   backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}; should come as last argument
@@ -237,10 +241,12 @@ The research pertains primarily on including structural sum types to the Futhark
 
 \section{Performance}
 
+It is fundamental to understand performance implications when creating a higher level abstraction in a performance critical environment.
 There are many components that can influence the performance of a program.
-This grows the importance of being able to identify {\it bottlenecks} but also understanding the underlying technological performance considerations\cite{programming-optimization}.
+This grows the importance of being able to identify {\it bottlenecks} but also understanding the underlying technological performance considerations.
 Within the first section fundamental optimizations related to the interaction between data and hardware are introduced.
-This is used to identify architecture agnostic performance considerations for array operations in the second section.
+This is used to identify architecture agnostic performance considerations for operations on collections of data in the second section.
+In the third section this information is used to enumerate efficient data structures for multiple variants of a type.
 
 \subsection{Optimizations}
 
@@ -248,34 +254,42 @@ In the early days of computing, memory was seen as a way to store data indefinit
 As computational power of processors increased, the importance of main memory increased.
 Main memory is dependant on the advancements of random-access-memory (RAM), which stagnated due to both cost and physical limitations\cite{memory}. 
 This put pressure on the software side to adapt to hardware components for optimizations, rather than merely the computational complexity of algorithms.
+One of these hardware optimizations is cache storage, which accelerates memory accesses of predetermined data.
+The chosen data is decided based on a cache replacement policy, often based on a temporal property. 
+The cache operates independently of the operating system\cite{memory}, and no direct control can be exercised.
 
 \begin{figure}[ht]
     \centering
     \includegraphics[scale=0.2]{memoryhierarchy}
-    \caption{ memory hierarchy }
+    \caption
+    {
+        An abstract view of a computer memory hierarchy. 
+        Each layer can be subdivided even further, depending on the type of hardware. 
+        The difference between both the memory access time and memory storage size for each layer can be several order-of-magnitudes.
+        As example: data in a register effectively takes 0 instruction cycles, while data from disk might take several million instruction cycles to arrive.  
+    }
 \end{figure}
-
-One of these hardware optimizations is cache storage, which accelerates memory accesses of predetermined data.
-The data is decided based on a cache replacement policy, often based on a temporal property. 
-The cache operates independently of the operating system\cite{memory}, and no direct control can be exercised.
-
 \paragraph{Instructions}
 
 Interfacing with processors is done through computer instructions.
-Fetching of an instruction is a memory operation, as it retrieves the instruction at the target of the program counter.
+Fetching of an instruction is a memory operation in itself, as it retrieves the instruction at the target of the program counter.
 Instructions operate on registers, which have distinct sizes depending on the architecture and their respective function.
-There are many instruction set architectures (ISA) and devices that implement distinct instruction sets.
-An intermediate representation (IR), such as the LLVM IR\cite{LLVM}, can be used to create a uniform interface between these instruction sets\cite{intermediate-representation}.
-Explicit use of these architecture exclusive instructions can be achieved through compiler intrinsics.
-Hardware design sometimes allows for executing specialized instructions\footnote{Note that the term {\it complex instruction} is avoided, as this concerns a compact {\it representation} of several instructions. }, which are faster than their semantically equivalent instruction(s).
-This includes sacrificing accuracy for performance (floating-point), combining a sequence of instructions (arithmetic) or by parallel execution on multiple data elements (SIMD).
+There are many instruction set architectures (ISA) and devices that utilize only a specific instruction set.
+An intermediate representation (IR), such as the LLVM IR\cite{LLVM}, can be used to create a single interface for multiple instruction sets\cite{intermediate-representation}.
+Hardware design sometimes allows for specialized instructions\footnote{Note that this is separate from a {\it complex instruction}, which concerns a compact {\it representation} of several instructions. }, which are faster than their semantically equivalent instruction(s).
+Examples include sacrificing accuracy for performance (floating-point), combining a sequence of instructions (arithmetic) or by parallel execution on multiple data elements (SIMD).
 SIMD instructions in particular are often very performant, as several steps within the execution pipeline can be parallelized.
-This process of instruction parallelization is called {\it vectorization}.
+The process of parallelization of multiple instructions is called {\it vectorization}.
+Using these architecture dependant instructions directly can be achieved through compiler intrinsics.
 
 \begin{figure}[ht]
     \centering
     \includegraphics[scale=0.2]{vectorization}
-    \caption{ vectorization of a scalar addition operation }
+    \caption
+    {
+        A scalar addition instruction is converted to the equivalent single instruction multiple data (SIMD) instruction, where each grey square denotes a single data component.
+        Vectorization requires the data to be contiguous in memory and effectively performs the work of several scalar operations within a single instruction.  
+    }
 \end{figure}
 
 \newpage
@@ -285,16 +299,16 @@ This process of instruction parallelization is called {\it vectorization}.
 Registers can be considered the fastest available memory, as the data is ready to be used by an instruction.
 Within the context of registers this data is commonly referred to as a variable.
 Variables existing within registers before execution is a prerequisite for reasonable performance.
-This scheduling problem is to be considered a NP-complete problem\cite{register-allocation}.
-Programming languages with any form of abstraction delegate this process to the compiler.
-This simplifies a lot of complexity, as only which data is being used by what instruction is relevant.
-In some cases there are too many live variables for the available registers, which {\it spills} the variable.
-This requires a variable to be stored outside registers, in a slower form of memory, and incites a delay upon use.
-This can be prevented by reducing the live-time of variables, reordering instructions and diversifying execution units.  
+The scheduling problem of ensuring all variables exist in registers before execution is to be considered a NP-complete problem\cite{register-allocation}.
+Programming languages with any form of abstraction generally delegate this process to the compiler.
+It simplifies a lot of complexity, as only which data is being used by what instruction is relevant for the programmer.
+In some cases there are too many live variables for the available registers, which can {\it spill} the variable.
+This requires a variable to be stored outside registers, in a slower form of memory, and incites a delay when attempting to use the data.
+It can be prevented by either reducing the time variables are live, reordering the sequence of instructions or diversifying the execution units.  
 
 \paragraph{Memory Access Time}
 
-Semantically random-access-memory (RAM) implies that memory operations take around the same amount of time.
+Semantically random-access-memory (RAM) implies that memory operations take around the same amount of time, independent of the physical storage location.
 In practice this does not hold for several reasons.
 
 \begin{itemize}
@@ -317,7 +331,7 @@ In practice this does not hold for several reasons.
     Direct-memory-access (DMA) is an interface for hardware components and allows memory operations to be more organized.
     This allows for large scale memory operations to be performed efficiently and independently of the main processor.
     It requires use of several buses which means some processors must idle at seemingly random periods of time.
-    This means that other hardware components can influence the memory access time.
+    In essence it means that other hardware components can influence the memory access time.
  
 \end{itemize}
 
@@ -325,138 +339,165 @@ In practice this does not hold for several reasons.
 
 \paragraph{Caching}
 
-Due to hardware related discrepancies in memory access time, it can be beneficial to organize data according to the memory access time.
-One way to achieve this is by caching data, that is storing a {\it copy} of the data in faster accessible medium.
-A cache is generally made of SRAM and resides close to the processor, which allows memory accesses to be magnitudes faster than the equivalent main memory access\cite{memory}.
-When data already exist in the cache it is referred to as a {\it cache hit}, otherwise a {\it cache miss}.
-Deciding which data is cached and for how long is a cache replacement policy.
-Adapting to these policies simplifies the scheduling and minimizes the amount of cache misses.
+Due to discussed hardware related discrepancies in memory access time, it can be beneficial to organize data according to the memory access time.
+The simplest way to achieve this is by caching data, that is storing a {\it copy} of the data in a faster accessible medium.
+A cache generally consists of SRAM and resides close to the processor, which allows memory accesses to be order-of-magnitudes faster than a main memory access\cite{memory}.
+When data already exist in the cache it is referred to as a cache hit, otherwise a cache miss has occurred.
+Deciding which data is cached and for how long is a cache replacement policy, utilizing both recency and frequency.
+Adapting to policies simplifies both the scheduling and minimizes the potential cache misses that can occur in the worst case scenario.
 
 \begin{figure}[ht]
-    \centering
-    \includegraphics[scale=0.3]{cache}
-    \caption{ cache hit (green), cache miss (yellow) and replacement (purple)}
-\end{figure}
-
-Caching of data can be done after the data has been retrieved, which means the delay already has occurred.
-This can be avoided by requesting data in advance and storing it a cache prematurely, so called cache prefetching.
-This is done by analyzing future instructions (hardware) and instructions that {\it hint} at the future use of data (software)\cite{cache-prefetching}.
-
-\begin{figure}[ht]
-    \centering
-    \includegraphics[scale=0.3]{prefetch}
-    \caption{ prefetch based on information (blue) from cache miss and processor instructions }
-\end{figure}
-
-This is harder when a branch is encountered, as both the data and the next instructions are uncertain.
-Speculatively executing these uncertain instructions can be performant if the overhead of redundant work remains small enough.
+\begin{minipage}{.65\textwidth}
+Caching of data can be done after the data has already been retrieved, which means a delay already has occurred.
+This can be avoided by requesting data in advance and storing the data in a cache prematurely, so called cache {\it prefetching}.
+It can be accomplished by analyzing future instructions (hardware) or using instructions that {\it hint} at the future use of a piece of data (software)\cite{cache-prefetching}.
+Prefetching is harder when there are multiple execution paths possible, as both the data and the next instructions will be uncertain.
+Speculatively executing the uncertain instructions can be performant if the overhead of redundant work remains small enough.
 Rather than executing unconditionally, some processors execute the most likely to happen branch based on some parameters (branch prediction)\cite{instruction-level-parallelism}.
- 
-\newpage
-
-\paragraph{Parallelism}
-
-Instruction-level parallelism is the parallel execution of multiple instructions\cite{instruction-level-parallelism}.
-This can be done by dividing instructions into several steps and outsourcing each step to a distinct processor unit (instruction pipelining).
-Shuffling the order of instructions can allow more processor units to work in parallel (out-of-order execution).
-Duplicate units and independent instructions allows for additional parallelism (superscalar execution).
-
-\begin{figure}[ht]
+\end{minipage}%
+\begin{minipage}{.35\textwidth}
     \centering
-    \includegraphics[scale=0.2]{instructionlevelparallelism}
-    \caption{ instruction pipelining: each color represents an instruction }
+    \includegraphics[scale=0.08]{cache (2).png}
+    \captionsetup{margin=0.5cm}
+    \captionsetup{format=plain}
+    \caption{Stream buffer that prefetches data into the cache based on cache misses.}
+\end{minipage}
 \end{figure}
-
-Data-level parallelism executes an instruction on several data elements, such as the previously discussed SIMD instructions.
+\vspace{-1.5em}
+\paragraph{Parallelism}
+Instruction-level parallelism is the parallel execution of multiple instructions\cite{instruction-level-parallelism}.
+It can be done by dividing an instruction into several steps and outsourcing each step to a distinct processor unit (instruction pipelining).
+Shuffling the order of instructions might allow more units to work in parallel from each other (out-of-order execution).
+This can be extended by outsourcing instructions to different units of the same type, such as execution units (superscalar execution).
+An abstraction-level higher is data-level parallelism, which executes a single instruction on multiple data elements such as the previously discussed SIMD instructions.
 Specialized processors sometimes either fully pipeline the data (vector processing) or allow for some form of autonomy (multithreading). 
 Both share instruction fetching and decoding, but threads have their own program counter which allows for an independent sequence of instructions.
+Execution of threads can be done concurrently, which can be useful to hide latencies (context-switching).
+In parallel is also possible with multi-core processors, which have several processors units (cores) that can support multiple threads at the same time.
+Cores are often not independent processors and might share several components with other cores, such as caches\cite{thread-level-parallelism}.
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.2]{vectorvsthreads}
-    \caption{ branch instructions: masking (vector) vs independent sequence (threads)}
+    \begin{minipage}{.5\textwidth}
+        \centering
+        \includegraphics[scale=0.09]{instructionpipeline.png}
+        \captionsetup{margin=0.2cm}
+        \caption
+        { 
+            Multiple phases allows a processor to hypothetically execute the [A, B, C, D] instructions in 8 cycles.
+            This is significantly faster in comparison to the 20 cycles it would require in a single lane.
+        }
+    \end{minipage}%
+    \begin{minipage}{.5\textwidth}
+        \centering
+        \includegraphics[scale=0.09]{vectorizationvsthreads.png}
+        \captionsetup{margin=0.2cm}
+        \caption
+        { 
+            Both vectorization and concurrency are single-core, but differ in handling multiple tasks.
+            Parallel threads are both independent and execute on multiple cores simultaneous.      
+        }
+    \end{minipage}
 \end{figure}
-
-Execution of threads can be done concurrently, which can be useful to hide latencies (context-switching).
-In parallel is also possible with multi-core processors, which have several processors units (cores) that can support multiple threads.
-Cores are often not independent processors and might share several components with other cores, such as caches\cite{thread-level-parallelism}.
 
 \newpage
 
 \subsection{Principles}
 
-There are many components that can influence the performance of a program, some of which were discussed in previous sections.
-This makes general statements on optimizations often weak, as the interaction between these components is complex.
-Focusing on a particular area, such as iterating on data elements, allows for stronger arguments.
-Within this section previously discussed optimizations will be discussed in the context of iterating on many elements.
+In the previous section several components have been identified that can influence the performance of a program, such as the cache.
+The interconnectivity of the components make general statements on optimizations often weak, as the environment in which the optimization exist can heavily influence the result.
+Focusing on a particular area, such as iterating on multiple data elements in parallel, allows for a stronger argument.
+Within this section previously discussed intricacies will be discussed in the context of iterating on many elements in parallel.
 
 \paragraph{Contiguous} 
 
-A rudimentary reason for contiguously allocated data is that it creates structure, which can be used to organize data.
-Arrays utilize their structure to align elements, such that each element can be identified in constant time\footnote{Both in {\it time complexity} and within {\it computer architecture} norms, as data access is a single instruction, unlike pointer trees and hash tables. } through a linear function.
-This is also used for compound datatypes, where structure and the type can identify the memory location of each field.
-The structure also simplifies work distribution between threads, as it is a matter of constant offsets.
+A rudimentary reason for using contiguously allocated data is that it creates structure, which can be used to organize data.
+Arrays utilize their structure to align elements, such that each element can be identified in constant time\footnote{Both in {\it time complexity} and within {\it computer architecture} norms, as data access from a memory location consists of a single instruction. This is in contrast with data structures such as pointer trees and hash tables, which require several instructions due to pointer chasing. } through a linear function.
+Composite datatypes work similarly, where each field exists as a predefined offset from the base memory location.
+Such structure also simplifies work distribution between threads, as all data is segregated through constant offsets.
 For vectorization contiguous data is a prerequisite as instructions operate on singular contiguous blocks of data.
 If data is not spatial adjacent in memory, data must aligned temporarily or complex interleaving methods must be used\cite{interleaved-SIMD}.
-In the general case compound datatypes interfere with vectorization, as spatial adjacent data is not of the same type.
-Parallel arrays solve this by creating a distinct array for each primitive type (Struct of Array) so that each field can be vectorized.
+Therefore composite datatypes interfere with vectorization in the general case, as the spatial adjacent data includes fields within the same datatype.
+Parallel arrays solve this by creating a distinct array for each primitive type within the composite datatype so that each field within the composite datatype can be vectorized independently.
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.2]{parallelarray}
-    \caption{ compound datatype array (1) and a parallel array (2) }
+    \includegraphics[scale=0.082]{soa-aos.png}
+    \caption
+    {
+        Visual comparison between an array-of-struct collection(1) and a struct-of-array collection(2). 
+        The solid lines represent indices in an array and the dotted lines denote an implicit connection that is relative to the original index.
+    }
 \end{figure}
 
 Caches also operate with contiguous blocks of memory, which means spatial adjacent data within a fixed alignment are stored together.
-This lends itself well to contiguous allocated data, as it means the least amount of cache blocks are required irrespective of block size and alignment.
-In addition all memory accesses use the same linear function, a {\it constant stride} access behavior, which makes it receptive to hardware cache prefetching\cite{cache-prefetching}. 
+A struct-of-array collection lends itself well to the cache, as it means the least amount of cache blocks are required irrespective of block size and alignment\footnote{Note that this is only the case when {\it all} elements in an array are operated on, which falls under the predefined context of this chapter.}.
+A function that operates on a single field in an array-of-struct collection pollutes the cache with the (unused) fields, which is not an issue for the struct-of-array collection. 
+In addition all memory accesses use the same linear function, a {\it constant stride} access behavior, which makes it particularly receptive to hardware cache prefetching\cite{cache-prefetching}. 
 
 \paragraph{Access Patterns}
 
-As the cache is finite a cache block can be ejected prematurely.
-This exists for data within the same block but also when the same block is required at multiple times.
-Increasing temporal locality is done by avoiding random accesses and organizing computations order around data usage.
-This is non-trivial in iterations where multiple indices are accessed (stencils) or computations that inherently involve random access.
-
-\begin{figure}[ht]
-    \centering
-    \includegraphics[scale=0.25]{locality}
-    \caption{ exploitation of spatial and temporal locality }
-\end{figure}
+As the cache is finite in size, a cache block can be ejected prematurely.
+Both for data within the same cache block but also when the same block is required at multiple times in the application.
+In the previous chapter it was stated that a cache replacement policy is based on temporal properties, which can be leveraged to increase the chance requested data exists in the cache.
+Increasing temporal locality is done by avoiding random accesses and organizing computations order when certain data is used.
+This is non-trivial in iterations which access multiple indices (stencils) or computations that inherently involve random access (linked lists).
+Due to the way caches operate with contiguous blocks, spatial locality of data commonly used together can also reduce the total amount of cache blocks that are required. 
 
 \newpage
 
-One way to apply this to iterating on many elements, is to iterate one subset of elements at a time (tiling).
-This can be further improved by also accounting for shared resources, by grouping elements that use the same resource in their instruction sequence. 
-This is explored in raytracing\cite{raytracing-reorder-ray}, where spatial locality of rays is used to exploit the cache coherence within the traversal of a tree.
-These techniques are also important for multi-core processors, as it reduces the need for data to exist in multiple caches.
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=0.12]{temporalspatial.png}
+    \caption
+    {
+        Comparison between temporal and spatial locality, where the data A/B and C/D will exist in different cache blocks when stored in the cache.
+        The initial sequence of operations has overlapping live time of cache blocks.
+        Reordering the operations can facilitate both spatial and temporal locality.
+    }
+\end{figure}
+
+A way to contextualize this is by partitioning an array into multiple segments, where each segment is repeatedly iterated on and therefore cache blocks will be reused (tiling).
+Cache coherence can be further improved by also accounting for shared resources, by grouping elements that use the same resource in their instruction sequence. 
+This technique is explored in raytracing\cite{raytracing-reorder-ray}, where rays are sorted to exploit the fact that spatially adjacent rays likely traverse the bounding-volume-hierarchy similarly.
+Avoiding redundant cache blocks is also important for multi-core processors, as it reduces the need for data to exist in multiple caches at the same time and minimizes cache reloads.
 
 \paragraph{Branching}
 
 Pipelining instructions is not possible when the sequence of instructions is dependant on the result of a previous instruction.
-This limits instruction-level parallelism, which is solved through various unconditional instruction executions\cite{instruction-level-parallelism}.
+This limits instruction-level parallelism, which is solved through various ways of unconditional instruction executions\cite{instruction-level-parallelism}.
 Either by discarding the computed results or by {\it flushing} the pipeline when the wrong branch is predicted, both of which intuitively have an overhead.
-A compiler can eliminate\footnote{Either by proofing the branch will never be executed or by replacing the branch with a {\it conditional move} instruction, which only writes the result on true.}  branches or move loop-invariant code to facilitate instruction-level parallelism\cite{assembly-optimizations}. 
-These optimizations are not absolute, as an increase in instructions can pressure registers and the cache.  
-It is also limited to instructions that cannot fail or overflow, as both can introduce unintentional side-effects.  
+A compiler can eliminate\footnote{Either by proofing the branch will never be executed or by replacing the branch with a {\it conditional move} instruction, which only writes the result on true.} branches or move loop-invariant code to facilitate instruction-level parallelism\cite{assembly-optimizations}. 
+These optimizations are not absolute, as an increase in instructions can pressure registers usage and the cache.  
+It is also limited to instructions that cannot fail or overflow, as unconditional execution of these instructions can introduce unintentional side-effects.  
 
 \begin{figure}[ht]
-    \centering
-    \includegraphics[scale=0.15]{branchcost}
-    \caption{ branch introduces dependency on execution of instruction (red) }
+    \begin{minipage}{.5\textwidth}
+        Branching is also problematic for vectorization, as all data within the instruction size must follow the same sequence of instructions.
+        It can be resolved through the use of a {\it bitmask}, which can nullify parts of a result\cite{assembly-optimizations}.  
+        Another notable application of unconditional execution is sequential loops, where unrolling the loop creates an opportunity to vectorize the scalar instructions.
+        Automatic vectorization of loops is an active field of research, and limitations have been primarily attributed to the lack of analysis information available to compilers\cite{automatic-vectorization}. 
+        This means branchless code and simplifying control flow allows the compiler to vectorize instructions in more instances.   
+    \end{minipage}%
+    \begin{minipage}{.5\textwidth}
+        \centering
+        \includegraphics[scale=0.10]{UpdatedCycle.png}
+        \captionsetup{margin=0.5cm}
+        \captionsetup{format=plain}
+        \caption
+        { 
+            Updated instruction-level pipeline when B is dependant on the result of A.
+        }
+    \end{minipage}
 \end{figure}
 
-Branching is also problematic for vectorization, as all data within a certain alignment must follow the same sequence of instructions.
-This can be resolved through the use of a {\it bitmask}, which can nullify parts of a result\cite{assembly-optimizations}.  
-The additional instructions and computing bit masks can prevents performance from vectorization in certain situations.  
-A notable application is sequential loops, where unrolling creates an opportunity to vectorize the scalar instructions.
-Automatic vectorization is an active field of research, and limitations have been primarily attributed to the lack of analysis information available to compilers\cite{automatic-vectorization}. 
-This means branchless code and simplifying control flow allows the compiler to vectorize in more instances.
+\vspace{-0.5em}
 
-Specialized processors where an instruction sequence is distributed over many cores are limited to executing all branches.
+Specialized processors where an instruction sequence is distributed over many cores are limited to executing all branches unconditionally.
 This is minimized through the use of Streaming Multiprocessors (SM), which contains several cores and fetch their own instructions.
 Streaming Multiprocessors operate and schedule warps, which often contain 32 threads.
-When divergence between these threads occurs ({\it branch divergence}) the instructions will in the general case be executed in lockstep\cite{threads-independent-scheduling}.
+When divergence between these threads occur ({\it branch divergence}) the instructions will in the general case be executed in lockstep\cite{threads-independent-scheduling}.
+This means diverging execution flows are not necessarily problematic when it only occurs between different Streaming Multiprocessors, as branches that are not executed can be skipped entirely.
 
 \newpage
 
@@ -482,6 +523,41 @@ The main advantage is that a variant change can be done independent of other ele
 A practical consideration is that each element in an array must be structurally the same, that is they occupy the same memory space.
 This is a limitation which enforces that each index can determine the location of an element. 
 For parallel arrays this restriction applies for all arrays individually\cite{accelerate-sum-types}.
+
+\paragraph{Memory Representation}
+
+Memory instructions operate on fixed boundaries, which means operations that overlap these boundaries require additional but strictly unnecessary instructions.
+A natural alignment of a datatype is achieved by aligning all types according to the instructions that access them.
+Many compilers introduce {\it padding} to enforce natural alignment for all the types within the structure.
+While computational efficient, the alternative of {\it packing} types together can be preferred for a smaller memory footprint.  
+
+\begin{verbatim}
+
+    struct PackedData // 8 bytes
+    {
+        char  name;         // 1 byte
+        int   node;         // 4 bytes
+        short identifier;   // 2 bytes
+        byte  alignment[1]; // 1 byte
+    };
+
+    struct PaddedData // 12 bytes
+    {
+        char  name;         // 1 byte
+        byte  padding[3];   // 3 bytes
+        int   node;         // 4 bytes
+        short identifier;   // 2 bytes
+        byte  alignment[2]; // 2 bytes
+    };    
+
+\end{verbatim}
+
+Parallel arrays (Struct of Arrays) have a natural alignment by default as they contain primitives types, which are naturally aligned.
+General purpose languages often default to the Array of Struct, while data-parallel applications use the Struct of Arrays representation.
+A zero-cost abstraction that can ergonomically switch between these constructs is non-trivial.
+An interface to index access with an intermediate structure can break automatic vectorization\cite{abstraction-vectorization}. 
+In addition the different internal representations must be statically definable and able to be handled by the data structures.
+Many C++ libraries utilize {\it class templates} to achieve this\cite{abstraction-vectorization}.
 
 \paragraph{Tagged Union}
 
@@ -607,43 +683,6 @@ Both allow instructions to be vectorized, but there exist several other consider
     \includegraphics[scale=0.3]{variant3}
     \caption{combination of both approaches}
 \end{figure}
-
-\newpage
-
-\subsection{Memory Representation}
-
-Memory instructions operate on fixed boundaries, which means operations that overlap these boundaries require additional but strictly unnecessary instructions.
-A natural alignment of a datatype is achieved by aligning all types according to the instructions that access them.
-Many compilers introduce {\it padding} to enforce natural alignment for all the types within the structure.
-While computational efficient, the alternative of {\it packing} types together can be preferred for a smaller memory footprint.  
-
-\begin{verbatim}
-
-    struct PackedData // 8 bytes
-    {
-        char  name;         // 1 byte
-        int   node;         // 4 bytes
-        short identifier;   // 2 bytes
-        byte  alignment[1]; // 1 byte
-    };
-
-    struct PaddedData // 12 bytes
-    {
-        char  name;         // 1 byte
-        byte  padding[3];   // 3 bytes
-        int   node;         // 4 bytes
-        short identifier;   // 2 bytes
-        byte  alignment[2]; // 2 bytes
-    };    
-
-\end{verbatim}
-
-Parallel arrays (Struct of Arrays) have a natural alignment by default as they contain primitives types, which are naturally aligned.
-General purpose languages often default to the Array of Struct, while data-parallel applications use the Struct of Arrays representation.
-A zero-cost abstraction that can ergonomically switch between these constructs is non-trivial.
-An interface to index access with an intermediate structure can break automatic vectorization\cite{abstraction-vectorization}. 
-In addition the different internal representations must be statically definable and able to be handled by the data structures.
-Many C++ libraries utilize {\it class templates} to achieve this\cite{abstraction-vectorization}.
 
 \newpage
 

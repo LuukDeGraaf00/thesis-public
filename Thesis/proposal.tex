@@ -1382,7 +1382,7 @@ These collective operators are currently not implemented beyond the necessary op
 
 \newpage
 
-\subsection{Benchmarks}
+\subsection{Benchmarks WIP}
 
 A concrete performant way to operate on multiple variants was not an objective in its own right, due the nature of many components being able to influence the performance of an application.
 In this section previously discussed optimizations are applied while preserving the type identity of the functions.
@@ -1395,12 +1395,6 @@ nearest :: Exp Pos -> Exp Dir -> Collection [Sphere, Plane] -> Acc (Scalar Dista
 nearest position direction = fold min Miss . map (intersect position direction)
 \end{verbatim}
 
-Examples
-
-input size for cache : small, large
-memory representation : no deduplicate, deduplicate
-(de)-construction : match, conditional, unconditional
-input : split, sorted, grouped
 
 
 \begin{center}
@@ -1449,7 +1443,7 @@ In this paper some fundamental choices have been made without extensive argument
 This chapter is used to highlight these choices and provide further reasoning for the choices that have been made.
 It also highlights some limitations of the framework and ways these can be resolved.
 
-\subsection{Benchmarks}
+\subsection{Benchmarks WIP}
 
 
 
@@ -1532,14 +1526,9 @@ As primitive types are implicitly distributed over multiple arrays, there is no 
 It in addition does not allow types existing outside the predefined types, which means memory representation is limited to that set of types.
 A solution would be to add an (untyped) type with a variable size and corresponding instructions to extract (aligned) data.
 
-\paragraph{Flexible pattern matching}
-
-this can maybe still be resolved (?)
-make class with variable pattern match, and implement it for all types including the variant type specifically. 
-
 \newpage
 
-\section{Conclusion}
+\section{Conclusion WIP}
 
 \subsection{Future Work}
 

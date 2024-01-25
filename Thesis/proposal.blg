@@ -3,44 +3,47 @@ Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: proposal.aux
 The style file: plain.bst
 Database file #1: refs.bib
-You've used 34 entries,
+Warning--I didn't find a database entry for "instruction-level-parallelism"
+Warning--empty booktitle in polymorphic-variants-expression-problem
+You've used 33 entries,
             2118 wiz_defined-function locations,
-            656 strings with 9159 characters,
-and the built_in function-call counts, 10467 in all, are:
-= -- 951
-> -- 590
-< -- 7
-+ -- 236
-- -- 198
-* -- 622
-:= -- 1717
-add.period$ -- 87
-call.type$ -- 34
-change.case$ -- 197
+            691 strings with 10264 characters,
+and the built_in function-call counts, 12281 in all, are:
+= -- 1202
+> -- 580
+< -- 15
++ -- 229
+- -- 192
+* -- 741
+:= -- 1905
+add.period$ -- 103
+call.type$ -- 33
+change.case$ -- 188
 chr.to.int$ -- 0
 cite$ -- 34
-duplicate$ -- 361
-empty$ -- 855
-format.name$ -- 198
-if$ -- 2218
+duplicate$ -- 534
+empty$ -- 978
+format.name$ -- 192
+if$ -- 2732
 int.to.chr$ -- 0
-int.to.str$ -- 34
-missing$ -- 12
-newline$ -- 153
-num.names$ -- 72
-pop$ -- 311
+int.to.str$ -- 33
+missing$ -- 23
+newline$ -- 161
+num.names$ -- 74
+pop$ -- 254
 preamble$ -- 1
-purify$ -- 163
+purify$ -- 155
 quote$ -- 0
-skip$ -- 334
+skip$ -- 468
 stack$ -- 0
-substring$ -- 401
-swap$ -- 95
-text.length$ -- 7
+substring$ -- 599
+swap$ -- 207
+text.length$ -- 15
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 136
-warning$ -- 0
-while$ -- 92
-width$ -- 36
-write$ -- 315
+type$ -- 132
+warning$ -- 1
+while$ -- 104
+width$ -- 35
+write$ -- 361
+(There were 2 warnings)

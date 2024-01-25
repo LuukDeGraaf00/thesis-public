@@ -1,19 +1,3 @@
-@article{memory
-,	Title	= {What Every Programmer Should Know About Memory}
-,	Author	= {Drepper, U.}
-,	Journal	= {Red Hat, Inc}
-,	Year	= {2007}
-}
-
-@article{register-allocation,
-    author  = {G. J. Chaitin and M. A. Auslander and A. K. Chandra and J. Cocke and M. E. Hopkins and P. W. Markstein},
-    title   = {Register Allocation Via Coloring},
-    journal = {Computer Languages},
-    volume  = {6},
-    pages   = {47--57},
-    year    = {1981},
-}
-
 @misc{threads-independent-scheduling,
     Author = {Nvidia},
     Title = {NVIDIA TESLA V100 GPU ARCHITECTURE},
@@ -38,6 +22,71 @@
     Year = {2022}
 }
 
+@misc{futhark-sum-types,
+    Author = {Robert Schenck},
+    Title = {Sum types in Futhark},
+    Year = {2019}
+}
+
+@misc{memory,
+  title={What Every Programmer Should Know About Memory},
+  author={Ulrich Drepper},
+  year={2007},
+  url={https://api.semanticscholar.org/CorpusID:6440708}
+}
+
+@misc{ecs-origin,
+    author  = {Adam Martin},
+    title   = {Entity Systems are the future of MMOG development},
+    year    = {2007},
+    site    = {\url{https://t-machine.org/index.php/2007/09/03/entity-systems-are-the-future-of-mmog-development-part-1/}}
+}
+
+@misc{unity-ecs-patent,
+    title     = "Method and system for improved performance of a video game engine",
+    number    = "10599560",
+    author    = "Ante, Joachim Christoph and Johansson, Tim",
+    year      = "2020",
+    month     = "March",
+    url       = "https://patents.google.com/patent/US10599560B2/en?q=(US10599560B2)&oq=US10599560B2"
+}
+
+@misc{assembly-optimizations,
+	title	    = {Optimizing subroutines in assembly language: An optimization guide for x86 platforms},
+	author	    = {Agner Fog},
+	year	    = {2008},
+	publisher	= {Copenhagen University College of Engineering}
+}
+
+@misc{ecs-apecs,
+    author = {Jonas Carpay},
+    title = {apecs: Fast Entity-Component-System library for game programming},
+    howpublished = {\url{https://hackage.haskell.org/package/apecs}}
+}
+
+@misc{ecs-specs,
+    author = {Amethyst Foundation},
+    title = {The Specs Book},
+    howpublished = {\url{https://specs.amethyst.rs/docs/tutorials/}}
+}
+
+@misc{expression-problem,
+    author = {Philip Wadler},
+    title = {The Expression Problem},
+    year = 1998,
+    note = {Accessed at \url{https://homepages.inf.ed.ac.uk/wadler/papers/expression/expression.txt}}
+}
+
+
+@article{register-allocation,
+    author  = {G. J. Chaitin and M. A. Auslander and A. K. Chandra and J. Cocke and M. E. Hopkins and P. W. Markstein},
+    title   = {Register Allocation Via Coloring},
+    journal = {Computer Languages},
+    volume  = {6},
+    pages   = {47--57},
+    year    = {1981},
+}
+
 @inproceedings{accelerate-llvm,
     author      = {McDonell, Trevor L. and Chakravarty, Manuel M T and Grover, Vinod and Newton, Ryan R},
     title       = {{Type-safe Runtime Code Generation: Accelerate to LLVM}},
@@ -58,20 +107,21 @@
 }
 
 @inproceedings{accelerate-pattern-matching,
+    author    = {McDonell, Trevor L. and Meredith, Joshua D. and Keller, Gabriele},
+    title     = {Embedded pattern matching},
+    year      = {2022},
+    isbn      = {9781450394383},
+    publisher = {Association for Computing Machinery},
+    address   = {New York, NY, USA},
+    url = {https://doi.org/10.1145/3546189.3549917},
     doi = {10.1145/3546189.3549917},
-	url = {https://doi.org/10.1145%2F3546189.3549917},
-	year = 2022,
-	month = {sep},
-	publisher = {{ACM}},
-	author = {Trevor L. McDonell and Joshua D. Meredith and Gabriele Keller}, 
-	title = {Embedded pattern matching},
-	booktitle = {Proceedings of the 15th {ACM} {SIGPLAN} International Haskell Symposium}
-}
-
-@misc{futhark-sum-types,
-    Author = {Robert Schenck},
-    Title = {Sum types in Futhark},
-    Year = {2019}
+    abstract = {Haskell is a popular choice for hosting deeply embedded languages. A recurring challenge for these embeddings is how to seamlessly integrate user defined algebraic data types. In particular, one important, convenient, and expressive feature for creating and inspecting data—pattern matching—is not directly available on embedded terms. We present a novel technique, embedded pattern matching, which enables a natural and user friendly embedding of user defined algebraic data types into the embedded language, and allows programmers to pattern match on terms in the embedded language in much the same way they would in the host language.},
+    booktitle = {Proceedings of the 15th ACM SIGPLAN International Haskell Symposium},
+    pages = {123–136},
+    numpages = {14},
+    keywords = {Haskell, algebraic data types, embedded languages, pattern matching},
+    location = {Ljubljana, Slovenia},
+    series = {Haskell 2022}
 }
 
 @inproceedings{destructive-update-array,
@@ -84,58 +134,60 @@
     pages       =	"879--886",
 }
 
-@misc{unity-ecs-patent,
-    title     = "Method and system for improved performance of a video game engine",
-    number    = "10599560",
-    author    = "Ante, Joachim Christoph and Johansson, Tim",
-    year      = "2020",
-    month     = "March",
-    url       = "https://patents.google.com/patent/US10599560B2/en?q=(US10599560B2)&oq=US10599560B2"
-}
-
-@misc{ecs-origin,
-    author = {Adam Martin},
-    title = {Entity Systems are the future of MMOG development},
-    year = {2007},
-    site = {\url{https://t-machine.org/index.php/2007/09/03/entity-systems-are-the-future-of-mmog-development-part-1/}}
-}
-
-@misc{intermediate-representation,
-    title   = "The challenge of cross-language interoperability",
-    author  = "David Chisnall",
-    journal = "Commun. ACM",
-    year    = "2013",
-    number  = "12",
-    volume  = "56",
-    pages   = "50--56",
+@article{intermediate-representation,
+    author = {Chisnall, David},
+    title = {The challenge of cross-language interoperability},
+    year = {2013},
+    issue_date = {December 2013},
+    publisher = {Association for Computing Machinery},
+    address = {New York, NY, USA},
+    volume = {56},
+    number = {12},
+    issn = {0001-0782},
+    url = {https://doi.org/10.1145/2534706.2534719},
+    doi = {10.1145/2534706.2534719},
+    abstract = {Interfacing between languages is becoming more important},
+    journal = {Commun. ACM},
+    month = {dec},
+    pages = {50–56},
+    numpages = {7}
 }
 
 @inproceedings{LLVM,    
-    title     =	"LLVM: A Compilation Framework for Lifelong Program Analysis \& Transformation",
-    author    =	"Chris Lattner and Vikram S. Adve",
-    publisher =	"IEEE Computer Society",
-    year      = "2004",
-    booktitle =	"CGO",
-    ISBN      = "0-7695-2102-9",
-    pages     =	"75--88",
+    author = {Lattner, Chris and Adve, Vikram},
+    title = {LLVM: A Compilation Framework for Lifelong Program Analysis \& Transformation},
+    year = {2004},
+    isbn = {0769521029},
+    publisher = {IEEE Computer Society},
+    address = {USA},
+    abstract = {This paper describes LLVM (Low Level Virtual Machine),a compiler framework designed to support transparent, lifelongprogram analysis and transformation for arbitrary programs,by providing high-level information to compilertransformations at compile-time, link-time, run-time, and inidle time between runs.LLVM defines a common, low-levelcode representation in Static Single Assignment (SSA) form,with several novel features: a simple, language-independenttype-system that exposes the primitives commonly used toimplement high-level language features; an instruction fortyped address arithmetic; and a simple mechanism that canbe used to implement the exception handling features ofhigh-level languages (and setjmp/longjmp in C) uniformlyand efficiently.The LLVM compiler framework and coderepresentation together provide a combination of key capabilitiesthat are important for practical, lifelong analysis andtransformation of programs.To our knowledge, no existingcompilation approach provides all these capabilities.We describethe design of the LLVM representation and compilerframework, and evaluate the design in three ways: (a) thesize and effectiveness of the representation, including thetype information it provides; (b) compiler performance forseveral interprocedural problems; and (c) illustrative examplesof the benefits LLVM provides for several challengingcompiler problems.},
+    booktitle = {Proceedings of the International Symposium on Code Generation and Optimization: Feedback-Directed and Runtime Optimization},
+    pages = {75},
+    location = {Palo Alto, California},
+    series = {CGO '04}
 }
 
 @inproceedings{cache-prefetching,    
-    author      = "J. L. Baer and T. F. Chen",
-    title       = "An effictive on-chip preloading scheme to reduce data access penalty",
-    booktitle   = "Supercomputing 1991",
-    pages       = "179--186",
-    month       = nov,
-    year        = "1991",
+    author = {Baer, Jean-Loup and Chen, Tien-Fu},
+    title = {An effective on-chip preloading scheme to reduce data access penalty},
+    year = {1991},
+    isbn = {0897914597},
+    publisher = {Association for Computing Machinery},
+    address = {New York, NY, USA},
+    url = {https://doi.org/10.1145/125826.125932},
+    doi = {10.1145/125826.125932},
+    booktitle = {Proceedings of the 1991 ACM/IEEE Conference on Supercomputing},
+    pages = {176–186},
+    numpages = {11},
+    location = {Albuquerque, New Mexico, USA},
+    series = {Supercomputing '91}
 }
 
-@TechReport{instruction-level-parallelism,    
-    author      = "Michael S. Schlansker and B. Ramakrishna Rau and Scott Mahlke and Vinod Kathail and Richard Johnson and Sadun Anik and Santosh G. Abraham",
-    title       = "Achieving High Levels of Instruction-Level Parallelism with Reduced Hardware Complexity",
-    type        = "Technical Report",
-    number      = "HPL-96-120",
-    institution = "Hewlett--Packard Corporation",
-    year        = "2000",
+@inproceedings{Schlansker1997AchievingHL,
+  title={Achieving high levels of instruction-level parallelism with reduced hardware complexity},
+  author={Mike Schlansker and B. Ramakrishna Rau and Scott A. Mahlke and Vinod Kathail and Richard Johnson and Sadun Anik and Santosh G. Abraham},
+  year={1997},
+  url={https://api.semanticscholar.org/CorpusID:16033302}
 }
 
 @article{thread-level-parallelism,    
@@ -149,17 +201,23 @@
     year        = "2002",
     ISSN        = "1535-766X",
 }
-}
 
-@article{interleaved-SIMD,
-    author      = "Dorit Nuzman and Ira Rosen and Ayal Zaks",
-    title       = "Auto-Vectorization of Interleaved Data for {SIMD}",
-    journal     = "PLDI'06",
-    pages       = "132--143",
-    publisher   = "ACM SIGPLAN",
-    address     = "Ottawa, Canada",
-    month       = jun,
-    year        = "2006"
+@inproceedings{interleaved-SIMD,
+    author = {Nuzman, Dorit and Rosen, Ira and Zaks, Ayal},
+    title = {Auto-vectorization of interleaved data for SIMD},
+    year = {2006},
+    isbn = {1595933204},
+    publisher = {Association for Computing Machinery},
+    address = {New York, NY, USA},
+    url = {https://doi.org/10.1145/1133981.1133997},
+    doi = {10.1145/1133981.1133997},
+    abstract = {Most implementations of the Single Instruction Multiple Data (SIMD) model available today require that data elements be packed in vector registers. Operations on disjoint vector elements are not supported directly and require explicit data reorganization manipulations. Computations on non-contiguous and especially interleaved data appear in important applications, which can greatly benefit from SIMD instructions once the data is reorganized properly. Vectorizing such computations efficiently is therefore an ambitious challenge for both programmers and vectorizing compilers. We demonstrate an automatic compilation scheme that supports effective vectorization in the presence of interleaved data with constant strides that are powers of 2, facilitating data reorganization. We demonstrate how our vectorization scheme applies to dominant SIMD architectures, and present experimental results on a wide range of key kernels, showing speedups in execution time up to 3.7 for interleaving levels (stride) as high as 8.},
+    booktitle = {Proceedings of the 27th ACM SIGPLAN Conference on Programming Language Design and Implementation},
+    pages = {132–143},
+    numpages = {12},
+    keywords = {SIMD, Viterbi, data reuse, subword parallelism, vectorization},
+    location = {Ottawa, Ontario, Canada},
+    series = {PLDI '06}
 }
 
 @inproceedings{raytracing-reorder-ray,
@@ -173,13 +231,6 @@
     pages       = "13:1--13:9",
 }
 
-@misc{assembly-optimizations,
-	title	    = {Optimizing subroutines in assembly language: An optimization guide for x86 platforms},
-	author	    = {Fog, A.},
-	year	    = {2008},
-	publisher	= {Copenhagen University College of Engineering}
-}
-
 @article{automatic-vectorization,
     author  = {Jing Ge Feng and Ye Ping He and Qiu Ming Tao},
     title   = {Evaluation of Compilers’ Capability of Automatic Vectorization Based on Source Code Analysis},
@@ -187,18 +238,6 @@
     volume  = {2021},
     journal = {Scientific Programming},
     Site ={\url{https://downloads.hindawi.com/journals/sp/2021/3264624.pdf?_gl=1*11c0uux*_ga*Mzk1ODcwMTM5LjE2OTAzODQzOTU.*_ga_NF5QFMJT5V*MTY5MDM4NDM5NS4xLjEuMTY5MDM4NDQzOS4xNi4wLjA.&_ga=2.168312865.1045421893.1690384396-395870139.1690384395}}
-}
-
-@misc{ecs-apecs,
-    author = {Jonas Carpay},
-    title = {apecs: Fast Entity-Component-System library for game programming},
-    howpublished = {\url{https://hackage.haskell.org/package/apecs}}
-}
-
-@misc{ecs-specs,
-    author = {Amethyst Foundation},
-    title = {The Specs Book},
-    howpublished = {\url{https://specs.amethyst.rs/docs/tutorials/}}
 }
 
 @inproceedings{STM-monad,
@@ -214,75 +253,159 @@
     edition = {PPoPP '05: Proceedings of the tenth ACM SIGPLAN symposium on Principles and practice of parallel programming},
 }
 
-
-@misc{associated-types,
-	author = {Manuel M. T. Chakravarty and Gabriele Keller and Simon Peyton Jones and Simon Marlow}, 
-    title = {Associated Types with Class},
-	year = 2004,
+@inproceedings{associated-types,
+    author = {Chakravarty, Manuel M. T. and Keller, Gabriele and Jones, Simon Peyton and Marlow, Simon},
+    title = {Associated types with class},
+    year = {2005},
+    isbn = {158113830X},
+    publisher = {Association for Computing Machinery},
+    address = {New York, NY, USA},
+    url = {https://doi.org/10.1145/1040305.1040306},
+    doi = {10.1145/1040305.1040306},
+    abstract = {Haskell's type classes allow ad-hoc overloading, or type-indexing, of functions. A natural generalisation is to allow type-indexing of data types as well. It turns out that this idea directly supports a powerful form of abstraction called associated types, which are available in C++ using traits classes. Associated types are useful in many applications, especially for self-optimising libraries that adapt their data representations and algorithms in a type-directed manner.In this paper, we introduce and motivate associated types as a rather natural generalisation of Haskell's existing type classes. Formally, we present a type system that includes a type-directed translation into an explicitly typed target language akin to System F; the existence of this translation ensures that the addition of associated data types to an existing Haskell compiler only requires changes to the front end.},
+    booktitle = {Proceedings of the 32nd ACM SIGPLAN-SIGACT Symposium on Principles of Programming Languages},
+    pages = {1–13},
+    numpages = {13},
+    keywords = {type-indexed types, type-directed translation, type classes, self-optimising libraries, associated types},
+    location = {Long Beach, California, USA},
+    series = {POPL '05}
 }
 
-@misc{generic-programming,
-	author = {Alexey Rodriguez and Johan Jeuring and Patrik Jansson and Alex Gerdes and Oleg Kiselyov and Bruna C. d. S. Oliveira}, 
-    title = {Comparing Libraries for Generic Programming in Haskell},
-	year = 2008,
+@inproceedings{generic-programming,
+    author = {Rodriguez, Alexey and Jeuring, Johan and Jansson, Patrik and Gerdes, Alex and Kiselyov, Oleg and Oliveira, Bruno C. d. S.},
+    title = {Comparing libraries for generic programming in haskell},
+    year = {2008},
+    isbn = {9781605580647},
+    publisher = {Association for Computing Machinery},
+    address = {New York, NY, USA},
+    url = {https://doi.org/10.1145/1411286.1411301},
+    doi = {10.1145/1411286.1411301},
+    abstract = {Datatype-generic programming is defining functions that depend on the structure, or "shape", of datatypes. It has been around for more than 10 years, and a lot of progress has been made, in particular in the lazy functional programming language Haskell. There are morethan 10 proposals for generic programming libraries orlanguage extensions for Haskell. To compare and characterise the many generic programming libraries in atyped functional language, we introduce a set of criteria and develop a generic programming benchmark: a set of characteristic examples testing various facets of datatype-generic programming. We have implemented the benchmark for nine existing Haskell generic programming libraries and present the evaluation of the libraries. The comparison is useful for reaching a common standard for generic programming, but also for a programmer who has to choose a particular approach for datatype-generic programming.},
+    booktitle = {Proceedings of the First ACM SIGPLAN Symposium on Haskell},
+    pages = {111–122},
+    numpages = {12},
+    keywords = {libraries comparison, datatype-generic programming},
+    location = {Victoria, BC, Canada},
+    series = {Haskell '08}
 }
 
-@misc{shallow-and-deep,
-	author = {Josef Svenningsson and Emil Axelsson}, 
-    title = {Combining deep and shallow embedding of domain-specific-languages},
-	year = 2015,
+@article{shallow-and-deep,
+    title = {Combining deep and shallow embedding of domain-specific languages},
+    journal = {Computer Languages, Systems \& Structures},
+    volume = {44},
+    pages = {143-165},
+    year = {2015},
+    note = {SI: TFP 2011/12},
+    issn = {1477-8424},
+    doi = {https://doi.org/10.1016/j.cl.2015.07.003},
+    url = {https://www.sciencedirect.com/science/article/pii/S1477842415000500},
+    author = {Josef Svenningsson and Emil Axelsson},
+    keywords = {Domain specific languages, Shallow embedding, Deep embedding, Fusion, Monads},
+    abstract = {We present a technique to combine deep and shallow embedding in the context of compiling embedded languages in order to provide the benefits of both techniques. When compiling embedded languages it is natural to use an abstract syntax tree to represent programs. This is known as a deep embedding and it is a rather cumbersome technique compared to other forms of embedding, typically leading to more code and being harder to extend. In shallow embeddings, language constructs are mapped directly to their semantics which yields more flexible and succinct implementations. But shallow embeddings are not well-suited for compiling embedded languages. Our technique uses a combination of deep and shallow embedding, which helps keeping the deep embedding small and makes extending the embedded language much easier. The technique also has some unexpected but welcome secondary effects. It provides fusion of functions to remove intermediate results for free without any additional effort. It also helps us to give the embedded language a more natural programming interface.}
 }
 
-@misc{clash,
-	author = {Christiaan Baaij and Matthijs Kooijman and Jan Kuper and Arjan Boeijink and Marco Gerards}, 
-    title = {ClaSH: Structural Descriptions of Synchronous Hardware using Haskell},
-	year = 2010,
+@inproceedings{clash,
+    author={Baaij, Christiaan and Kooijman, Matthijs and Kuper, Jan and Boeijink, Arjan and Gerards, Marco},
+    booktitle={2010 13th Euromicro Conference on Digital System Design: Architectures, Methods and Tools}, 
+    title={C?aSH: Structural Descriptions of Synchronous Hardware Using Haskell}, 
+    year={2010},
+    volume={},
+    number={},
+    pages={714-721},
+    keywords={Hardware;Integrated circuit modeling;Pattern matching;Hardware design languages;Multiplexing;Prototypes;Radiation detectors},
+    doi={10.1109/DSD.2010.21}
 }
 
-@misc{hydra,
-	author = {John T O'Donnell}, 
-    title = {Overview of Hydra: A Concurrent Language for Synchronous Digital Circuit Design},
-	year = 2002,
+@inproceedings{hydra,
+    author={O'Donnell, J.},
+    booktitle={Proceedings 16th International Parallel and Distributed Processing Symposium}, 
+    title={Overview of hydra: a concurrent language for synchronous digital circuit design}, 
+    year={2002},
+    volume={},
+    number={},
+    pages={9 pp-},
+    keywords={Digital circuits;Circuit simulation;Timing;Software tools;Hardware design languages;Computer languages;Circuit analysis computing;Analytical models;Specification languages;Concurrent computing},
+    doi={10.1109/IPDPS.2002.1016653}
 }
 
-@misc{kansas-lava,
-	author = {Andy Gill and Tristan Bull and Garrin Kimmell and Erik Perrins and Ed Komp and Brett Werling}, 
-    title = {Introducing Kansas Lava},
-	year = 2010,
+@inproceedings{kansas-lava,
+    author = {Gill, Andy and Bull, Tristan and Kimmell, Garrin and Perrins, Erik and Komp, Ed and Werling, Brett},
+    biburl = {https://puma.ub.uni-stuttgart.de/bibtex/23915bd0d583d9076ba774684d09cd773/dblp},
+    booktitle = {IFL},
+    editor = {Morazán, Marco T. and Scholz, Sven-Bodo},
+    ee = {https://doi.org/10.1007/978-3-642-16478-1_2},
+    interhash = {d09660aabb6304b9a96f6fd5f70feb1c},
+    intrahash = {3915bd0d583d9076ba774684d09cd773},
+    isbn = {978-3-642-16477-4},
+    keywords = {dblp},
+    pages = {18-35},
+    publisher = {Springer},
+    series = {Lecture Notes in Computer Science},
+    timestamp = {2019-09-27T12:35:11.000+0200},
+    title = {Introducing Kansas Lava.},
+    url = {http://dblp.uni-trier.de/db/conf/ifl/ifl2009.html#GillBKPKW09},
+    volume = 6041,
+    year = 2009
 }
 
-@misc{forsyde,
-	author = {Ingo Sander}, 
-    title = {System Modeling and Design Refinment in ForSyDe},
-	year = 2003,
+@article{forsyde,
+  author={Sander, I. and Jantsch, A.},
+  journal={IEEE Transactions on Computer-Aided Design of Integrated Circuits and Systems}, 
+  title={System modeling and transformational design refinement in ForSyDe [formal system design]}, 
+  year={2004},
+  volume={23},
+  number={1},
+  pages={17-32},
+  keywords={Modeling;System-on-a-chip;Design methodology;Hardware;Formal specifications;Costs;Mathematical model;Embedded system;Design optimization;Synchronization},
+  doi={10.1109/TCAD.2003.819898}
 }
 
-@misc{llama,
-	author = {Bernhard Manfred Gruber and Guilherme Amadio and Jakob Blomer and Alexander Matthes and Rene Widera and Michael Bussmann}, 
-    title = {LLAMA: The Low-Level Abstraction for Memory Access},
-	year = 2022,
+@article{llama,
+    title={LLAMA: The low‐level abstraction for memory access},
+    volume={53},
+    ISSN={1097-024X},
+    url={http://dx.doi.org/10.1002/spe.3077},
+    DOI={10.1002/spe.3077},
+    number={1},
+    journal={Software: Practice and Experience},
+    publisher={Wiley},
+    author={Gruber, Bernhard Manfred and Amadio, Guilherme and Blomer, Jakob and Matthes, Alexander and Widera, René and Bussmann, Michael},
+    year={2022},
+    month=mar, 
+    pages={115–141} 
 }
 
-@misc{abstraction-vectorization,
-	author = {Sylvain Jubertie and Ian Masliah and Joel Falcou}, 
-    title = {Data Layout and SIMD Abstraction Layers: Decoupling Interfaces from Implementations},
-	year = 2018,
+@inproceedings{abstraction-vectorization,
+    author={Jubertie, Sylvain and Masliah, Ian and Falcou, Joel},
+    booktitle={2018 International Conference on High Performance Computing \& Simulation (HPCS)}, 
+    title={Data Layout and SIMD Abstraction Layers: Decoupling Interfaces from Implementations}, 
+    year={2018},
+    volume={},
+    number={},
+    pages={531-538},
+    keywords={Layout;Libraries;Containers;C++ languages;Arrays;Program processors},
+    doi={10.1109/HPCS.2018.00089}
 }
 
-@misc{datatype-generic-programming,
-    author = {Jeremy Gibbons},
-    title = {Datatype Generic Programming},
-    year = 2006,
+@inproceedings{datatype-generic-programming,
+    author="Gibbons, Jeremy",
+    editor="Backhouse, Roland
+    and Gibbons, Jeremy
+    and Hinze, Ralf
+    and Jeuring, Johan",
+    title="Datatype-Generic Programming",
+    booktitle="Datatype-Generic Programming",
+    year="2007",
+    publisher="Springer Berlin Heidelberg",
+    address="Berlin, Heidelberg",
+    pages="1--71",
+    abstract="Generic programming aims to increase the flexibility of programming languages, by expanding the possibilities for parametrization --- ideally, without also expanding the possibilities for uncaught errors. The term means different things to different people: parametric polymorphism, data abstraction, meta-programming, and so on. We use it to mean polytypism, that is, parametrization by the shape of data structures rather than their contents. To avoid confusion with other uses, we have coined the qualified term datatype-generic programming for this purpose. In these lecture notes, we expand on the definition of datatype-generic programming, and present some examples of datatype-generic programs. We also explore the connection with design patterns in object-oriented programming; in particular, we argue that certain design patterns are just higher-order datatype-generic programs.",
+    isbn="978-3-540-76786-2"
 }
 
-@misc{polymorphic-variants-expression-problem,
-    author = {Jacques Garrigue},
-    title = {Code reuse through polymorphic variants},
-    year = 2000,
-}
-
-@misc{expression-problem,
-    author = {Philip Wadler},
-    title = {The Expression Problem},
-    year = 1998,
+@inproceedings{polymorphic-variants-expression-problem,
+    title={Code reuse through polymorphic variants},
+    author={Jacques Garrigue},
+    year={2000},
+    url={https://api.semanticscholar.org/CorpusID:60104645}
 }

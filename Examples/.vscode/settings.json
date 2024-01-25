@@ -1,0 +1,16 @@
+{
+    "workbench.colorTheme": "Default Light Modern",
+    "codesnap.boxShadow": "none",
+    "codesnap.showLineNumbers": false,
+    "codesnap.showWindowControls": false,
+    "codesnap.transparentBackground": true,
+    "editor.mouseWheelZoom": true,
+    "haskell.hlint.run": "never",
+    "haskell.plugin.hlint.diagnosticsOn": false,
+    "latex-workshop.message.error.show": true,
+    "haskell.plugin.hlint.codeActionsOn": false,
+    "haskell.hlint.executablePath": "",
+    "workbench.tree.renderIndentGuides": "none",
+    "editor.guides.highlightActiveIndentation": false,
+    "editor.guides.indentation": false,
+}

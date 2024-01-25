@@ -74,7 +74,6 @@
         (De)construction of variant types is automated through datatype-generic programming, which means custom memory representations can be provided seamlessly.
         It results in a fully modular variant type that can exercise low-level control while preserving the type identity of variant.
         An implementation is provided in the data-parallel language {\it Accelerate}, which demonstrates the viability of variant types in a data-parallel context.
-
     \end{abstract}
 
 	\vfill
@@ -96,110 +95,100 @@
 
 \section{Introduction}
 
-Array languages can operate on a higher abstraction level and implicitly execute instructions in parallel on multiple elements. 
-A data-parallel \type{map} and \type{fold} function is sufficient to cover a wide range of high-performance applications.
-A naive intersection algorithm for a raytracer can be defined incredibly concisely compared to a handwritten c++ implementation.
+Array languages such as APL, Accelerate\cite{accelerate-sum-types} and Futhark\cite{futhark-sum-types} can operate on a higher abstraction level compared to general-purpose languages through collective operations. 
+This is used to implicitly execute instructions in parallel on elements within array. 
+Data-parallel \type{map} and \type{fold} functions are sufficient to cover a wide range of high-performance applications.
+A naive intersection algorithm for a raytracer can therefore be defined incredibly concisely.
 
-\begin{verbatim}
-    nearest :: Ray -> [Triangle] -> Float
-    nearest ray = fold min 1e30f . map (intersect ray)
+\begin{figure}[ht]
+    \hspace{1em}
+    \includegraphics[scale=0.45]{CodeIntro1.png}
+\end{figure}
 
-    float nearest(Ray ray, Triangle tri)
-    {
-        float4 minimum4 = float4(1e30f, 1e30f, 1e30f, 1e30f);
-        for (int i = 0; i < objects.Length / 4; i += 4)
-        {
-            float4 dist4 = intersect(ray, tri[i], tri[i + 1], tri[i + 2], tri[i + 3]);
-            minimum4 = min(minimum4, dist4);
-        }
-        float minimum = min(min(minimum4.x, minimum4.y), min(minimum4.z, minimum4.w))
-        for (int i = 0; i < objects.Length % 4; i++)
-        {
-            float distance = intersect(ray, tri[objects.Length + i]);
-            minimum = min(minimum, distance);
-        }
-        return minimum;
-    }
-\end{verbatim}
+A single ray is intersected with a collection of triangles, where the distance to the nearest triangle is computed by folding over all distances.
+As example, an equivalent c-like pseudocode implementation would have to take in account both the parallel distribution of work but also the potential vectorization in the inner loop.
+As the amount of triangles might not be nicely divisible the remaining scalar case must also be handled.
+The example is far from optimal as it does not enforce blocks of equal size, but demonstrates the complexity of even a simplified version.
 
-A consideration for working on a higher-abstraction level is the lack of low-level control, which can be crucial in performance sensitive cases.
-Sometimes it is easy to incorporate optimizations, with the example of the \type{nearest} function using the sentinel value \type{1e30f} to avoid returning an explicit failure state\footnote{A tag would require branching on the result, which hinders data-parallelism in the general case.}.
-In other cases this is significantly harder, such as low-level optimizations around memory representation and cache efficiency.
-This is made apparent when attempting to extend the intersection function to operate on other primitives, such as spheres.
-The path of least resistance is to create a datatype that can either be a triangle or a sphere.
+\begin{figure}[ht]
+    \hspace{1em}
+    \includegraphics[scale=0.45]{CodeC.png}
+\end{figure}
 
-\begin{verbatim}
-    data Primitive = Triangle ... | Sphere ...
-
-    nearest :: Ray -> [Primitive] -> Float
-    nearest ray = fold min 1e30f . map (intersect ray)
-\end{verbatim}
-
-Such datatype can also be used to return the specific primitive that was hit. 
-In the general case\footnote{When the branching does not diverge within a warp, which is the case when the array is sorted, a GPU will have very little overhead.} this will unfortunately hinder data-parallelism as it requires branching on the identity of the object.
-A solution is to handle primitives as standalone types with their own respective collection, which can be achieved nicely with an uniform interface.
-
-\begin{verbatim}
-    class Primitive a where
-        intersect :: Ray -> a -> Float
-
-    nearest :: (Primitive a) => Ray -> [[a]] -> Float
-    nearest ray = fold min 1e30f . fold (map (intersect ray)) 1e30
-\end{verbatim}
+The collective array operations are preferable for both maintainability and expressiveness.
+A drawback for working on a higher-abstraction level is the lack of low-level control, which can be crucial in performance sensitive cases.
+Sometimes it is easy to incorporate optimizations, with the example of the \type{nearest} function using the sentinel value \type{1e30f} to avoid implementing an explicit failure state.
+Making the failed intersection explicit would require branching after each intersection, which hinders data-parallelism in the general case.
 
 \newpage
 
-While we improved the possibility for data-parallelism, we still need to maintain the \type{Primitive} datatype when we want to explicitly return which primitive was hit.
+In other cases this is significantly harder, such as low-level optimizations around memory representation and cache efficiency.
+This is apparent when attempting to extend the intersection function to operate on other geometrical shapes, such as spheres.
+The path of least resistance is to create a datatype that can either be a triangle or a sphere.
+
+\begin{figure}[ht]
+    \hspace{1em}
+    \includegraphics[scale=0.4]{CodeIntro2.png}
+\end{figure}
+
+In the general case this will hinder data-parallelism as it requires branching on the identity of the object.
+A solution is to store each primitive in their own respective collection.
+Static polymorphism is used to define an intersection function for each primitive separately.
+Each primitive is folded over separately and later the result of other primitive intersections are combined.
+
+\begin{figure}[ht]
+    \hspace{1em}
+    \includegraphics[scale=0.45]{CodeIntro3.png}
+\end{figure}
+
+The intent of both approaches remains interchangeable, which is to operate on a collection of primitives.
+While we improved the possibility for data-parallelism, we still need to maintain the \type{Primitive} datatype when we want to explicitly return the exact primitive which was intersected with.
 To improve our naive O(n) implementation we can use an acceleration structure to eliminate primitives prematurely based on their spatial properties.
 This means intersections will be performed in smaller batches, to be able to exit early, which reduces the opportunities for data-parallelism.
 From a performance standpoint it might be preferable to separate the primitives on a batch-level, requiring even another datatype.
 Maintaining the architecture around all these different constructs is ergonomically not viable and caused by our attempt to achieve low-level control.  
-The intent of all approaches remains interchangeable, which is to operate on a collection with multiple variants of a type.
 A type-safe and generic implementation is often not possible, as datatypes and interfaces must be defined at compile time.
 It is also not feasible to manually define mappings between all these different representations.
-
-\begin{verbatim}
-    // value-level tagged union with a closed system 
-    data Primitive = Triangle ... | Sphere ...
-
-    // type-level interface with an open system
-    class Primitive a where
-        intersect :: Ray -> a -> Float
-\end{verbatim}
-
 The inability to abstract over both value-level variant types and type-level variant types prevent a generic higher level abstraction from taking form.
+
+\begin{figure}[ht]
+    \hspace{1em}
+    \includegraphics[scale=0.45]{CodeIntro4.png}
+\end{figure}
+
 Unifying these concepts would allow a collection of primitives to be fully agnostic to the underlying representation.
-Within this paper we propose a way to ergonomically switch between representations for collections of variant types.
+In this thesis, I propose a way to ergonomically switch between representations for collections of variant types.
 Type-safety is preserved by elevating the concept of a mutually exclusive datatype to the type-level, which is achieved through type-level and datatype-generic programming.
 An implementation can exist without it being natively supported as construct in the implementation language.
 This can be utilized by libraries, frameworks and embedded domain-specific languages that exist in languages that facilitate type-level programming and datatype-generic programming, like Haskell.
 
-\begin{verbatim}
-    image: explain type-level variant type
+\newpage
 
-
-\end{verbatim}
-
-Such implementation also gives the opportunity to give low-level control on both the memory representation and the (de)-construction of variant types. 
+Such an implementation also gives the opportunity to provide low-level control on both the memory representation and the (de)construction of variant types. 
 Control over the memory representation is invaluable for adapting to cache behavior without having to change the architecture around it.
-Manual control over the (de)-construction would also prevent the need for the explicit sentinel value in our intersection algorithm.
-The failure state \type{Nothing} can be used, which is internally represented as \type{1e30f}.
+Manual control over the (de)construction would also prevent the need for the explicit sentinel value in our intersection algorithm.
+The failure state \type{Miss} can be used, which is internally represented as \type{1e30f}.
 The \type{min} function uses the value directly while other functions must pattern match on the value \type{1e30f}.
 Within the context of raytracing this other function might spawn an extension ray that simulates the ray bouncing of a surface.
 Pattern matching on the \type{1e30f} value will limit data-parallelism for all subsequent extension rays.
 A solution can be to unconditionally execute like with the \type{min} function or eliminate all rays that failed for each iterative step. 
 The latter can now be represented as an internal reorganization in the proposed implementation, as it does not change the identity of the collection but merely the layout and thus no architectural changes are required.
-To summarize, the goal of this paper is to improve the experience of operating on a collection of multiple variants.
-The primary question pertains to how variant types can be implemented with adaptability to low-level optimizations within a data-parallel context.
-The contribution of this paper includes:
+To summarize, the research questions answered in this thesis are:
 
 \begin{itemize}
-    \item An extendable deduplication algorithm for variant types. 
-    \item Automatic derivation of an isomorphic mapping between any two datatypes. 
-    \item A collection of multiple variants that is completely agnostic to its internal representation.
+    \item How to obtain low-level control that is applicable for high performance computing, while preserving the higher-abstraction surface representation?
+    \item What is the conceptualization of a higher-abstraction variant type, which can exercise the obtained low-level control within in a data-parallel environment?
 \end{itemize}
 
-\newpage
+\noindent
+Concretely, the contributions of this thesis include: 
+
+\begin{itemize}
+    \item An extendable deduplication algorithm for the memory representation of a variant type.
+    \item Datatype-generic derivation of an isomorphic mapping between any two datatypes.
+    \item Explicit unconditional operator through bit masking.
+    \item A collection of multiple variants that can be completely agnostic to its internal representation
+\end{itemize}
 
 \subsection{Related Work}
 

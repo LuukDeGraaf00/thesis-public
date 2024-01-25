@@ -11,13 +11,16 @@ Daniel~Meister 0002, Jakub Boksansk{\'y}, Michael Guthe, and Jir{\'i} Bittner.
 \bibitem{clash}
 Christiaan Baaij, Matthijs Kooijman, Jan Kuper, Arjan Boeijink, and Marco
   Gerards.
-\newblock Clash: Structural descriptions of synchronous hardware using haskell,
-  2010.
+\newblock C?ash: Structural descriptions of synchronous hardware using haskell.
+\newblock In {\em 2010 13th Euromicro Conference on Digital System Design:
+  Architectures, Methods and Tools}, pages 714--721, 2010.
 
 \bibitem{cache-prefetching}
-J.~L. Baer and T.~F. Chen.
-\newblock An effictive on-chip preloading scheme to reduce data access penalty.
-\newblock In {\em Supercomputing 1991}, pages 179--186, November 1991.
+Jean-Loup Baer and Tien-Fu Chen.
+\newblock An effective on-chip preloading scheme to reduce data access penalty.
+\newblock In {\em Proceedings of the 1991 ACM/IEEE Conference on
+  Supercomputing}, Supercomputing '91, page 176–186, New York, NY, USA, 1991.
+  Association for Computing Machinery.
 
 \bibitem{ecs-apecs}
 Jonas Carpay.
@@ -33,16 +36,19 @@ G.~J. Chaitin, M.~A. Auslander, A.~K. Chandra, J.~Cocke, M.~E. Hopkins, and
 \bibitem{associated-types}
 Manuel M.~T. Chakravarty, Gabriele Keller, Simon~Peyton Jones, and Simon
   Marlow.
-\newblock Associated types with class, 2004.
+\newblock Associated types with class.
+\newblock In {\em Proceedings of the 32nd ACM SIGPLAN-SIGACT Symposium on
+  Principles of Programming Languages}, POPL '05, page 1–13, New York, NY,
+  USA, 2005. Association for Computing Machinery.
 
 \bibitem{intermediate-representation}
 David Chisnall.
-\newblock The challenge of cross-language interoperability, 2013.
+\newblock The challenge of cross-language interoperability.
+\newblock {\em Commun. ACM}, 56(12):50–56, dec 2013.
 
 \bibitem{memory}
-U.~Drepper.
-\newblock What every programmer should know about memory.
-\newblock {\em Red Hat, Inc}, 2007.
+Ulrich Drepper.
+\newblock What every programmer should know about memory, 2007.
 
 \bibitem{automatic-vectorization}
 Jing~Ge Feng, Ye~Ping He, and Qiu~Ming Tao.
@@ -56,32 +62,42 @@ Martijn Fleuren.
   2020.
 
 \bibitem{assembly-optimizations}
-A.~Fog.
+Agner Fog.
 \newblock Optimizing subroutines in assembly language: An optimization guide
   for x86 platforms, 2008.
 
 \bibitem{polymorphic-variants-expression-problem}
 Jacques Garrigue.
-\newblock Code reuse through polymorphic variants, 2000.
+\newblock Code reuse through polymorphic variants.
+\newblock 2000.
 
 \bibitem{datatype-generic-programming}
 Jeremy Gibbons.
-\newblock Datatype generic programming, 2006.
+\newblock Datatype-generic programming.
+\newblock In Roland Backhouse, Jeremy Gibbons, Ralf Hinze, and Johan Jeuring,
+  editors, {\em Datatype-Generic Programming}, pages 1--71, Berlin, Heidelberg,
+  2007. Springer Berlin Heidelberg.
 
 \bibitem{kansas-lava}
 Andy Gill, Tristan Bull, Garrin Kimmell, Erik Perrins, Ed~Komp, and Brett
   Werling.
-\newblock Introducing kansas lava, 2010.
+\newblock Introducing kansas lava.
+\newblock In Marco~T. Morazán and Sven-Bodo Scholz, editors, {\em IFL}, volume
+  6041 of {\em Lecture Notes in Computer Science}, pages 18--35. Springer,
+  2009.
 
 \bibitem{llama}
 Bernhard~Manfred Gruber, Guilherme Amadio, Jakob Blomer, Alexander Matthes,
-  Rene Widera, and Michael Bussmann.
-\newblock Llama: The low-level abstraction for memory access, 2022.
+  René Widera, and Michael Bussmann.
+\newblock Llama: The low‐level abstraction for memory access.
+\newblock {\em Software: Practice and Experience}, 53(1):115–141, March 2022.
 
 \bibitem{abstraction-vectorization}
 Sylvain Jubertie, Ian Masliah, and Joel Falcou.
 \newblock Data layout and simd abstraction layers: Decoupling interfaces from
-  implementations, 2018.
+  implementations.
+\newblock In {\em 2018 International Conference on High Performance Computing
+  \& Simulation (HPCS)}, pages 531--538, 2018.
 
 \bibitem{destructive-update-array}
 Georgios Korfiatis, Michalis~A. Papakyriakou, and Nikolaos Papaspyrou.
@@ -93,10 +109,12 @@ Georgios Korfiatis, Michalis~A. Papakyriakou, and Nikolaos Papaspyrou.
   879--886, 2011.
 
 \bibitem{LLVM}
-Chris Lattner and Vikram~S. Adve.
+Chris Lattner and Vikram Adve.
 \newblock Llvm: A compilation framework for lifelong program analysis \&
   transformation.
-\newblock In {\em CGO}, pages 75--88. IEEE Computer Society, 2004.
+\newblock In {\em Proceedings of the International Symposium on Code Generation
+  and Optimization: Feedback-Directed and Runtime Optimization}, CGO '04,
+  page~75, USA, 2004. IEEE Computer Society.
 
 \bibitem{thread-level-parallelism}
 Deborah~T. Marr, Frank Binns, David~L. Hill, Glenn Hinton, David~A. Koufaty,
@@ -123,47 +141,52 @@ Trevor~L. McDonell, Manuel M~T Chakravarty, Gabriele Keller, and Ben Lippmeier.
 \bibitem{accelerate-pattern-matching}
 Trevor~L. McDonell, Joshua~D. Meredith, and Gabriele Keller.
 \newblock Embedded pattern matching.
-\newblock In {\em Proceedings of the 15th {ACM} {SIGPLAN} International Haskell
-  Symposium}. {ACM}, sep 2022.
+\newblock In {\em Proceedings of the 15th ACM SIGPLAN International Haskell
+  Symposium}, Haskell 2022, page 123–136, New York, NY, USA, 2022.
+  Association for Computing Machinery.
 
 \bibitem{interleaved-SIMD}
 Dorit Nuzman, Ira Rosen, and Ayal Zaks.
-\newblock Auto-vectorization of interleaved data for {SIMD}.
-\newblock {\em PLDI'06}, pages 132--143, June 2006.
+\newblock Auto-vectorization of interleaved data for simd.
+\newblock In {\em Proceedings of the 27th ACM SIGPLAN Conference on Programming
+  Language Design and Implementation}, PLDI '06, page 132–143, New York, NY,
+  USA, 2006. Association for Computing Machinery.
 
 \bibitem{threads-independent-scheduling}
 Nvidia.
 \newblock Nvidia tesla v100 gpu architecture.
 
 \bibitem{hydra}
-John~T O'Donnell.
-\newblock Overview of hydra: A concurrent language for synchronous digital
-  circuit design, 2002.
+J.~O'Donnell.
+\newblock Overview of hydra: a concurrent language for synchronous digital
+  circuit design.
+\newblock In {\em Proceedings 16th International Parallel and Distributed
+  Processing Symposium}, pages 9 pp--, 2002.
 
 \bibitem{generic-programming}
 Alexey Rodriguez, Johan Jeuring, Patrik Jansson, Alex Gerdes, Oleg Kiselyov,
-  and Bruna~C. d.~S.~Oliveira.
-\newblock Comparing libraries for generic programming in haskell, 2008.
+  and Bruno C. d.~S. Oliveira.
+\newblock Comparing libraries for generic programming in haskell.
+\newblock In {\em Proceedings of the First ACM SIGPLAN Symposium on Haskell},
+  Haskell '08, page 111–122, New York, NY, USA, 2008. Association for
+  Computing Machinery.
 
 \bibitem{forsyde}
-Ingo Sander.
-\newblock System modeling and design refinment in forsyde, 2003.
+I.~Sander and A.~Jantsch.
+\newblock System modeling and transformational design refinement in forsyde
+  [formal system design].
+\newblock {\em IEEE Transactions on Computer-Aided Design of Integrated
+  Circuits and Systems}, 23(1):17--32, 2004.
 
 \bibitem{futhark-sum-types}
 Robert Schenck.
 \newblock Sum types in futhark, 2019.
 
-\bibitem{instruction-level-parallelism}
-Michael~S. Schlansker, B.~Ramakrishna Rau, Scott Mahlke, Vinod Kathail, Richard
-  Johnson, Sadun Anik, and Santosh~G. Abraham.
-\newblock Achieving high levels of instruction-level parallelism with reduced
-  hardware complexity.
-\newblock Technical Report HPL-96-120, Hewlett--Packard Corporation, 2000.
-
 \bibitem{shallow-and-deep}
 Josef Svenningsson and Emil Axelsson.
-\newblock Combining deep and shallow embedding of domain-specific-languages,
-  2015.
+\newblock Combining deep and shallow embedding of domain-specific languages.
+\newblock {\em Computer Languages, Systems \& Structures}, 44:143--165, 2015.
+\newblock SI: TFP 2011/12.
 
 \bibitem{accelerate-sum-types}
 Rick van Hoef.
@@ -172,6 +195,8 @@ Rick van Hoef.
 \bibitem{expression-problem}
 Philip Wadler.
 \newblock The expression problem, 1998.
+\newblock Accessed at
+  \url{https://homepages.inf.ed.ac.uk/wadler/papers/expression/expression.txt}.
 
 \bibitem{accelerate-performance}
 Bart Wijgers.

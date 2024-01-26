@@ -1,3 +1,5 @@
+// INTRO
+
 float nearest(ray, triangles, left, right)
 {
     difference = right - left;
@@ -25,6 +27,20 @@ float nearest(ray, triangles, left, right)
     }
 }
 
+// MEMORY REPRESENTATION
+
+struct PackedData       // 5 bytes
+{
+    char id;            // 1 byte
+    int  data;          // 4 bytes
+};
+
+struct PaddedData       // 8 bytes
+{
+    char id;            // 1 byte
+    char padding[3];    // 3 bytes
+    int  data;          // 4 bytes
+}; 
 
 
 

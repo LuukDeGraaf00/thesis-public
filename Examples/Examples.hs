@@ -11,7 +11,7 @@ nearest ray = fold min 1e30 . map (intersect ray)
 
 --------------------------------------------------------------
 
-data Primitive = Triangle _ | Sphere _
+data Primitive = Triangle ___ | Sphere ____
 
 nearest :: Ray -> [Primitive] -> Float
 nearest ray = fold min 1e30 . map (intersect ray)
@@ -27,7 +27,7 @@ nearest ray = fold min 1e30 . fold (map (intersect ray)) 1e30
 --------------------------------------------------------------
 
 -- value-level tagged union with a closed system
-data Primitive = Triangle _ | Sphere _
+data Primitive = Triangle ___ | Sphere ____
 
 -- type-level interface with an open system
 class Primitive a where

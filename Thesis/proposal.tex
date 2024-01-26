@@ -7,6 +7,7 @@
 \usepackage{listings}
 \usepackage{color}
 \usepackage{lipsum}
+\usepackage{subcaption}
 \usepackage[margin=1cm]{caption}
 
 \definecolor{codegray}{gray}{0.9}
@@ -327,7 +328,6 @@ In practice this does not hold for several reasons.
     This allows for large scale memory operations to be performed efficiently and independently of the main processor.
     It requires use of several buses which means some processors must idle at seemingly random periods of time.
     In essence it means that other hardware components can influence the memory access time.
- 
 \end{itemize}
 
 \newpage
@@ -502,65 +502,69 @@ A fundamental aspect of computing is data structures, which is a constant overhe
 For collective operations arrays are essential; as they have a constant access time, are contiguously allocated and access can be parallelized.
 Composite datatypes within arrays introduce some considerations.
 One is the {\it implicit} use of parallel arrays, where each primitive datatype is stored in a distinct array.
-This enables vectorization opportunities, but a random access pattern might cause additional cache blocks to be cycled between.
+It enables vectorization opportunities, but a random access pattern might cause additional cache blocks to be cycled between.
 Since collective operations control the access pattern, parallel arrays are often a natural choice for array languages.
 The consideration for both structurally and functionally distinct data, now referred to as variant, is often complex.
+It is at the essence of why non-uniform data demands control over the low-level representation.
 Variants can be represented on an individual basis (element-wise) or collectively (variant-wise).
 Usage and implementations of these approaches are explored in this chapter. 
 Within this chapter the assumption is made that parallel arrays are used, as they align with the intention to vectorize operations. 
-The example composite datatype has type \textcolor{blue}{A}, and either has type \textcolor{red}{B} or type \textcolor{green}{C}.
 
 \subsubsection{Element-wise}
 
-For each element the choice of variant is represented, which introduces branching and in the general case will break vectorization.
+For each individual element the choice of variant is represented, which introduces branching and in the general case will break vectorization.
 As variants are not grouped, functions cannot iterate on a specific variant without iterating on the complete array.
 The main advantage is that a variant change can be done independent of other elements, and thus can be parallelized.
 A practical consideration is that each element in an array must be structurally the same, that is they occupy the same memory space.
 This is a limitation which enforces that each index can determine the location of an element. 
-For parallel arrays this restriction applies for all arrays individually\cite{accelerate-sum-types}.
+For parallel arrays this restriction intuitively applies for all arrays individually\cite{accelerate-sum-types}.
 
 \paragraph{Memory Representation}
 
-Memory instructions operate on fixed boundaries, which means operations that overlap these boundaries require additional but strictly unnecessary instructions.
+Another restriction is that memory instructions only operate on fixed boundaries, which means operations that overlap these boundaries require additional but strictly unnecessary instructions.
 A natural alignment of a datatype is achieved by aligning all types according to the instructions that access them.
 Many compilers introduce {\it padding} to enforce natural alignment for all the types within the structure.
 While computational efficient, the alternative of {\it packing} types together can be preferred for a smaller memory footprint.  
 
-\begin{verbatim}
-
-    struct PackedData // 8 bytes
+\begin{figure}[ht]
+    \subcaptionbox{Compact packed struct of 5 bytes}[.45\linewidth]
+    {%
+        \centering
+        \includegraphics[scale=0.5]{CodeMemory1.png}%
+    }%
+    \hfill
+    \subcaptionbox{Naturally aligned padded struct of 8 bytes}[.45\linewidth]
+    {%
+        \centering
+        \includegraphics[scale=0.5]{CodeMemory2.png}%
+    }
+    \caption
     {
-        char  name;         // 1 byte
-        int   node;         // 4 bytes
-        short identifier;   // 2 bytes
-        byte  alignment[1]; // 1 byte
-    };
+        As \type{data} has a size of 4 bytes, padding the \type{id} to 4 bytes enforces that \type{data} is naturally aligned for the instructions that access it.
+        In the case \type{data} is stored before \type{id}, the \type{data} type will not always be naturally aligned when stored within an array.   
+        It would require padding the complete struct to a multiple of the largest field, which in this case would be 8 bytes.
+    }
+\end{figure}
 
-    struct PaddedData // 12 bytes
-    {
-        char  name;         // 1 byte
-        byte  padding[3];   // 3 bytes
-        int   node;         // 4 bytes
-        short identifier;   // 2 bytes
-        byte  alignment[2]; // 2 bytes
-    };    
-
-\end{verbatim}
-
-Parallel arrays (Struct of Arrays) have a natural alignment by default as they contain primitives types, which are naturally aligned.
-General purpose languages often default to the Array of Struct, while data-parallel applications use the Struct of Arrays representation.
-A zero-cost abstraction that can ergonomically switch between these constructs is non-trivial.
-An interface to index access with an intermediate structure can break automatic vectorization\cite{abstraction-vectorization}. 
-In addition the different internal representations must be statically definable and able to be handled by the data structures.
+Parallel arrays have a natural alignment by default as they only consist of primitives types, which are inherently naturally aligned.
+A zero-cost abstraction that can ergonomically switch between Struct-of-Array and Array-of-Struct arrays is non-trivial.
+An intermediate structure as interface can break automatic vectorization\cite{abstraction-vectorization}. 
+In addition, all the distinct internal representations must be statically definable and able to be handled by the data structures independently.
 Many C++ libraries utilize {\it class templates} to achieve this\cite{abstraction-vectorization}.
 
 \paragraph{Tagged Union}
 
-Multiple variants can be represented through a tag and a fixed size data component with multiple representations, so called {\it union}.
-The tag is used to identify the current representation of the union. 
-A naive implementation creates an array for each field of each variant, which means the memory usage is cumulative for each variant. 
-A compact tagged union overlaps fields of variants, as only one representation can be valid at a time.
-This can in theory reduce the size to the largest variant and the accompanied tag, but this is complicated due to alignment requirements\cite{accelerate-sum-types}.
+Multiple variants can be represented by a fixed size data component with multiple interpretations, so called {\it union}.
+A tag is used to identify the currently active interpretation of the union. 
+A naive implementation creates a new field for all fields within the variants, which means the memory usage is cumulative for each variant within the union. 
+A compact tagged union overlaps fields of variants, as only one interpretation can be valid at a time.
+The process of overlapping fields is generally referred to as {\it deduplication}.
+It can in theory reduce the size to the largest variant within the union, but this is complicated due to the previously discussed alignment requirements\cite{accelerate-sum-types}.
+A deduplication algorithm for unions balances between enforcing natural alignment and compactness of the memory representation, a space-time tradeoff.
+The most primitive form of deduplication is to combine fields that are of the same type.
+An extension can be made for types that have the same byte size, which would require support for reinterpretation of data.
+A restriction to this way of thinking is that it is not apparent how fields that are of different size should be handled.
+Is it acceptable to pack a byte and short within an integer, or should they exist as separate fields.
 
 \begin{figure}[ht]
     \centering
@@ -568,7 +572,9 @@ This can in theory reduce the size to the largest variant and the accompanied ta
     \caption{ index implicit and tag (gray) identify the data representation }
 \end{figure}
 
-\newpage
+General-purpose languages solve this by overlapping the complete variant with each other, irrespective of the individual fields within the variants.
+While strictly speaking it can be more flexible than deduplicating over multiple parallel arrays, it would prevent vectorization as fields are no longer contiguous.
+It can be less problematic for tagged unions as branching on the tag appears to prevent vectorization regardless, but unconditional execution has not been taking in account.
 
 \paragraph{Tagged Pointer}
 
@@ -577,13 +583,6 @@ The indirection allows variants to escape the uniform size restriction, but ther
 General complications around pointers, such as being unsafe to operate on and complicating garbage collection apply.
 In addition, pointers that point to the same data (alias) can prevent parallelization due to possible race conditions.
 These can be partly solved through language constructs; such as smart pointers, immutable data or abstracting the use of pointers altogether.
-
-\begin{figure}[ht]
-    \centering
-    \includegraphics[scale=0.4]{taggedpointer}
-    \caption{ tag and pointer (gray) identify the location and representation. }
-\end{figure}
-
 The key issue is that a change in variant requires new data to be allocated and the pointer to be adjusted.
 This allocation means there is no guarantee that the data is contiguous, which in addition to the required branching prevents any vectorization efforts.
 The indirection and fragmented memory is also problematic for cache efficiency, as it is unpredictable and a cache block is not used effectively.

@@ -1,15 +1,15 @@
 # Fdb version 3
-["bibtex proposal"] 1706204678 "proposal.aux" "proposal.bbl" "proposal" 1706204680
+["bibtex proposal"] 1706282659 "proposal.aux" "proposal.bbl" "proposal" 1706282827
   "/usr/share/texlive/texmf-dist/bibtex/bst/base/plain.bst" 1292289607 20613 bd3fbfa9f64872b81ac57a0dd2ed855f ""
-  "proposal.aux" 1706204680 14847 0ae06a95c38eb3d2d7ed3021b0008c8b "pdflatex"
-  "refs.bib" 1706204678 22784 0ab0e3fa3e13e942f38e45fb6e7e8f41 ""
+  "proposal.aux" 1706282827 15472 e8138b719c8388aaaeb39f3fa8b35cb0 "pdflatex"
+  "refs.bib" 1706204818 22788 e4b8428ec76bac7383a1be31b91a6752 ""
   (generated)
   "proposal.bbl"
   "proposal.blg"
-["pdflatex"] 1706204678 "/home/luukdegraaf00/Haskell/ADT-of-Arrays/Thesis/proposal.tex" "proposal.pdf" "proposal" 1706204680
+["pdflatex"] 1706282824 "/home/luukdegraaf00/Haskell/ADT-of-Arrays/Thesis/proposal.tex" "proposal.pdf" "proposal" 1706282827
   "/etc/texmf/web2c/texmf.cnf" 1681814908 475 c0e671620eb5563b2130f56340a5fde8 ""
   "/home/luukdegraaf00/.texlive2021/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1000.600pk" 1686421914 11524 0e9dfc2738d8693f8cf277a6ef939195 ""
-  "/home/luukdegraaf00/Haskell/ADT-of-Arrays/Thesis/proposal.tex" 1706198615 99480 0e1c0892b7b2f33296f9dc6c068c61d4 ""
+  "/home/luukdegraaf00/Haskell/ADT-of-Arrays/Thesis/proposal.tex" 1706282824 100757 677bef90d871e08990b98e711b3f5809 ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/tcrm1000.tfm" 1136768653 1536 e07581a4bb3136ece9eeb4c3ffab8233 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmbx10.tfm" 1136768653 1328 c834bbb027764024c09d3d2bf908b5f0 ""
@@ -72,6 +72,7 @@
   "/usr/share/texlive/texmf-dist/tex/latex/base/size10.clo" 1636758526 8448 96f18c76bf608a36ee6fbf021ac1dd32 ""
   "/usr/share/texlive/texmf-dist/tex/latex/caption/caption.sty" 1603745920 51746 e89c4da670ba533e6ab38e045ce6d1d9 ""
   "/usr/share/texlive/texmf-dist/tex/latex/caption/caption3.sty" 1603745920 67929 d50ae850e1d9604065e8337a75a41029 ""
+  "/usr/share/texlive/texmf-dist/tex/latex/caption/subcaption.sty" 1603745920 6133 46bea384e36e9b74bd53a238fc2d0654 ""
   "/usr/share/texlive/texmf-dist/tex/latex/colortbl/colortbl.sty" 1579991017 10793 d0af3aa11e27ae35ba4685b17597b122 ""
   "/usr/share/texlive/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty" 1579991033 13886 d1306dcf79a944f6988e688c1785f9ce ""
   "/usr/share/texlive/texmf-dist/tex/latex/geometry/geometry.sty" 1578002852 41601 9cf6c5257b1bc7af01a58859749dd37a ""
@@ -116,6 +117,8 @@
   "Images//CodeIntro2.png" 1706191128 26301 b08a87ae5e9120b142303ce30587512b ""
   "Images//CodeIntro3.png" 1706191778 30518 e9c0a253fed6e6d7b6547e57b1b784be ""
   "Images//CodeIntro4.png" 1706193609 32470 63e156b84b1bde0068e74a0b5fd18376 ""
+  "Images//CodeMemory1.png" 1706272896 15254 c68bc857746238562df017a40ed19333 ""
+  "Images//CodeMemory2.png" 1706272926 21281 540828c66b3e15a12265cddcd46ae547 ""
   "Images//UpdatedCycle.png" 1705967846 230129 9962a279cedfc14234e62a5ef05af1bc ""
   "Images//cache (2).png" 1705947133 133093 5e403671798df3c69e322b272846ab1e ""
   "Images//framework.png" 1704499254 96838 d637c93fd7fa53e80c4e457542fc9bb7 ""
@@ -126,7 +129,6 @@
   "Images//soa-aos.png" 1705959350 194145 e88887e9d579fc0670a437dfab527ec0 ""
   "Images//stable1.png" 1688218398 8899 2da4d94ff48e5dc8f35f3d15175097b3 ""
   "Images//stable2.png" 1688218421 8372 928c264933939c43fbb2d724bc485f6d ""
-  "Images//taggedpointer.png" 1688216814 12447 8f49a7dde2245526ab3c9618be844a9a ""
   "Images//taggedunion.png" 1688214670 54901 23f1cc72ef2020b43cdfc563e365bfbb ""
   "Images//temporalspatial.png" 1705958910 118918 b9d0b8467ed050dc21a07a9c79cfdad0 ""
   "Images//uulogo.png" 1705781159 36397 40ba3dfc2f55a89f4d9018986beac89f ""
@@ -136,11 +138,11 @@
   "Images/Variant1.png" 1688219366 3755 2966b1a8202f2e812ca7f971e6865467 ""
   "Images/Variant2.png" 1688219380 3440 537b885959692b4615ee7abe51ecc8c1 ""
   "Images/Variant3.png" 1688219410 3965 5aeb921e1484917ef86694357bb8bd3a ""
-  "proposal.aux" 1706204680 14847 0ae06a95c38eb3d2d7ed3021b0008c8b "pdflatex"
-  "proposal.bbl" 1706204678 8134 6721c547f3d93a7fe150c4c76cf9412e "bibtex proposal"
-  "proposal.out" 1706204680 4247 2480fbb58b3f8ef51df030b839d44ad1 "pdflatex"
-  "proposal.tex" 1706198615 99480 0e1c0892b7b2f33296f9dc6c068c61d4 ""
-  "proposal.toc" 1706204680 4508 f08c73af46579a2fc65d54a1de8b18a0 "pdflatex"
+  "proposal.aux" 1706282827 15472 e8138b719c8388aaaeb39f3fa8b35cb0 "pdflatex"
+  "proposal.bbl" 1706282659 8416 4f57d0660609b4f78a590f2a9495f952 "bibtex proposal"
+  "proposal.out" 1706282827 4247 2480fbb58b3f8ef51df030b839d44ad1 "pdflatex"
+  "proposal.tex" 1706282824 100757 677bef90d871e08990b98e711b3f5809 ""
+  "proposal.toc" 1706282827 4508 20dc9248fe8dcc451cf126ca0abeb2ce "pdflatex"
   (generated)
   "proposal.aux"
   "proposal.log"

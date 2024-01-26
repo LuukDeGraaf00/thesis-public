@@ -182,6 +182,13 @@ I.~Sander and A.~Jantsch.
 Robert Schenck.
 \newblock Sum types in futhark, 2019.
 
+\bibitem{instruction-level-parallelism}
+Mike Schlansker, B.~Ramakrishna Rau, Scott~A. Mahlke, Vinod Kathail, Richard
+  Johnson, Sadun Anik, and Santosh~G. Abraham.
+\newblock Achieving high levels of instruction-level parallelism with reduced
+  hardware complexity.
+\newblock 1997.
+
 \bibitem{shallow-and-deep}
 Josef Svenningsson and Emil Axelsson.
 \newblock Combining deep and shallow embedding of domain-specific languages.

@@ -559,74 +559,84 @@ A tag is used to identify the currently active interpretation of the union.
 A naive implementation creates a new field for all fields within the variants, which means the memory usage is cumulative for each variant within the union. 
 A compact tagged union overlaps fields of variants, as only one interpretation can be valid at a time.
 The process of overlapping fields is generally referred to as {\it deduplication}.
-It can in theory reduce the size to the largest variant within the union, but this is complicated due to the previously discussed alignment requirements\cite{accelerate-sum-types}.
-A deduplication algorithm for unions balances between enforcing natural alignment and compactness of the memory representation, a space-time tradeoff.
+It can in theory reduce the size to the largest variant within the union, but this is not necessarily computationally efficient due to the previously discussed alignment requirements\cite{accelerate-sum-types}.
+A deduplication algorithm for unions therefore balances between enforcing natural alignment and compactness of the memory representation, a space-time tradeoff.
 The most primitive form of deduplication is to combine fields that are of the same type.
-An extension can be made for types that have the same byte size, which would require support for reinterpretation of data.
-A restriction to this way of thinking is that it is not apparent how fields that are of different size should be handled.
-Is it acceptable to pack a byte and short within an integer, or should they exist as separate fields.
+It can be extended for types of the same size, which would require support for reinterpretation of data.
+A consideration for this approach is that it is not apparent how to deduplicate fields of different sizes.
+Is it acceptable to pack a byte and short within an integer, or should the individuality of each datatype be preserved.
+The individuality of a primitive type is essential for parallel arrays, as it allows for efficient vectorization.
+
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.4]{taggedunion}
-    \caption{ index implicit and tag (gray) identify the data representation }
+    \includegraphics[scale=0.1]{TaggedUnion.png}
+    \caption
+    { 
+        Example of an union type that can either be an integer or a byte and a short.
+        The dotted lines within a layout represent a parallel array.
+        The first layout is compact, while the other layouts preserve the individuality of a type.
+        Performance of each layout depends on which fields are accessed by what instructions.
+    }
 \end{figure}
 
-General-purpose languages solve this by overlapping the complete variant with each other, irrespective of the individual fields within the variants.
-While strictly speaking it can be more flexible than deduplicating over multiple parallel arrays, it would prevent vectorization as fields are no longer contiguous.
-It can be less problematic for tagged unions as branching on the tag appears to prevent vectorization regardless, but unconditional execution has not been taking in account.
+General-purpose languages avoid this discussion by overlapping the complete variant, irrespective of the individual fields within the variants.
+As stated previously, this would prevent vectorization as fields are no longer contiguous. 
+Strictly speaking it can be considered less problematic for tagged unions as there already exists branching on the tag which breaks vectorization, but this does not necessarily always hold.
+A form of unconditional execution or compatibility with existing architecture might make a tagged union spread over multiple arrays preferable.
+It also makes it possible to enforce natural alignment, as an alternative to padding.
 
 \paragraph{Tagged Pointer}
 
-Another way to comply with elements being structurally the same is to use a form of indirection, in this case a pointer to memory.
+Another way to comply with elements being structurally the same is to use a form of indirection, in this case a pointer to a memory location.
 The indirection allows variants to escape the uniform size restriction, but there are several notable complications.
 General complications around pointers, such as being unsafe to operate on and complicating garbage collection apply.
 In addition, pointers that point to the same data (alias) can prevent parallelization due to possible race conditions.
 These can be partly solved through language constructs; such as smart pointers, immutable data or abstracting the use of pointers altogether.
 The key issue is that a change in variant requires new data to be allocated and the pointer to be adjusted.
-This allocation means there is no guarantee that the data is contiguous, which in addition to the required branching prevents any vectorization efforts.
+The allocation means there is no guarantee that the data is contiguous, which in addition to the required branching prevents any vectorization efforts.
 The indirection and fragmented memory is also problematic for cache efficiency, as it is unpredictable and a cache block is not used effectively.
 
 \newpage
 
 \paragraph{Entity}
 
-A notable observation is that the re-allocation of a variant change causes the data to be not contiguous, not the indirection in itself.
-This can be illustrated through a hash table data structure, where a key is mapped to a value within an array (bucket).
-Any collective operation on the hash table can be vectorized by disregarding the hashing and using the internal array directly, as computations are inherently independent and order is irrelevant.   
+A notable observation is that the re-allocation caused by the variant change causes the data to be not contiguous, not the indirection in itself.
+The concept can be illustrated through a hash table data structure, where a key is mapped to a value within an array (bucket).
+Any collective operation on the hash table can be vectorized by disregarding the hashing operations and using the internal array directly, as computations are inherently independent and order is irrelevant.   
+The indirection is not inherently problematic, merely the use of indirection to denote the identity of an variant.
+In essence, a form of indirection that is not used by the collective operations. 
+The entity-component-system (ECS) is a coding pattern that utilizes this concept to efficiently represent collections of multiple variants.
+Represented as a single heterogeneous collection which internally consists of several variant-wise collections. 
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.1]{hashtable}
-    %\caption{ hash table }
+    \includegraphics[scale=0.1]{HashTableECS.png}
+    \caption
+    { 
+        Each entry within the surface array can uniquely identify the variant and index through the hashing function.
+        The relative costly operating of using the hashing function can generally be avoided, by operating on the variants directly.
+        It allows the collection to appear as a heterogenous collection, while being able to vectorize collective operations.
+    }
 \end{figure}
 
-Entities within the ECS pattern function similarly, a form of indirection that is not used by the collective operations. 
-Represented as a single heterogeneous array, which internally consists of several variant-wise collections. 
-It will mean that variant choice is not {\it directly} represented on an element basis, which has several implications.
+It will mean that variant choice is not {\it directly} represented on an element basis, now referred to as an {\it entity}, which has several implications.
+
 
 \begin{itemize}
     \item [Stable] 
-The same entity is not guaranteed to refer to the same data, the entity is no longer stable across structural changes.
-The reverse also holds, the data is not guaranteed to have the same entity along iterations.
-This can solved by tracking the location of entities {\it or} annotating the data with their entity. 
-These approaches can be complementary for performance reasons, but they are collectively isomorphic\footnote{A single entity cannot identify the data in constant time, without an array of pointers. A data element cannot identify the entity in constant time, without the entity as data. } through gather and scatter operations. 
-
-\begin{figure}[ht]
-    \centering
-    \includegraphics[scale=0.3]{stable1}
-    \includegraphics[scale=0.3]{stable2}
-    \caption{ persistent array with indirection (1) or annotate the data with their index (2). }
-\end{figure}
-
-For many array operations stableness is excessive, as it means data is discriminated on the basis of their index. 
-The implicit connection that data with the same index has can be represented through a (temporary) datatype.
-
+The same entity is not guaranteed to refer to the same data, as the location of the data might change when the variant changes.
+The reverse also holds, the data is not guaranteed to have the same entity.
+Concretely, the entity is no longer stable across structural changes as it depends on the relative location of the data.
+It can solved by maintaining a logbook, by updating the entities with the location of data {\it or} annotating the data with their entity. 
+These approaches can be complementary for performance reasons, but they are inverses of each other through gather and scatter operations. 
+For many collective array operations stableness is excessive, as it means data is discriminated based on the index of the data. 
     \item [Independent]
-Elements can no longer change their variant independently of other elements, which can be problematic for parallelism.
+Elements can no longer change their variant independently of other elements, which can be problematic when considering data-parallelism.
 Depending on the way variants are grouped, there can also be a significant cost associated with regrouping variants.
-This can be minimized by delaying structural changes indefinitely, by using a tagged union approach.
-Regrouping variants is a performance consideration between the cost of regrouping and having to branch for future iterations.
+It can be minimized by delaying structural changes indefinitely, by using the previously discussed tagged union approach.
+Regrouping variants can be seen as a performance consideration between the cost of regrouping and having to branch for future iterations.
+
 \end{itemize}    
 
 \newpage
@@ -634,233 +644,223 @@ Regrouping variants is a performance consideration between the cost of regroupin
 \subsubsection{Variant-wise}
 
 Grouping variants means all data is uniform, contiguously allocated and there exist no inherit branching within the same grouping of variants.
-This can be achieved through an array for each variant, but also grouping {\it within} the same array and using segment descriptors.
+It can be achieved through an array for each variant, but also grouping {\it within} the same array and using segment descriptors.
 The latter is effectively an untagged union, where the representation is determined by the index within the array.
-Both allow instructions to be vectorized, but there exist several other considerations.
+Both allow operations to be vectorized, but there exist several other considerations.
 
 \begin{itemize}
     \item [grouping]
     As stated in the previous section, regrouping variants to a variant-wise collection is a performance consideration.
     When variants are stored in separate arrays, the amount of a certain variant must be known before allocation.
-    When this is dependant on a computation, it can be retrieved through an additional scan or atomically\footnote{Atomic instructions prevent interruptions by other processes and are thread-safe.} counting any structural change, which adds an overhead.
-    This is not required for a singular array if the total remains the same.
+    When this is dependant on a computation, it can be retrieved through an additional scan or by atomically\footnote{Atomic instructions prevent interruptions by other processes and are thread-safe.} counting any structural change.
+    This adds an overhead, which is not required for a singular array when the total of elements remains the same.
 
     \item [immutable]
     An important consideration for purely functional languages is that values, and therefore arrays, are to be considered immutable.
     This means that {\it{updating}} parts of an array efficiently is non-trivial.
     It must be proven that the array before update will never be used again, otherwise both arrays must co-exist in memory.
-    This is inefficient for small updates and grows the necessity to {\it destructively update}\cite{destructive-update-array}.
+    This is inefficient for small updates and grows the necessity to {\it destructively update}\cite{destructive-update-array}, which is not always possible.
 
     \item[automatic]
     Most compilers support automatic vectorization of iterations with flexible bounds, where the final leftover iteration is not vectorized.  
     This overhead can be a significant when the loop is extensively unrolled.
-    This is minimized through epilogue vectorization, which (re-)applies loop vectorization to the remaining scalar code.
-    In practice data must be aligned along specific byte boundaries to be vectorized, which is challenging for (dynamic) regions within an array and not always analyzed by compilers\cite{automatic-vectorization}.
+    It is minimized through epilogue vectorization, which (re-)applies loop vectorization to the remaining scalar code.
+    In practice data must be aligned along specific boundaries to be vectorized, which is challenging for (dynamic) regions within an array and not always analyzed by compilers\cite{automatic-vectorization}.
 
     \item [operable]
-    An undiscussed benefit of parallel arrays is that fields can be operated on independent of other fields, as they are distinct arrays.
+    An undiscussed benefit of parallel arrays is that fields can be operated on independent of other fields, as they are completely distinct arrays.
     This is also possible for {\it regions} within an array, but this is less trivial and often requires explicit support in array languages\cite{accelerate-independent-regions}. 
-
-
 \end{itemize}
 
-\begin{figure}[ht]
-    \centering
-    \includegraphics[scale=0.3]{variant1}
-    \hspace{10pt}
-    \includegraphics[scale=0.3]{variant2}
-    \caption{distinct arrays (1) or distributed in a single array (2)}
-\end{figure}
-
-\begin{figure}[ht]
-    \centering
-    \includegraphics[scale=0.3]{variant3}
-    \caption{combination of both approaches}
-\end{figure}
+The concept of a variant-wise collection can be extended further by considering other data structures, which are generally dependant on the specific type of data.
+The initial example of an acceleration structure for geometry intersection is such a tailored data structure.
+While there are many examples of such data structures, a common pattern for variant types in particular is a shared component.
+Rather than organizing based on the variant, it can be beneficial to organize around the types of which the variant is composed.
 
 \newpage
 
 \section{Interface}
 
-A preliminary conclusion of the previous chapter is that a performant internal representation cannot be deducted from a mere theoretical framework.
-With this in mind it is important for high performance oriented applications to be flexible with the internal representation of datatypes.
-This is important for both composite data types and data structures.
-Within this chapter a modular interface is explored around iterating on collections of non-uniform data.
+A preliminary conclusion of the previous chapter can be that a performant internal representation cannot be deducted from a theoretical framework.
+There are considerations for the computational efficiency and memory efficiency, but also practical considerations related to how the data is organized and accessed by which operations.
+Can the operations on the data be vectorized, or do the operations require a lot of random-access.
+The specific device and which hardware accelerated instructions it supports can also influence the effectiveness of certain memory representations.
+The concept of organizing the program structure around concrete data transformations is called data-oriented design.
+With this in mind it is important for high performance oriented applications to be flexible in the internal representation of their datatypes, as there is not a concrete optimal solution for all situations.
+In this case flexibility entails that no architecture changes will be required for changing the internal representation of a datatype.
+This is especially important for variant types, due the previously discussed numerous amount of suitable data structures for variant types.
+In this chapter an interface is discussed which can capture all these data structures in a type-preserving matter and as a zero-cost-abstraction. 
+In the first section requirements are discussed and the way these are generally captured in other applications.
+The second and third section apply type-level programming and datatype-generic programming respectively to incorporate the discussed method.
 
-\subsection{Paradigm}
+\subsection{Conceptual Framework}
 
-As discussed in the data structures section, there are two internal representations for collections of non-uniform data.
-Variants of a particular type are stored either element-wise or variant-wise.
-There are several considerations for a data structure that is agnostic to if it stores non-uniform data in element-wise or a variant-wise way.
-A variant-wise collection can operate on only the relevant variants, while an element-wise is forced to discover that at runtime.
-To avoid redundant iterations for variant-wise collections, a function must be able to be defined on the most specific subset of all variants.
-For element-wise collection the amount of variants must be finite and no large discrepancies can exist between the size of all the variants.
-
+As discussed in the data structures section, there are two primary categorizations for collections of variant types.
+Variants of a particular type can broadly speaking be stored either by element or by variant.
+There are several considerations for making a data structure that is agnostic to if an element-wise or a variant-wise way is used.
+A variant-wise collection can operate on a subset of variants, while an element-wise collection is forced to discover the identity of all variants by iterating on the complete collection.
+To avoid redundant iterations for variant-wise collections, a function must be able to be defined on a specific subset of all variants when necessary.
+For element-wise collection the amount of variants must be finite, the type must be identifiable and no large discrepancies should exist between the size of each variant.
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.1]{paradigm.png}
-    \caption{A non-exhaustive function can skip a significant amount of work when non-uniform data is stored in a variant-wise collection, while this is problematic for an element-wise collection. }
+    \includegraphics[scale=0.06]{ConceptualFramework.png}
+    \caption
+    {
+        Example where an operation is applied on a single variant.
+        A non-exhaustive function can skip a significant amount of work when using a variant-wise collection, while this requires a complete iteration for an element-wise collection. 
+    }
 \end{figure}
 
-For variant-wise collections the ECS-pattern will be used as reference.
-The first section goes into how the ECS-pattern collectively operates on only some variants.
-For element-wise collections Algebraic Data Types (ADTs) are used to safely discriminate between multiple variants as element. 
-The second section utilizes structurally typed ADTs to create an efficient interface for a variant-wise and element-wise collection.  
+The previously mentioned Entity-Component-System (ECS) allows for functions to be defined on a subset of variants, and is commonly associated with data-oriented design.
+The first section explains the ECS pattern and identifies the core principles around the interface it uses for variant-wise collections.
+For element-wise collections sum types can be used to safely discriminate between multiple variants by enforcing pattern matching.
+The second section is dedicated to sum types and their role in creating an internal representation that is agnostic to whether it is a variant-wise or element-wise collection.  
 
 \newpage
 
 \subsubsection{Entity-Component-System}
 
 The ECS pattern is arguably a reaction to the prevalence of object-oriented languages within game engines.
-The premise is to organizes game-logic within functions rather than data, where the relation between data is flexible\cite{ecs-origin}.
+The premise is to organizes game-logic within functions rather than data, where the relation between data remains flexible\cite{ecs-origin}.
 In contrast to inheritance, where relations are statically determined and game-logic is embedded within an predetermined hierarchy.
-The pattern is often combined with data-oriented design and is used to be able to implicitly exploit data-parallelism in general purpose languages. 
-While there exist many implementations of the pattern in many languages, the principles remain similar.  
+The pattern is often combined with data-oriented design and is used to implicitly exploit data-parallelism in general purpose languages.
+It exist on a similar abstraction-level as array languages, by using collective operations. 
+While there exist many implementations of the pattern in many different languages, the principles remain similar.  
 
 \paragraph{Components}
 A component is the smallest addressable type within the pattern.
-Examples of components are \type{Position} and \type{Velocity}, which together represent movement.
-Components are generally value types to avoid race conditions when using data-parallelism.
-Some implementations allow for a (readonly) reference component that is shared along multiple instances.
-A shared \type{Mesh} component prevents redundant geometry to be stored by referencing it.
+Example of components are \type{Position} and \type{Velocity}, which when combined would represent movement.
+Components are generally value types to avoid race conditions and are stored in parallel arrays for vectorization.
+Some implementations allow for a (readonly) reference component which shares it data along multiple instances.
+A shared \type{Mesh} component would prevent excessive geometry to be stored, which is beneficial for cache efficiency.
 
 \paragraph{Entity}
-An entity is idiomatically a set of components.
-A movable entity has the \type{Position} and \type{Velocity} components, while an immovable entity only has the \type{Position} component.
+An entity is idiomatically a set of components, but as discussed earlier effectively an identifier of the concrete data.
+A movable entity would have both the \type{Position} and \type{Velocity} component, while an immovable entity would only have the \type{Position} component.
 Adding and removing components is done at runtime and there is no predetermined relation between any of the components.   
 Any immovable entity can be made movable by attaching the \type{Velocity} component at runtime.
 
 \paragraph{Systems}
 A system operates on all entities that match a specific set of components.
-The \type{Movement} system will operate on all movable entities, irrespective of any other attached components.
-Systems are effectively global functions, which operate only on specific variants of the more general entity type. 
-This allows for a variant-wise collection of entities, which most ECS implementations enforce to implicitly create performant vectorized code.
+The \type{Movement} system will operate on all movable entities, irrespective of any other components attached to it.
+Systems are effectively global functions, which operate only on specific variants that contain certain components. 
+It allows for a variant-wise collection of entities, which most ECS implementations use to optimize the performance of individual systems.
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.2]{ecs}
-    \caption{ conceptual entity-component-system representation of systems }
+    \includegraphics[scale=0.10]{ECSexample.png}
+    \caption
+    { 
+        The movement and render systems both have two components as a dependency and only operate on variants that contain their specific components.
+        The underlying representation has a parallel array for each unique combination, but some implementations connect specific parallel arrays to maximize data-parallelism of a specific operation. 
+    }
 \end{figure}
 
 The ECS design pattern is arguably inherently imperative, as structural changes to entities are done imperatively.
 Apecs, an ECS library in Haskell, achieves this imperative style through monads\cite{ecs-apecs}.
-The ECS pattern makes element-wise collections infeasible, as there is no type-safe way to restrict the possible amount of structural changes to an entity.
+The ECS pattern makes element-wise collections infeasible, as there is no type-safe way to restrict the possible amount of structural changes.
 This is inherit to the pattern, as any component can be attached to any entity.
-Implementations circumvent this limitation by allowing components to be enabled and disabled through a tag.
-Disabling a component changes the {\it type} of an entity but the internal representation remains the same.
-An analogy can be made to a non-deduplicated tagged union that is explicit in the variants it holds.
+An element-wise collection requires a statically definable form of mutually exclusivity.
 
 \newpage
 
 \subsubsection{Algebraic Data Type}
 
 Functional languages handle tagged unions safely through algebraic data types (ADTs).
-A product type (x) is the combination of datatypes, while a sum type (+) is the alternation between datatypes.
-It is often useful to discriminate between variations of a datatype, which is generally done through a data constructor. 
+Intuitively a product type is the combination of datatypes, while a sum type is the alternation between datatypes.
+It is often useful to discriminate between variations of a datatype, which is done through a data constructor.
+An example is the \type{Maybe a} type, which represents an optional value. 
 
-\begin{verbatim}
-    
-    data Maybe a = Just a | Nothing
-    
-\end{verbatim}
+\begin{figure}[ht]
+    \hspace{1em}
+    \includegraphics[scale=0.05]{InterfaceCode1Annotated.png}
+\end{figure}
 
 Deconstructing an algebraic data type is done by pattern matching on a data constructor.
 The pattern match can exhaustively match on all variants, as the data constructors of variants are known at compile-time.
 It can be seen as a native control-flow mechanism that ensures only the operations on the active variant are applied.
 
-\begin{verbatim}
-    
-    fmap :: (a -> b) -> Maybe a -> Maybe b
-    fmap f (Just a) = Just (f a)
-    fmap f Nothing  = Nothing
-    
-\end{verbatim}
+\begin{figure}[ht]
+    \hspace{1em}
+    \includegraphics[scale=0.4]{CodeInterface2.png}
+\end{figure}
 
-In Haskell, algebraic data types are distinguishable by name (nominally typed) and therefore explicitly declared.
-This means data constructors are local to the declared type and pattern matching happens within the same type.
-The type signature of the \type{fmap} function provides no information on the potential structural change of a datatype.
+In Haskell, algebraic data types are distinguishable by name and therefore explicitly declared.
+This means data constructors are local to the declared type and pattern matching happens under the same type.
+The type signature of the \type{fmap} function provides no information on the potential structural change of the function datatype.
 It is possible to return \type{Nothing} for both cases\footnote{\type{Just b} is not possible as it can only be inferred through \type{Just a} and the \type{a -> b} function.}.
-A function that takes \type{Just a} and returns \type{Just b} ensures that the {\it collective identity} is preserved in a collective operation, irrespective of the data transformation.
-This exact definition is not possible due to being nominally typed, as \type{Just a} is not a type but a data constructor under the type \type{Maybe a}. 
-In some cases, such as a safe division function, the introduced branching is inherit to the function and is now made explicit in the type definition.   
+A function that takes \type{Just a} and returns \type{Just b} ensures that the {\it collective identity} can be preserved in a collective operation, irrespective of the concrete data transformation.
+This exact definition is not possible, as \type{Just a} is not a type but a data constructor under the type \type{Maybe a}. 
+In some cases, such as a safe division function, the introduced uncertainty is inherit to the function.  
 
-\begin{verbatim}
+\begin{figure}[ht]
+    \hspace{1em}
+    \includegraphics[scale=0.4]{CodeInterface3.png}
+\end{figure}
 
-    fmap :: (a -> b) -> Just a -> Just b
-    fmap f (Just a) = Just (f a)
-
-    divide :: Int -> Int -> (Just Int | Nothing)
-    divide _ 0 = Nothing
-    divide n m = Just (n `div` m)
-    
-\end{verbatim}
-
-In this case a function is defined on the structure of a type, the data constructor of algebraic data types.
-\type{Maybe a} is now an alias for the mutually exclusive relationship \type{Just a | Nothing}, rather than a unique and standalone type. 
-This generalizes variance to be between all types.
-OCaml calls these {\it polymorphic variants}\footnote{OCaml also implements nominally typed sum types, so called {\it variants}.}, while other functional languages generally refer to them as {\it extensible} or {\it open sum types}.
+Concretely, \type{Maybe a} is now an alias for the mutually exclusive relationship \type{Just a} or \type{Nothing}, rather than a unique and standalone type. 
+OCaml calls these {\it polymorphic variants}\footnote{OCaml also implements nominally typed sum types, so called {\it variants}.}, while other functional languages generally refer to them as extensible or open sum types.
+A way to compartmentalize the difference is by considering that \type{|} is now a datatype that takes two variants.
+The variants are now apparent to the type system, which can be used to generically adapt data structures to the variants within a specific polymorphic variants. 
+The flexibility polymorphic variant types provide align with the intention to create a modular system that can be agnostic to the internal representation.
 A motivating example is that a collection of \type{Maybe a} can be an element-wise collection or two variant-wise collections of \type{Just a} and \type{Nothing}\footnote{As \type{Nothing} does not hold data, a size descriptor is sufficient.}.
 While the former involves branching for \type{fmap}, the latter can ignore the \type{Nothing} collection and vectorize the \type{fmap} function.
-This flexibility aligns with the intention to create a modular system that is agnostic to the internal representation.
 
 \newpage
 
 \subsection{Type-level programming}
 
-In the previous section an interface that is agnostic to the variant-wise and element-wise collection is proposed.
-This demands defining efficient intermediate internal representations for all possible variant combinations, which defeats the purpose of ergonomic switching between representations.
-Statically deriving an internal representation is impossible or restricted to predetermined parameters in most languages.
-Some high-performance libraries circumvent this restriction by meta-programming or custom data layouts\cite{llama}.
-A customizable and type-safe solution is type-level programming, which will be explored in this chapter.
+In the previous section polymorphic variants are proposed, effectively type constructors that can take a variable amount of variants.
+Analogous to a nested \type{Either a b} datatype, but functionally similar to a flattened sum type with data constructors.
+Defining an internal representations manually for each use of a polymorphic variant is infeasible and defeats the purpose of being able to ergonomically switch between representations.
+Statically deriving an internal representation for a datatype is impossible in most languages.
+Some high-performance libraries circumvent this restriction by meta-programming or having predetermined custom data layouts\cite{llama}.
+A type-safe solution is type-level programming, which will be utilized within this chapter to generically derive efficient memory representations.
 
 \subsubsection{Kinds}
 
 A value is categorized by types, while a type is categorized by {\it kinds}.
-This is relevant when discussing type constructors, where each constructor with a different arity has a distinguishable kind.
+This is relevant when discussing type constructors, where for example each constructor with a different arity has a distinguishable kind.
 A well known exposition of type constructors are parametric polymorphic data types, which take type variables as argument.
-While a lot of languages support polymorphic data types, the concept of kinds is not evident as only concrete types are able to be used for arguments.
+While a lot of languages support polymorphic data types, the concept of kinds is not evident as only concrete types are used as argument.
 Haskell supports higher-kinded types, which are analogous to higher-order functions for types, which makes kinds apparent to the user.
 
-\begin{verbatim}
-    2.5f         :: Float
-    Float        :: *
-    Option a     :: * -> *
-    Option Float :: *
-    Apply f x    :: (* -> *) -> * -> *
-\end{verbatim}
+\vspace{-0.2em}
+\begin{figure}[ht]
+    \hspace{1em}
+    \includegraphics[scale=0.38]{CodeType1.png}
+\end{figure}
+\vspace{-0.2em}
 
 Type constructors can be used to encode data statically, such as Peano numbers.
 The parametric \type{Succ a} and \type{Nil} types are axioms that can be used to construct a natural number on the type-level.
 By default these exist in a open universe, which means ill-formed expressions can be created.
 On the type-level this can be resolved by Generalized Algebraic Data Types (GADTs), implemented in Haskell as an extension.
-It allows the type variables of constructors to diverge from the more general type.
+The type variables of constructors can diverge from the more general type.
 
-\begin{verbatim}
-    // open universe where 'a' can be anything
-    data Succ a
-    data Nil
-
-    // closed universe under the phantom type 'a'
-    data Natural a where
-        Succ :: Natural b -> Natural (Natural b)
-        Nil  :: Natural ()
-\end{verbatim}
+\vspace{-0.2em}
+\begin{figure}[ht]
+    \hspace{1em}
+    \includegraphics[scale=0.38]{CodeType2.png}
+\end{figure}
+\vspace{-0.2em}
 
 The consequence is that deconstructing a GADT will refine the type.
-This can be used to construct evidence of certain properties by pattern matching on data constructors.
+It can be used to construct evidence of certain properties by pattern matching on data constructors.
 An observation is that this is a categorization of types, similar to how the kind \type{*} represents all concrete types.
 The \type{DataKind} extension promote types to the kind-level and constructors to the type-level. 
-The kind \type{Natural} includes the types \type{Succ (a :: Natural)} and \type{Nil}.
+The kind \type{Natural} would include the type \type{Succ (a :: Natural)} and \type{Nil}.
 It both creates a closed universe and allows other type constructors to expect the more precise kind \type{Natural}.
 A limitation is that the construction of the type, which is needed for arithmetic operations, is guarded by the definition of \type{Natural}.
 
-\begin{verbatim}
-    data Natural = Succ Natural | Nil | Add Natural Natural | Minus Natural Natural
-\end{verbatim}
+\begin{figure}[ht]
+    \hspace{1em}
+    \includegraphics[scale=0.38]{CodeType3.png}
+\end{figure}
 
-On the value-level this is solved through functions that transform their input into another output type.
-Translated to the type-level it means type-level functions that transform an input kind into an output kind.
+On the value-level this problem is solved by defining functions.
+Translated to the type-level it means we need type-level functions that transform an input kind into an output kind.
 
 \newpage
 
@@ -869,165 +869,145 @@ Translated to the type-level it means type-level functions that transform an inp
 A way to approach type-level functions is to see it as a type dependent on the instantiation of a type variable.
 This is akin to functions in type classes, where type-indexing allows functions to be overloaded.
 Haskell reuses this functionality for types, categorizable as {\it associated types}\cite{associated-types}.
-This is particularly useful for domain-specific languages, as an instance can have a specialized return type.
-Accelerate uses the \type{Elt} class to create a mapping between surface types and the internal representation.
+It is particularly useful for embedded domain-specific languages, as an instance can have a specialized return type.
+Accelerate uses the \type{Elt}\footnote{Extract, Load, Transform.} class to create a mapping between surface and embedded types.
 
-\begin{verbatim}
-    class (Elt a) where
-        type EltR a :: *
-        toElt       :: a -> EltR a
-        fromElt     :: EltR a -> a
-\end{verbatim}
+\begin{figure}[ht]
+    \hspace{1em}
+    \includegraphics[scale=0.38]{CodeType4.png}
+\end{figure}
 
-While these integrate well with type classes, type families is the terminology for the standalone concept.
-A \type{data family} has unique types associated with the type, while a \type{type family} is merely the type synonym equivalent.
-In some cases this is insufficient to represent a function, as the type checker is unsure which instance to use.
-This is the case when the function has a more general default case which will always match.
+While these type-indexed integrate well with type classes, type families is the much stronger standalone concept.
+A \type{data family} has unique types associated with each type, while a \type{type family} is merely the type synonym equivalent.
+In some cases a function cannot be represented, as the type checker is unsure which instance within the type family to use.
+This is the case when the function has a more general default case, which will always match.
 A closed type family attempts the instances in order of definition, which expresses itself in being able to pattern match on types.
 
-\begin{verbatim}
-    type family Elem a (bs :: [b]) :: Bool where
-        Elem x '[]       = False        -- no
-        Elem x (x : ys)  = True         -- yes
-        Elem x (y : ys)  = Elem x ys    -- no, but recurse
-\end{verbatim}
+\begin{figure}[ht]
+    \hspace{1em}
+    \includegraphics[scale=0.38]{CodeType5.png}
+\end{figure}
 
 In this example the variable \type{y} can be \type{x}, which means the second and third instance are overlapping with each other.
 A closed type-family resolves this by attempting the more specific case of \type{x = x} first.
-An annoying limitation is that type families in Haskell cannot be partially applied, which means a lot of boilerplate is required to capture more complex functions.
-It cannot be partially applied due to partially applied type synonyms requiring higher-order unification, which is currently not supported in Haskell.
+A lot of functions can now directly be translated into a type-level equivalent.
+An annoying limitation in Haskell is that type families cannot be partially applied, which means a lot of boilerplate is required to capture more complex functions.
+Type families cannot be partially applied due to it requiring higher-order unification, which is currently not supported in Haskell.
 
 \subsubsection{Interface}
 
-Type-level functions allow for computation of types, and as such a way to easily construct multiple representations for a single type.
+Type-level functions allow types to be computed, and as such are a way to easily construct multiple representations for a variant type.
 The process of constructing multiple representations can be captured within a single datatype.
 
-\begin{verbatim}
-    data Variant (constructor :: [variant] -> *) (variants :: [variant])
-\end{verbatim}
+\vspace{-0.5em}
+\begin{figure}[ht]
+    \hspace{1em}
+    \includegraphics[scale=0.38]{CodeType6.png}
+\end{figure}
+\vspace{-0.5em}
 
 The data type \type{Variant} takes two type variables, a higher-kinded construction type and a promoted list type.
 The constructor takes the promoted list and transforms it into a concrete type.
-As type families cannot be partially applied, a data family is used to create a constructor.
+As type families cannot be partially applied, a data family is used to create the concrete constructor.
 
-\begin{verbatim}
-    data family Constructor argument :: [variant] -> *
+\begin{figure}[hbt!]
+    \hspace{1em}
+    \includegraphics[scale=0.38]{CodeType7.png}
+\end{figure}
 
-    type V argument (variants :: [variant]) = V (Constructor argument) variants
-\end{verbatim}
-
-An instance of the constructor data family constructs a unique type based on some type argument.
-An example variant type is \type{V Compact [Int, Float, Bool]}, where \type{Compact} is an (empty) descriptive datatype.
-The \type{Compact} type is associated with the constructed type within the data family.
+An instance of the constructor data family constructs a unique type, which is based on the given argument.
+It avoids partial application by effectively using the \type{Constructor} data family as a dictionary.
+An example variant type would be \type{V Compact [Int, Float, Bool]}, where \type{Compact} is the argument.
+The \type{Constructor} data family then constructs the actual \type{[variant] -> *} type based on the passed \type{Compact} argument.
  
 \newpage
 
 \subsubsection{Type Structure}
 
-With closed type families it is possible to derive compact layouts for multiple variants of a type.
-As a memory layout only concerns itself with the bit sizes of types, the intermediate structure will be the previously discussed natural number.
+While it is now possible to abstract over the multiple construction, the next step is to define the concrete computation of the type.
+As a memory representation only concerns itself with the bit sizes of types, the intermediate structure will be the previously discussed natural number.
 The \type{DataKinds} extension natively supports the \type{Nat} kind with arithmetic expressions and literals for syntax.
-While mapping of primitive types to their corresponding natural number is trivial, this is not the case for user-defined datatypes.
+While mapping primitive types to their corresponding natural number is trivial, this is not the case for user-defined datatypes.
 
-\begin{verbatim}
-    type family BitSize (a :: *) :: Nat where
-        BitSize Word8  = 8
-        BitSize Custom = ?
-\end{verbatim}
+\begin{figure}[hbt!]
+    \hspace{1em}
+    \includegraphics[scale=0.38]{CodeType8.png}
+\end{figure}
 
 It is not possible to statically derive the bit size of the \type{Custom} type within the type family.
-For this the types of which \type{Custom} is composed must be known to the type family.
-This means the structure of the type must be apparent to the type family.
-One way to approach this is to use a kind more specific then \type{*} that is explicit in the composition, such as the \type{Natural} kind but for all datatypes.
+For this the types of which \type{Custom} is composed of, or the structure of the type itself, must be apparent to the type family.
+A way to approach this is to use a kind more specific then \type{*} that is also explicit in the composition, such as the \type{Natural} kind but for all datatypes.
+While the approach is clinical, it would require all used types to be of that kind. 
 Another way is to enforce an implicit constraint by ensuring the type can be constructed with a particular GADT.
-The latter is used by Accelerate where the \type{TupR} constructor ensures that the type is composed of only units, singles and pairs.
+The latter is used by Accelerate, where the \type{TupR} constructor ensures that the embedded type is composed of only primitives types and tuples.
 The function \type{eltR} enforces this by requiring the associated type \type{EltR a} to have a mapping to the \type{TupR} type\footnote{Note this can circumvented by merely returning a bottom type such as \type{undefined}, which will only be detected when using the value. }. 
-The GADT approach is preferable when access to the structure on the value-level is needed, which is the case for future datatype generic programming endeavors.
+The GADT approach is preferable when access to the structure on the value-level is also needed, which is the case for future datatype-generic programming endeavors.
 
-\begin{verbatim}
-    class (Elt a) where
-        type EltR a :: *
-        eltR        :: TupR (EltR a)
+\begin{figure}[hbt!]
+    \hspace{1em}
+    \includegraphics[scale=0.38]{CodeType9.png}
+\end{figure}
 
-    data TupR v where
-        TupRunit   ::                     TupR ()
-        TupRsingle :: a                -> TupR a
-        TupRpair   :: TupR a -> TupR b -> TupR (a, b)
-\end{verbatim}
+With this constraint it is now possible to figure out the bit size of user-defined datatypes.
+A closed type family is used to recursively traverse the structure, where primitive types are converted to their respective bit size.
+It lays the foundation for type-level programming on user-defined datatypes.
 
-A simple example to demonstrate the explicit structure is to convert tuples of \type{Word8} to a single type. 
-In Accelerate each primitive type in a tuple is spread out over multiple arrays, which means this type-family enables an Array of Struct representation for such a tuple.
-
-\begin{verbatim}
-    type family ToBitSize (a :: *) :: Nat where
-        ToBitSize (a, b) = ToBitSize a + ToBitSize b 
-        ToBitSize ()     = 0                   
-        ToBitSize Word8  = 8 
-
-    type family FromBitSize (a :: Nat) :: * where
-        FromBitSize 0    = ()
-        FromBitSize 8    = Word8
-        FromBitSize ...  = Word...
-\end{verbatim}
+\begin{figure}[hbt!]
+    \hspace{1em}
+    \includegraphics[scale=0.38]{CodeType10.png}
+\end{figure}
 
 In Accelerate the embedded representation is the one relevant for optimizations.
 All type-functions therefore operate on the embedded representation, the type associated with \type{EltR}.
 It is impossible to construct such type outside the \type{Elt} class.
 A solution is to automatically derive the \type{EltR} class for a set of types with a fixed representation, such as tuples. 
-A return type with a fixed representation means that all computed representations will implement the \type{Elt} class. 
-It is now possible to ergonomically define many internal representations for embedded representations.
+Returning a type with a fixed representation means that all computed representations will inherently implement the \type{Elt} class. 
+Defining the \type{Elt} class for a specific representation of a variant is therefore made trivial.
 
 \newpage
 
-\subsubsection{Layout}
+\subsubsection{Deduplication}
 
-While the tools are there to generically construct intermediate representations, it is not trivial to create a single performant solution.
-Within this section a modular interface is proposed which allows for ergonomic switching between internal representations of multiple variants.
-The most general intermediate structure of a composite datatype is a collection with the size in bits of each field in the datatype.
-This removes both hierarchy and type identity, which makes it is easier to reason about the layout of a datatype.
-The representation does preserve performance critical information about the way data is retrieved from the internal representation.
+While the tools are there to generically compute different memory representations, it is not trivial to create a single performant solution.
+Within this section a modular interface is proposed which allows for ergonomic switching between multiple representations.
+The most general intermediate structure of a composite datatype is; a collection where each field in the datatype is represented as their size in bits.
+It removes both hierarchy and type identity, which makes it is easier to reason about a specific layout of a datatype.
+The intermediate representation will preserve performance critical information about the way data can be retrieved by instructions.
+The conversion is analogous to the \type{CustomBitSize} type family, but the the promoted list type \type{[]} is used as the monoid instead.
 
-\begin{verbatim}
-    type family FieldSizes (a :: *) :: [Nat] where
-        FieldSizes (a, b)   = FieldSizes a ++ FieldSizes b 
-        FieldSizes ()       = '[]                   
-        FieldSizes a        = ToBitSize a : '[]
-\end{verbatim}
+\begin{figure}[hbt!]
+    \hspace{1em}
+    \includegraphics[scale=0.42]{CodeType11.png}
+\end{figure}
 
-For simplicity the kind \type{[]}, the promoted list type, is used to denote all possible variants of a certain type.
-With closed type-families it is possible to define all relevant operations on lists.
-The definition of these are similar to their value-level counterparts without any partial application.
-With these operations it is possible to define a type-level union that creates a compact deduplicated union.
-The \type{FieldSizes} function returns a list of natural numbers, the size for each individual field in a tuple. 
-The \type{BitSizeUnion} recursively adds the unique elements for each datatype, such that all fields map to a distinct element.
-This is achieved by removing the element from the comparison list once it has been matched.
+With closed type-families it is possible to virtually define all common operations on lists.
+The definition of these are similar to their value-level counterparts, but without any partial application.
+As such it possible to define a type-level function that creates a compact deduplicated union.
+As stated, the \type{IntermediateRep} function returns a list of natural numbers.
+The \type{Union} function recursively adds an element only if it is unique.
+The corresponding element is removed from the comparison list once it has been matched, which preserves each individual field within the variant.
 
-\begin{verbatim}
-    type family Difference (a :: [r]) (b :: [r]) :: [r] where
-        Difference '[]      bs = bs
-        Difference (a : as) bs = a : Difference as (RemoveOne a bs)
+\begin{figure}[hbt!]
+    \hspace{1em}
+    \includegraphics[scale=0.42]{CodeType12.png}
+\end{figure}
 
-    type family BitSizeUnion (a :: [Nat]) (b :: [r]) :: [Nat] where
-        BitSizeUnion xs  '[]      = xs
-        BitSizeUnion xs  (y : ys) = BitSizeUnion (Difference xs (BitSizes (EltR y))) ys
-\end{verbatim}
-
-While strictly speaking the representation is compact, it deduplicates when the bit size of the primitive type is of equal size.
+One could consider the representation compact, but it deduplicates only the bit size of the primitive type is of equal size.
 This is very safe, as there is no inherit performance cost to operating on types with the same size.
 This is not necessarily the case for types stored in a larger type, or even a type spread out over multiple types.
 In some memory-bound cases this approach can still be preferable.
-An efficient implementation requires type-level sorting, to avoid a scenario where the smallest type is inserted into the largest type.
+An implementation would require type-level sorting, to avoid a scenario where the smallest type is inserted into the largest type.
 A naive sorting algorithm is quite trivial to implement, by inserting all elements into their respective position. 
 
-\begin{verbatim}
-    type family Sort (types :: [Nat]) :: [Nat] where
-        Sort '[]      = '[]
-        Sort (x : xs) = Insert x (Sort xs)
-\end{verbatim}
+\begin{figure}[hbt!]
+    \hspace{1em}
+    \includegraphics[scale=0.42]{CodeType13.png}
+\end{figure}
 
-The derivation of such a compact layout is not particularly complex, as it is similar to the deduplication approach but with multiple stages.
-Each step increasing the perceived performance cost of the merge and avoiding a local optimum solution by unifying large datatypes first. 
-The complexities of such layout exist with generically operating on such a layout. 
+The derivation of such a compact layout is not particularly complex, as it is similar to the normal deduplication approach but with multiple stages.
+Each step increasing the perceived performance cost of the deduplication and avoiding a local optimum solution by unifying large datatypes first. 
+The complexities of such layout lay within generically operating on it.
+The simplicity is only the case due to implicitly using parallel arrays, as it avoids having to incorporate padding.
 
 \newpage
 
@@ -1035,47 +1015,45 @@ The complexities of such layout exist with generically operating on such a layou
 
 In the previous chapter we established a way to compute a wide-range of internal representations for a set of variants.
 It is not ergonomically viable to write insertion and extraction functions for all the different internal representations. 
-As users can create their own representations there is no closed system, so mapping between all datatypes must be handled.
-This can be done through datatype-generic programming, which parametrizes on the composition of a datatype\cite{datatype-generic-programming}. 
+As users can create their own representations there is no closed system, so mapping between all possible datatypes must be handled.
+This can be achieved with datatype-generic programming, which parametrizes on the composition of a datatype\cite{datatype-generic-programming}. 
 A mapping must be isomorphic, such that all information is preserved between construction and deconstruction of the union.
-This is not possible for all possible pairings, as the variant must be smaller or equal to the size of the representation.
-Within the first section a type-level way to prove valid pairings is explored, essential for supporting user-defined datatypes.
-The second section goes onto the theory of datatype-generic programming, which is used for an implementation of a datatype-generic framework in the third section.
+This is not possible for all possible pairings, as the variant must be smaller or equal in comparison to the union.
+Within the first section a type-level way to prove valid pairings is explored, which can be essential for supporting user-defined datatypes.
+The second section goes onto the foundations of datatype-generic programming, which is used for an implementation of a datatype-generic framework in the third section.
 
 \subsubsection{Verifying}
 
-A variant must be smaller or equal to the representation.
-A variant that is larger than its representation loses information when constructing and deconstructing, which means type safety is breached.
+A variant must be smaller or equal to the union it exists in.
+A variant that is larger than its union loses information when constructing and deconstructing, which means type safety is breached.
 While it is possible to ensure that the computation of the representation is always larger than all the variants, this is a risky construction.
 It limits users extensibility and does not catch flaws within the type computation code. 
 A modular implementation requires an independent method that ensures the variant is smaller than its representation.
 The \type{Constraint} kind can be used to restrict the construction to larger or equal types.
-Constraints occur on the left-hand side and are generally constructed through type-classes to enforce a general interface.
+Constraints occur on the left-hand side of the type annotation, and are generally used to enforce that an interface has been implemented.
 A relevant example is ensuring that our newly computed representation has a mapping to the embedded representation.
 
-\begin{verbatim}
-    class (Elt a) where
-        type EltR a :: *
+\begin{figure}[hbt!]
+    \hspace{1em}
+    \includegraphics[scale=0.4]{CodeType14.png}
+\end{figure}
 
-    instance (Elt (constructor types)) => Elt (Variant constructor types) where
-\end{verbatim}
 
 In the type-level programming chapter we already achieved a way to determine the size of any type as kind \type{Nat}.
-Fortunately the native \type{Nat} type already has several comparison operators with the kind \type{Nat -> Nat -> Constraint}.
+Fortunately the native \type{Nat} type already supports several comparison operators with the kind \type{Nat -> Nat -> Constraint}.
 A simple but functional constraint is the \type{<=} operator.
-While it does omit performance considerations, this is required to support a wide-range of representations.
-The \type{IsVariant} class has a default implementation but can be extended by the user to support unsafe variants, such as sentinel values.
-The data-type generic programming part pertains to implementing the default \type{construct} and \type{destruct} functions.
+While it does omit performance considerations, a lax restriction is required to support a wide-range of representations.
+A generic class can be used to capture the relation between variant and union nicely, the \type{IsVariant} class.
+Operations that require type-safety can use this class, while the general variant type can remain constraint-free due to the assumption that the union will be larger than the variant.
+The \type{IsVariant} class has a default implementation for constructing and deconstructing, but can be extended by the user to support unsafe variants such as sentinel values.
 
-\begin{verbatim}
-    class (Elt v, Elt t, BitSize v <= BitSize t) => IsVariant v t where
+\begin{figure}[hbt!]
+    \hspace{1em}
+    \includegraphics[scale=0.4]{CodeType15.png}
+\end{figure}
 
-        construct :: Exp v -> Exp t
-        construct = ...
-
-        destruct  :: Exp t -> Exp v
-        destruct = ...
-\end{verbatim}
+The \type{IsVariant} class can be restricted further by constraining the individual fields within the datatype.
+The upcoming data-type generic programming part pertains to implementing the default \type{construct} and \type{destruct} functions.
 
 \newpage
 
@@ -1084,45 +1062,56 @@ The data-type generic programming part pertains to implementing the default \typ
 Before looking into how \type{construct} and \type{destruct} are implemented concretely, it is essential to understand the problem datatype-generic programming is attempting to solve. 
 Paradoxically variant types are best to illustrate the problem, coined the {\it expression problem}\cite{expression-problem}.
 Extending the variants within the \type{Color} type means all functions that pattern match on \type{Color} must be changed. 
-This can be resolved by having a general interface, but extending the behavior of this interface requires all types that implement the interface to change. 
+It can be resolved by having a general interface, but extending the behavior of this interface requires all types that implement the interface to change. 
+There is no way to extend functionality without having to define some sort of behavior manually.
 
-\begin{verbatim}
-    data Color = Red | Green | Blue             class ColorInterface a  
-                                                    transform :: a -> a
-    transform :: Color -> Color
-    transform Red   = ...                       instance ColorInterface Red where
-    transform Green = ...                           transform :: Red -> Red
-    transform Blue  = ...                           transform = ...
-\end{verbatim}
+\begin{figure}[ht]
+    \centering
+    \begin{minipage}{.5\textwidth}
+        \hspace{1em}
+        \includegraphics[scale=0.4]{CodeType16.png}
+    \end{minipage}%
+    \begin{minipage}{.5\textwidth}
+        \hspace{1em}
+        \includegraphics[scale=0.4]{CodeType17.png}
+    \end{minipage}
+\end{figure}
 
 The impact of the {\it expression problem} can be minimized through several methods. 
 Some argue that polymorphic variants fit within this category themselves, as it separates pattern matching with the underlying data\cite{polymorphic-variants-expression-problem}.
-In our case we have chosen for the representations to be extensible, which requires behavior to be defined for each possible representation.
-Both constructing and deconstructing the variant type into a specific variant.
-The possible datatypes is an infinite domain, which can be made finite by considering that all composite types can be reduced to primitive types.
+In our case we have chosen for the representations to be extensible, which requires behavior to be defined for all possible representations.
+Both constructing and deconstructing the union into a specific variant.
+The possible datatypes is an infinite domain, which can be made finite by considering that all composite types can always be reduced to primitive types.
 Datatype-generic programming utilizes the inherit concept of composition in programming languages to operate on any type.
-This is sufficient to generically operate on the multiple representations, as the semantics of the type are irrelevant for constructing and deconstructing the variant type.
+This is sufficient to generically operate on multiple representations, as the semantics of the type are irrelevant for constructing and deconstructing the variant type.
 It requires access to the composition of a type, which is often not natively supported in programming languages.
 While Haskell does support datatype-generic programming, we do not operate directly on native Haskell types.
 An implementation through native Haskell types, which Accelerate currently uses for sum types, is restrictive.
 This is apparent when attempting to implement structurally typed sum types or more complex representations generically\cite{accelerate-sum-types}.
-This is caused due to the \type{Elt} class requiring a direct mapping to the Haskell equivalent. 
-The translation layer remains essential, but can be implemented with the help of the standalone implementation.
+The complexity is caused due to the \type{Elt} class requiring a direct mapping to the Haskell equivalent. 
+Each deduplication decision must also be represented on both the value-level and type-level, rather than just the type-level.
+The translation layer remains essential for embedded languages, but can be implemented with the help of a standalone implementation.
 Operating directly on embedded types results in a more targeted and adaptable implementation. 
 
 \begin{figure}[ht]
     \centering
     \includegraphics[scale=0.15]{framework.png}
+    \caption
+    {
+        Visual diagram that displays the interconnectivity of data types within Accelerate and the relative placement of the framework.
+        Note that the type and transform are separate, which adds to the modularity of the approach. 
+        It can be used to implement the translation layer between surface and embedded representations.
+    }
 \end{figure}
 
 \newpage
 
 \subsubsection{Framework}
 
-The composition of types is enforced through a GADT, as stated within the type-level programming section.
+The composition of types is enforced through a GADT, as stated within the type-level programming chapter.
 As such a type can only have three cases; the empty type \type{()}, the primitive type \type{a} and the composed type \type{(a, b)}.
 An initial attempt would be to traverse the structure and apply a function to each primitive type.
-This means we need a function that discriminates between primitives types at the value level.
+It means we need a function that discriminates between primitives types at the value level.
 This is possible in most embedded languages, as the abstract syntax tree itself is represented through a GADT.
 
 \paragraph{Traversing}
@@ -1131,9 +1120,10 @@ Each pattern match will refine the type further, which means we need a function 
 When passing a polymorphic function to a higher-order function it is not instantiated on the refined type, which means we cannot apply it.
 A solution is to explicitly limit the scope of type variables, such that it is local to each recursive call.
 
-\begin{verbatim}
-    traverse :: Monoid r => (forall v. Type v -> r) -> Structure e -> r
-\end{verbatim}
+\begin{figure}[hbt!]
+    \hspace{1em}
+    \includegraphics[scale=0.4]{CodeType18.png}
+\end{figure}
 
 A generic traversal of a structure is extremely powerful and the first step to a datatype-generic implementation.
 The next step is traversing over the values of a structure, which is only a small step up.
@@ -1141,16 +1131,10 @@ It simply includes an expression with the same type as the structure, which is a
 This allows for functions to operate on fields within the datatype individually, but is restrictive in that it does not account for the hierarchy it exists in.
 A more involved traverse function makes available how a primitive type can be inserted and retrieved from the structure. 
 
-\begin{verbatim}
-    type Insert value expression   = value -> expression -> expression
-    type Retrieve value expression = expression -> value 
-
-    traverse :: Monoid r => Structure a 
-                         -> (forall v. Type v -> Insert v e -> Retrieve v e -> r) 
-                         -> Insert a e 
-                         -> Retrieve a e 
-                         -> r                  
-\end{verbatim}
+\begin{figure}[hbt!]
+    \hspace{1em}
+    \includegraphics[scale=0.4]{CodeType19.png}
+\end{figure}
 
 The \type{Retrieve} function recursively accumulates the further we traverse into the structure.
 The \type{Insert} function is slightly more involved, as it is recursive on the composed value.
@@ -1168,12 +1152,10 @@ The intermediate representation of a list, also used for computing the type repr
 This requires an heterogeneous list with all the different primitive types.
 Extensional types allow a type variable to be hidden, and thus they can be stored in a singe list.
 
-\begin{verbatim}
-    data Field e = forall v. Field (Type v) (Insert v e) (Retrieve v e)
-
-    fields :: Structure e -> [Field e]
-    fields = traverse (\type insert retrieve -> [Field type insert retrieve])
-\end{verbatim}
+\begin{figure}[hbt!]
+    \hspace{1em}
+    \includegraphics[scale=0.4]{CodeType20.png}
+\end{figure}
 
 Normally extensional types results in functions not being able to discriminate between the hidden types.
 As the primitive types exist within a GADT, pattern matching on \type{Type v} will reveal the type to the type system.
@@ -1186,20 +1168,14 @@ Both must map primitive types to the same fields, otherwise we cannot retrieve t
 A simple way to achieve this is by creating both within the same function, such that all mapping decisions are inherently isomorphic.
 This is trivial with access to the \type{Field} type, as we have access to functions that insert and retrieve the value.
 
-\begin{verbatim}
-    decisions :: forall v t. (Elt v, Elt t) => (Exp v -> Exp t, Exp t -> Exp v) 
-    decisions = ...
+\begin{figure}[hbt!]
+    \hspace{1em}
+    \includegraphics[scale=0.4]{CodeType21.png}
+\end{figure}
 
-    construct :: forall v t. (Elt v, Elt t) => Exp v -> Exp t
-    construct = fst (decisions @v @t)
-
-    destruct :: forall v t. (Elt v, Elt t) => Exp t -> Exp v
-    destruct = snd (decisions @v @t)
-\end{verbatim}
-
-It does mean that the constructor \type{v -> t} might make different decisions than the constructor \type{t -> v}, as decisions are made based from the perspective of one side. 
+It does mean that the constructor \type{v -> u} might make different decisions than the constructor \type{u -> v}, as decisions are made based from the perspective of one side. 
 This is not a problem as constructed types must always be destructed first.
-The \type{t} type within the \type{decisions} function is allowed to have spare fields, as they are the undefined fields within an union.
+The \type{u} type within the \type{decisions} function is allowed to have spare fields, as they are the undefined fields within an union.
 
 \paragraph{Steps}
 

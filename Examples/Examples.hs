@@ -189,19 +189,103 @@ transform Red   = ...
 transform Green = ...
 transform Blue  = ...
 
-
 class ColorInterface a 
     transform :: a -> a
 
 instance ColorInterface Red where
     transform :: Red -> Red
     transform = ...
+
 ---------------------------------------------------------------------------
 
--- HELPERS
+traverse :: Monoid r => (forall v. Type v -> r) -> Structure e -> r
 
-fold :: (a -> a -> a) -> a -> [b] -> a
-fold = undefined
 
-intersect :: a -> b -> c
-intersect = undefined
+---------------------------------------------------------------------------
+
+type Insert value expression   = value -> expression -> expression
+type Retrieve value expression = expression -> value 
+
+traverse :: Monoid r => Structure a 
+                     -> (forall v. Type v -> Insert v e -> Retrieve v e -> r) 
+                     -> Insert a e 
+                     -> Retrieve a e 
+                     -> r      
+
+----------------------------------------------------------------------------------
+
+data Field e = forall v. Field (Type v) (Insert v e) (Retrieve v e)
+
+fields :: Structure e -> [Field e]
+fields = traverse (\type insert retrieve -> [Field type insert retrieve])
+
+-----------------------------------------------------------------------------------
+
+decisions :: forall v u. (Elt v, Elt u) => (Exp v -> Exp u, Exp u -> Exp v) 
+decisions = ...
+
+construct :: forall v u. (Elt v, Elt u) => Exp u -> Exp t
+construct = fst (decisions @v @u)
+
+destruct :: forall v u. (Elt v, Elt u) => Exp t -> Exp u
+destruct = snd (decisions @v @u)
+
+
+-----------------------------------------------------------------
+
+data Collection (types :: [*]) = VariantWise ...
+                               | ElementWise [Variant Compact types]
+
+
+
+--------------------------------------------------------------------
+
+dotp :: Acc (Vector Float) -> Acc (Vector Float) -> Acc (Scalar Float)
+dotp xs ys = fold (+) 0 (zipWith (*) xs ys)
+
+
+------------------------------------------------------------------------
+
+data Maybe a = Just a | Nothing
+
+instance Elt Maybe a where
+    type EltR Maybe a = (TAG, a)
+
+fmap :: (Exp a -> Exp b) -> Exp (Maybe a) -> Exp (Maybe b)
+fmap f (T2 tag value ) = ...
+
+
+--------------------------------------------------------------------------
+
+pattern Just_ x <- (T2 1 x)
+    where Just_ x = T2 1 x
+
+fmap :: (Exp a -> Exp b) -> Exp (Maybe a) -> Exp (Maybe b)
+fmap f (Just_ a) = Just_ (f a)
+fmap f Nothing_ = Nothing_
+
+-----------------------------------------------------------------------------
+
+pattern Con :: (Elt (IX n vs), Elt (f vs)) => Exp (IX n vs) -> Exp (V f vs)
+pattern Con v <- (matchable (toWord @n) -> Just v)
+    where Con v = constructable (toWord @n) (construct v :: Exp (f vs))
+
+type Maybe a = Variant Compact [a, ()]
+
+fmap :: (Exp a -> Exp b) -> Exp (Maybe a) -> Exp (Maybe b)
+fmap f (Con0 a)  = Con0 (f a)
+fmap f (Con1 ()) = Con1 ()
+
+------------------------------------------------------------------------------
+
+type Primitive = V Compact [Sphere, Plane, Triangle]
+
+intersect :: Exp Primitive -> Exp Pos -> Exp Dir -> Exp Distance
+intersect (Con0 sphere)   = sphereIntersect sphere
+intersect (Con1 plane)    = planeIntersect plane
+intersect (Con2 triangle) = triangleIntersect triangle 
+
+--------------------------------------------------------------------
+
+
+

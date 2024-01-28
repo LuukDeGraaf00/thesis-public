@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2024.1.20)  28 JAN 2024 01:21
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2024.1.20)  28 JAN 2024 22:14
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -590,11 +590,11 @@ File: ./Images//framework.png Graphic file (type png)
 Package pdftex.def Info: ./Images//framework.png  used on input line 1098.
 (pdftex.def)             Requested size: 362.53886pt x 109.00253pt.
  [23 <./Images//CodeType16.png> <./Images//CodeType17.png> <./Images//framework.png>]
-<./Images//CodeType18.png, id=516, 896.59969pt x 34.62938pt>
+<./Images//CodeType18.png, id=516, 891.33pt x 25.59563pt>
 File: ./Images//CodeType18.png Graphic file (type png)
 <use ./Images//CodeType18.png>
 Package pdftex.def Info: ./Images//CodeType18.png  used on input line 1125.
-(pdftex.def)             Requested size: 358.63351pt x 13.85149pt.
+(pdftex.def)             Requested size: 356.52568pt x 10.23805pt.
 <./Images//CodeType19.png, id=517, 1026.08344pt x 256.70906pt>
 File: ./Images//CodeType19.png Graphic file (type png)
 <use ./Images//CodeType19.png>
@@ -611,23 +611,56 @@ File: ./Images//CodeType21.png Graphic file (type png)
 <use ./Images//CodeType21.png>
 Package pdftex.def Info: ./Images//CodeType21.png  used on input line 1173.
 (pdftex.def)             Requested size: 396.87572pt x 102.38068pt.
- [25 <./Images//CodeType20.png> <./Images//CodeType21.png>] [26] [27] [28] [29] [30] [31] [32] (./proposal.bbl [33] [34]) [35] (./proposal.aux)
+ [25 <./Images//CodeType20.png> <./Images//CodeType21.png>]
+<./Images//CodeType22.png, id=541, 900.36375pt x 60.97781pt>
+File: ./Images//CodeType22.png Graphic file (type png)
+<use ./Images//CodeType22.png>
+Package pdftex.def Info: ./Images//CodeType22.png  used on input line 1200.
+(pdftex.def)             Requested size: 360.13911pt x 24.39069pt.
+<./Images//CodeType23.png, id=544, 927.465pt x 58.71938pt>
+File: ./Images//CodeType23.png Graphic file (type png)
+<use ./Images//CodeType23.png>
+Package pdftex.def Info: ./Images//CodeType23.png  used on input line 1219.
+(pdftex.def)             Requested size: 370.97943pt x 23.48732pt.
+<./Images//CodeType24.png, id=546, 773.89125pt x 230.36063pt>
+File: ./Images//CodeType24.png Graphic file (type png)
+<use ./Images//CodeType24.png>
+Package pdftex.def Info: ./Images//CodeType24.png  used on input line 1235.
+(pdftex.def)             Requested size: 309.55101pt x 92.14261pt.
+ [26 <./Images//CodeType22.png> <./Images//CodeType23.png> <./Images//CodeType24.png>]
+<./Images//CodeType25.png, id=560, 773.89125pt x 191.9672pt>
+File: ./Images//CodeType25.png Graphic file (type png)
+<use ./Images//CodeType25.png>
+Package pdftex.def Info: ./Images//CodeType25.png  used on input line 1251.
+(pdftex.def)             Requested size: 309.55101pt x 76.7855pt.
+<./Images//CodeType26.png, id=561, 995.97093pt x 288.3272pt>
+File: ./Images//CodeType26.png Graphic file (type png)
+<use ./Images//CodeType26.png>
+Package pdftex.def Info: ./Images//CodeType26.png  used on input line 1263.
+(pdftex.def)             Requested size: 398.38132pt x 115.32883pt.
+ [27 <./Images//CodeType25.png> <./Images//CodeType26.png>]
+<./Images//CodeType27.png, id=574, 852.18375pt x 193.47281pt>
+File: ./Images//CodeType27.png Graphic file (type png)
+<use ./Images//CodeType27.png>
+Package pdftex.def Info: ./Images//CodeType27.png  used on input line 1296.
+(pdftex.def)             Requested size: 340.86745pt x 77.38774pt.
+ [28 <./Images//CodeType27.png>] [29] [30] [31] [32] (./proposal.bbl [33] [34]) [35] (./proposal.aux)
 Package rerunfilecheck Info: File `proposal.out' has not changed.
-(rerunfilecheck)             Checksum: CB11D9B2DCC9E6A9B6A519F654AA9FD6;4345.
+(rerunfilecheck)             Checksum: 7262F6083DBBA130C8F55D6ADD63F2AA;4322.
  ) 
 Here is how much of TeX's memory you used:
- 12979 strings out of 480247
- 214804 string characters out of 5896151
- 773361 words of memory out of 5000000
- 30542 multiletter control sequences out of 15000+600000
+ 13034 strings out of 480247
+ 216207 string characters out of 5896151
+ 772361 words of memory out of 5000000
+ 30584 multiletter control sequences out of 15000+600000
  476181 words of font info for 51 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  68i,9n,77p,860b,470s stack positions out of 5000i,500n,10000p,200000b,80000s
  </home/luukdegraaf00/.texlive2021/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1000.600pk></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx9.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmcsc10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsl10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti9.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb>
-Output written on proposal.pdf (36 pages, 2047802 bytes).
+Output written on proposal.pdf (36 pages, 2196665 bytes).
 PDF statistics:
- 735 PDF objects out of 1000 (max. 8388607)
- 566 compressed objects within 6 object streams
- 187 named destinations out of 1000 (max. 500000)
- 490 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 755 PDF objects out of 1000 (max. 8388607)
+ 574 compressed objects within 6 object streams
+ 194 named destinations out of 1000 (max. 500000)
+ 520 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -78,6 +78,7 @@ instance Show VariantOf where
     
     show (VariantOf v) = P.show v
 
+
 -- | inserts a collection (forces variant-wise collection)
 insert :: (Elt v) => Acc (Vector v) -> Collection vs -> Collection (v : vs)
 insert v (VariantWise vs) = VariantWise (VariantOf v : vs)

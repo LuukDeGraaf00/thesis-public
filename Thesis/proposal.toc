@@ -1,7 +1,7 @@
 \contentsline {section}{\numberline {1}Introduction}{2}{section.1}%
-\contentsline {subsection}{\numberline {1.1}Related Work}{4}{subsection.1.1}%
-\contentsline {paragraph}{Performance}{4}{section*.7}%
-\contentsline {paragraph}{Interface}{4}{section*.8}%
+\contentsline {subsection}{\numberline {1.1}Related Work}{5}{subsection.1.1}%
+\contentsline {paragraph}{Performance}{5}{section*.7}%
+\contentsline {paragraph}{Interface}{5}{section*.8}%
 \contentsline {paragraph}{Implementation}{5}{section*.9}%
 \contentsline {section}{\numberline {2}Performance}{6}{section.2}%
 \contentsline {subsection}{\numberline {2.1}Optimizations}{6}{subsection.2.1}%

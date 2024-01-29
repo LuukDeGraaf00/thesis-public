@@ -62,18 +62,22 @@
 	\vspace{1cm}
 	{\Large \textsc{Computing Science Master Thesis}\par}
 	\vspace{1.0cm}
-	{\huge\bfseries Polymorphic Variant Types in Data-Parallel Languages \par}
+	{\huge\bfseries Obtaining Low-Level Control in a High-Level Language \par}
+	\vspace{0.5cm}
+	{\Large Variant Types in Data-Parallel Array Languages \par}
 	\vspace{1.5cm}
 
     \begin{abstract}
+        A high-level abstraction sacrifices the ability to exercise low-level control, which can be problematic for performance sensitive applications.
+        The phenomenon is apparent in data-parallel array languages, which traditionally do not support types with multiple variants.
         Data-parallelism uses the uniformity between multiple data elements to accelerate the process of operating on large collections of data.
         Variant types constrain the ability to operate uniformly, which therefore limit data-parallelism opportunities in the general case.
         In the situations where non-uniformity is inherit to the algorithm low-level optimizations are used to mitigate the heterogeneity.
-        In this paper a higher abstraction level variant type is explored which can capture the required low-level control to be able to represent these optimizations in data-parallel languages.
+        In this paper a higher abstraction level variant type is explored which can capture the low-level control required to implement low-level optimizations in data-parallel languages.
         A polymorphic variant type is used to represent variability on the type-level, which is used by data structures to adapt to the identity of the variant type.
         Type-level programming is used to derive memory efficient representation for user-defined datatypes.
-        (De)construction of variant types is automated through datatype-generic programming, which means custom memory representations can be provided seamlessly.
-        It results in a fully modular variant type that can exercise low-level control while preserving the type identity of variant.
+        (De)construction of variant types is automated through datatype-generic programming, which allows user to provide custom memory representations.
+        It results in a fully modular variant type that can exercise low-level control while preserving the high-level architecture around it.
         An implementation is provided in the data-parallel language {\it Accelerate}, which demonstrates the viability of variant types in a data-parallel context.
     \end{abstract}
 
@@ -191,6 +195,8 @@ Concretely, the contributions of this thesis include:
     \item A collection of multiple variants that can be completely agnostic to its internal representation
 \end{itemize}
 
+\newpage
+
 \subsection{Related Work}
 
 Initial objective was establishing a computational efficient representations for non-uniform data in data-parallel applications.
@@ -256,7 +262,7 @@ The cache operates independently of the operating system\cite{memory}, and no di
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.2]{memoryhierarchy}
+    \includegraphics[scale=0.10]{Performance1.png}
     \caption
     {
         An abstract view of a computer memory hierarchy. 
@@ -280,7 +286,7 @@ Using these architecture dependant instructions directly can be achieved through
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.2]{vectorization}
+    \includegraphics[scale=0.1]{Performance2.png}
     \caption
     {
         A scalar addition instruction is converted to the equivalent single instruction multiple data (SIMD) instruction, where each grey square denotes a single data component.
@@ -352,7 +358,7 @@ Rather than executing unconditionally, some processors execute the most likely t
 \end{minipage}%
 \begin{minipage}{.35\textwidth}
     \centering
-    \includegraphics[scale=0.08]{cache (2).png}
+    \includegraphics[scale=0.08]{Performance3.png}
     \captionsetup{margin=0.5cm}
     \captionsetup{format=plain}
     \caption{Stream buffer that prefetches data into the cache based on cache misses.}
@@ -375,7 +381,7 @@ Cores are often not independent processors and might share several components wi
     \centering
     \begin{minipage}{.5\textwidth}
         \centering
-        \includegraphics[scale=0.09]{instructionpipeline.png}
+        \includegraphics[scale=0.09]{Performance4.png}
         \captionsetup{margin=0.2cm}
         \caption
         { 
@@ -385,11 +391,11 @@ Cores are often not independent processors and might share several components wi
     \end{minipage}%
     \begin{minipage}{.5\textwidth}
         \centering
-        \includegraphics[scale=0.09]{vectorizationvsthreads.png}
+        \includegraphics[scale=0.09]{Performance5.png}
         \captionsetup{margin=0.2cm}
         \caption
         { 
-            Both vectorization and concurrency are single-core, but differ in handling multiple tasks.
+            Both vectorization and concurrency are single lane concepts, but differ in handling multiple tasks.
             Parallel threads are both independent and execute on multiple cores simultaneous.      
         }
     \end{minipage}
@@ -417,7 +423,7 @@ Parallel arrays solve this by creating a distinct array for each primitive type 
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.082]{soa-aos.png}
+    \includegraphics[scale=0.082]{Performance6.png}
     \caption
     {
         Visual comparison between an array-of-struct collection(1) and a struct-of-array collection(2). 
@@ -443,7 +449,7 @@ Due to the way caches operate with contiguous blocks, spatial locality of data c
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.12]{temporalspatial.png}
+    \includegraphics[scale=0.12]{Performance7.png}
     \caption
     {
         Comparison between temporal and spatial locality, where the data A/B and C/D will exist in different cache blocks when stored in the cache.
@@ -476,7 +482,7 @@ It is also limited to instructions that cannot fail or overflow, as unconditiona
     \end{minipage}%
     \begin{minipage}{.5\textwidth}
         \centering
-        \includegraphics[scale=0.10]{UpdatedCycle.png}
+        \includegraphics[scale=0.10]{Performance8.png}
         \captionsetup{margin=0.5cm}
         \captionsetup{format=plain}
         \caption
@@ -1321,10 +1327,6 @@ Pattern matching will effectively occur on the Haskell side, which is trivial du
 Distributing the \type{intersect} function over multiple arrays, within a collection of \type{Primitives}, can therefore be done.
 With this many collective operations can be supported, including ones that modify the identity of such a collection.
 These collective operators are currently not implemented beyond the necessary operators to support benchmarking.
-
-\begin{verbatim}
-    example of some collection functions
-\end{verbatim}
 
 \newpage
 

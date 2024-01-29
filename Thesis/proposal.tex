@@ -1326,23 +1326,27 @@ These collective operators are currently not implemented beyond the necessary op
     example of some collection functions
 \end{verbatim}
 
-
 \newpage
 
 \subsection{Benchmarks}
 
-A concrete performant way to operate on multiple variants was not an objective in its own right, due the nature of many components being able to influence the performance of an application.
-In this section previously discussed optimizations are benchmarked, while preserving the initial type identity of the functions to demonstrate the principle.
-The benchmarks will be done with the Criterion library, and will utilize the different backends of Accelerate.
+A concrete performant way to operate on multiple variants was not the objective in its own right.
+As discussed in the performance chapter, many components would be able to dictate the viability of a concrete optimization. 
+In this section previously discussed optimizations are benchmarked, to demonstrate the viability of the abstraction around variant types.
+The benchmarks will be done with the Criterion Haskell library, and will utilize both the multi-core CPU and GPU backend of Accelerate.
 Benchmarks will be run on an {\it Intel Core i5-10600KF} CPU and a {\it NVIDIA GeForce RTX 3060 Ti} GPU.
 
 \paragraph{Nearest}
 
-The \type{nearest} function is used, the original motivating example, which computes the nearest primitive that intersects with a ray.
+The \type{nearest} function, the original motivating example, computes the nearest primitive that intersects with a ray.
 The type of primitive include spheres, planes and triangles.
-A comparison is made with a variant-wise collection, which either uses multiple functions branchless (split) or a single function (joined). 
-The element-wise collection are either randomly distributed or the primitives are sorted to exploit coherence.
-The compact representation deduplicates all fields of equal size.
+The Möller-Trumbore algorithm is used for the triangle intersection, while the plane and sphere use the obvious intersection algorithm.
+In the benchmarks, a comparison is made with and between variant-wise collections.
+The split category uses multiple functions for each primitive, and combines the results after.
+The join category uses a single function, but branches on the index to determine the concrete primitive which is intersected with.
+The element-wise collection are either randomly distributed or the primitives are grouped together to exploit potential coherence.
+The compact representation deduplicates fields of equal size or smaller size, through the framework established in this thesis.
+The benchmarks were run on 3000 equally distributed primitives, where the time in milliseconds is the average of 1000 samples.
 
 \begin{center}
     \begin{tabular}{ | m{14em} | m{8em}| m{8em} | m{8em} | } 
@@ -1364,6 +1368,9 @@ The compact representation deduplicates all fields of equal size.
     \end{tabular}
 \end{center}
 
+As seen in the results, the overhead of running multiple functions appears to exceed the cost of the branch on the primitive.
+Scaling the amount of primitive intersection would give a more conclusive answer to whether it is actually faster and if the overhead can be recouped.  
+
 \begin{center}
     \begin{tabular}{ | m{14em} | m{8em}| m{8em} | m{8em} | } 
       \hline
@@ -1384,8 +1391,15 @@ The compact representation deduplicates all fields of equal size.
     \end{tabular}
 \end{center}
 
-An extension
-
+While it appears to recoup slightly for the multi-core CPU backend, the difference becomes larger for the GPU backend.
+In general, the element-wise collections heavily benefit of the reduced memory footprint of the compact representations.
+A surprise is that this does not translate to the joined category, which inherently uses the least amount of memory possible.
+A possible explanation is that the non-contiguous memory and not being able to pattern match diminish the obtained benefit of using less memory.
+This would also explain the discrepancy between multi-core CPU and GPU, as the difference is less significant on the GPU.
+The large difference between the devices themselves can be most likely attributed to the inability of the CPU backend to vectorize the intersection algorithm.
+This is unsurprising, as the control-flow within the individual intersections algorithms is complex and contains branches.  
+The coherence of grouped primitives also has a minimal influence, which is likely a side-effect of the already unpredictable control-flow.
+In summary, the framework but more specifically the deduplication algorithm appears to be useful and can be applied without changing existing architecture.
 
 \newpage
 
@@ -1395,8 +1409,17 @@ In this paper some fundamental choices have been made without extensive argument
 This chapter is used to highlight these choices and provide further reasoning for the choices that have been made.
 It also highlights some limitations of the framework and ways these can be resolved.
 
-\subsection{Benchmarks WIP}
+\subsection{Non-variant types}
 
+In the preamble obtaining low-level control for datatypes in general was discussed.
+The obtained method for variant types can be extended to product types, as it is effectively a simpler problem space.
+Rather than deduplication, different padding strategies can be used to create multiple memory representations on the type-level.
+The datatype-generic programming must be adapted to facilitate padding, which has already been previously discussed.
+Ergonomic switching between representations can be achieved with a similar higher-kinded type constructor as \type{Variant}.
+
+\begin{verbatim}
+    data Product (constructor :: * -> *) (type :: *)
+\end{verbatim}
 
 
 \subsection{Embedded Domain-Specific Language}
@@ -1432,14 +1455,19 @@ It is also not possible to sort the types on the type-level, as closed type fami
 An implementation that is fully modular and extendible on both the value-level and type-level prevent these complications.
 Explicit derivation of the \type{Elt} class is also not required, as the sum type itself is effectively a polymorphic datatype that implements the \type{Elt} class. 
 
+\newpage
+
 \subsection{Limitations}
+
+The framework has some limitations, either in general or specific to the implementation in Accelerate.
+Within this section limitations will be discussed (further). 
 
 \paragraph{Surface type}
 
 As structural sum types do not exist in Haskell, it is not apparent what the corresponding surface type should be.
-Currently there exists no mapping from the variant type to a surface type, which might sound more problematic then it really is.
+Currently there exists no mapping from the variant type to an appropriate surface type, which might sound more problematic then it really is.
 It means (de)-constructing the variants must be done in the Accelerate code, rather than Haskell.
-A solution can also be to just use a dynamic type, or make a direct mapping to an existing open sum library.
+A solution can also be to use a dynamic type, or make a direct mapping to an existing open sum library.
 
 \paragraph{Nested pattern matching}
 
@@ -1478,11 +1506,49 @@ As primitive types are implicitly distributed over multiple arrays, there is no 
 It in addition does not allow types existing outside the predefined types, which means memory representation is limited to that set of types.
 A solution would be to add an (untyped) type with a variable size and corresponding instructions to extract (aligned) data.
 
+\paragraph{Compilation Speed}
+
+As type-level programming is done statically, it puts additional strain on the compilation speed of programs.
+This might become apparent in larger projects, where statically resolving many interactions might become too costly.
+As extension to this problem, the datatype-generic programming data (de)constructors might recompute the mapping each time.
+Strictly speaking it can be optimized away, but this might not always be obvious to the compiler. 
+This is not an issue for embedded languages, as it will be delegated to the compilation speed of the abstract syntax tree. 
+
 \newpage
 
-\section{Conclusion WIP}
+\section{Conclusion}
+
+The first research question of this thesis was:
+
+\begin{quote}
+{\it How to obtain low-level control that is applicable for high performance computing, while preserving the higher-abstraction surface representation?}
+\end{quote}
+
+Answering this required understanding performance implications of low-level optimizations, an exposition of relevant considerations was therefore done in the first chapter of this thesis.
+The importance of contiguous memory allocation, cache efficiency, access patterns and influence of branching was demonstrated.
+Due to the inability to derive an efficient solution from a mere theoretical framework, the flexibility of representations became prominent in the task to capture low-level control.  
+This thought was used for answering the second research question of this thesis:
+
+\begin{quote}
+{\it What is the conceptualization of a higher-abstraction variant type, which can exercise the obtained low-level control within in a data-parallel environment?}
+\end{quote}
+
+A polymorphic variant type was used, which is able to represent both element-wise and variant-wise collections.
+It also gave the opportunity to use type-level programming for a deduplicating algorithm for variant types, which can be extended by the user.
+Datatype-generic was successfully used to create isomorphic mappings between datatypes, which made data (de)-constructors independent of the concrete memory representation.
+As such a fully modular framework has been established, which can capture various low-level optimizations through a higher-abstraction variant type.
+An implementation was realized in Accelerate, an embedded domain-specific data-parallel language in Haskell, which demonstrates the viability of the established flexibility.
+Concretely, the low-level control of the second research question has been obtained through polymorphic variant types that are flexible in their memory representation.
+It creates the foundation for answering the first research question, where low-level control has been established through type-level and datatype-generic programming. 
+
 
 \subsection{Future Work}
+
+Within this thesis a notable focus was the performance of predictable non-uniformity, which is data that is not dependant on a previous computation.
+Exceptions in particular are not predictable, and as such must use an element-wise collection.
+It can be more performant to effectively filter out the exception states, that is the transform from an element-wise collection to an variant-wise collection.
+It would require a performant data-parallel grouping algorithm, which is not trivial to implement and as such subject to future research.
+It can be categorized together with other applications that can potentially accelerate operations in specific use case, such as task-parallelism. 
 
 \newpage
 

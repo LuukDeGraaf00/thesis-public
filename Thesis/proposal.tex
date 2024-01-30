@@ -2,7 +2,7 @@
 
 \usepackage[margin = 3cm]{geometry}
 \usepackage[table]{xcolor}
-\usepackage{graphicx}
+\usepackage[draft]{graphicx}
 \usepackage{hyperref}
 \usepackage{listings}
 \usepackage{color}
@@ -191,7 +191,6 @@ Concretely, the contributions of this thesis include:
 \begin{itemize}
     \item An extendable deduplication algorithm for the memory representation of a variant type.
     \item Datatype-generic derivation of an isomorphic mapping between any two datatypes.
-    \item Explicit unconditional operator through bit masking.
     \item A collection of multiple variants that can be completely agnostic to its internal representation
 \end{itemize}
 
@@ -199,19 +198,20 @@ Concretely, the contributions of this thesis include:
 
 \subsection{Related Work}
 
-Initial objective was establishing a computational efficient representations for non-uniform data in data-parallel applications.
-This induced the need for a flexible and type-safe interface, which has been achieved through type-level and datatype generic programming.
+First performance considerations must be understood, to capture the most relevant low-level optimizations.
+This induces the need for a flexible and type-safe interface, which has been achieved through type-level and datatype generic programming.
 Relevance is established by an implementation in the data-parallel language Accelerate, which is deeply embedded within Haskell.
 
 \paragraph{Performance}
 
-The memory representation of a datatype is often based on the functionality they perform within a language.
+Capturing low-level optimizations in high-level languages has been achieved by methods such as relying on compiler optimizations, a Foreign Function Interface (FFI) or compiler intrinsics. 
+For variant types specifically the problem is not the expressiveness, as it can be achieved through untyped code, but the ability to abstract over it.   
 In data-parallel applications primitive types are distributed over multiple arrays to facilitate vectorization.
 It is not apparent what the representation of a tagged union should be, as they inherently break vectorization in most cases. 
 The functional data-parallel languages Accelerate\cite{accelerate-sum-types} and Futhark\cite{futhark-sum-types} implicitly distribute primitive types in composite datatypes over multiple arrays.
 Both implementations have limited deduplication capabilities, but research has been done to integrate a memory efficient tagged union in Accelerate\cite{accelerate-sum-types}.
 Game-engines, which deal with many clusters of data, have a fundamentally different approach as they have widely adopted the Entity-Component-System (ECS) pattern. 
-Many implementations incite a collective re-organization of the internal representation when a variant change occurs at runtime.
+Many implementations; such as Unity\cite{unity-ecs-patent}, Flecs\cite{ecs-flecs} and Bevy\cite{ecs-bevy}, incite a re-organization of the internal representation when a variant change occurs at runtime.
 A type-safe and performant implementation is notably hard due to having to statically resolve all interactions between the representations, which means meta-programming and untyped code are extremely prevalent. 
 
 \paragraph{Interface}
@@ -223,7 +223,7 @@ In Haskell sum types are nominally typed, which means variants are not standalon
 Structural sum types are often called extensible or open sum types, as they do not have to be explicitly declared before use.
 In OCaml these are natively supported as polymorphic variants, while Futhark is completely structurally typed and refers to them as sum types.
 Deriving an efficient internal representation for a user-defined datatype can be done statically by type-indexing types\cite{associated-types}, which are called {\it traits} in c++.
-Some libraries also create a low-level abstractions which allows for custom memory representations \cite{llama} or employ meta-programming to be flexible in the memory representation.
+Some libraries also create a low-level abstractions which allows for custom memory representations\cite{llama} or employ meta-programming to be flexible in the memory representation.
 Datatype-generic functions, which parametrize on the structure of a datatype, can be used to create mappings between these computed representations.
 Both concepts are used in highly generic libraries for a wide-range of applications\cite{generic-programming}. 
 
@@ -235,7 +235,7 @@ Some implementation details are therefore primarily centered around these two la
 Accelerate is a data-parallel array language deeply embedded within Haskell, where sum types are currently represented as a non-compact tagged union.
 Research has been done on a compact tagged union representation for parallel arrays, which has been named a {\it Recursive Tagged Union}\cite{accelerate-sum-types}.
 The representation uses a unified tag for nested sum types, which optimizes memory usage at the cost of tag (de-)construction but has not yet been implemented. 
-This paper fundamentally distinct itself by looking beyond the sum type and implementing an extendable and modular interface, rather than a single concrete layout. 
+This paper fundamentally distinct itself by looking beyond the sum type and implementing an extendable and modular interface for types with multiple variants, rather than a single concrete layout. 
 Futhark is a functional structurally typed data-parallel array language, where only identical primitive types are deduplicated.
 The research pertains primarily on including structural sum types to the Futhark compiler\cite{futhark-sum-types}.
 
@@ -678,6 +678,10 @@ Both allow operations to be vectorized, but there exist several other considerat
     This is also possible for {\it regions} within an array, but this is less trivial and often requires explicit support in array languages\cite{accelerate-independent-regions}. 
 \end{itemize}
 
+To summarize, there are many variant-wise collections that vary in the organization of the concrete data. 
+Either within the same array, spread out over of multiple arrays, or a hybrid which maximizes contiguous memory of only a certain field within the datatype. 
+It translates to iterating over a variant-wise collection as well, as one can either iterate over each variant separately (split) or within the same collective function but branch on the index to get the concrete variant (joined).
+The split iteration is suitable for vectorization, while the joined iteration reduces potential overhead of having multiple functions and increases the cache predictability.
 The concept of a variant-wise collection can be extended further by considering other data structures, which are generally dependant on the specific type of data.
 The initial example of an acceleration structure for geometry intersection is such a tailored data structure.
 While there are many examples of such data structures, a common pattern for variant types in particular is a shared component.
@@ -765,9 +769,9 @@ It allows for a variant-wise collection of entities, which most ECS implementati
 
 The ECS design pattern is arguably inherently imperative, as structural changes to entities are done imperatively.
 Apecs, an ECS library in Haskell, achieves this imperative style through monads\cite{ecs-apecs}.
-The ECS pattern makes element-wise collections infeasible, as there is no type-safe way to restrict the possible amount of structural changes.
+The ECS pattern makes element-wise collections infeasible, as there is no feasible way to restrict the possible amount of structural changes.
 This is inherit to the pattern, as any component can be attached to any entity.
-An element-wise collection requires a statically definable form of mutually exclusivity.
+An element-wise collection would require a statically definable form of mutually exclusivity.
 
 \newpage
 
@@ -807,7 +811,7 @@ In some cases, such as a safe division function, the introduced uncertainty is i
 
 Concretely, \type{Maybe a} is now an alias for the mutually exclusive relationship \type{Just a} or \type{Nothing}, rather than a unique and standalone type. 
 OCaml calls these {\it polymorphic variants}\footnote{OCaml also implements nominally typed sum types, so called {\it variants}.}, while other functional languages generally refer to them as extensible or open sum types.
-A way to compartmentalize the difference is by considering that \type{|} is now a datatype that takes two variants.
+A way to compartmentalize the difference is by considering that \type{||} is now a datatype that takes two variants.
 The variants are now apparent to the type system, which can be used to generically adapt data structures to the variants within a specific polymorphic variants. 
 The flexibility polymorphic variant types provide align with the intention to create a modular system that can be agnostic to the internal representation.
 A motivating example is that a collection of \type{Maybe a} can be an element-wise collection or two variant-wise collections of \type{Just a} and \type{Nothing}\footnote{As \type{Nothing} does not hold data, a size descriptor is sufficient.}.
@@ -883,7 +887,7 @@ Accelerate uses the \type{Elt}\footnote{Extract, Load, Transform.} class to crea
     \includegraphics[scale=0.38]{CodeType4.png}
 \end{figure}
 
-While these type-indexed integrate well with type classes, type families is the much stronger standalone concept.
+While these type-indexed types integrate well with type classes, type families is the much stronger standalone concept.
 A \type{data family} has unique types associated with each type, while a \type{type family} is merely the type synonym equivalent.
 In some cases a function cannot be represented, as the type checker is unsure which instance within the type family to use.
 This is the case when the function has a more general default case, which will always match.
@@ -902,7 +906,7 @@ Type families cannot be partially applied due to it requiring higher-order unifi
 
 \subsubsection{Interface}
 
-Type-level functions allow types to be computed, and as such are a way to easily construct multiple representations for a variant type.
+With type-level functions a type can be computed based on an argument type, which is the foundation for constructing multiple representations for a single variant type.
 The process of constructing multiple representations can be captured within a single datatype.
 
 \vspace{-0.5em}
@@ -924,7 +928,7 @@ As type families cannot be partially applied, a data family is used to create th
 An instance of the constructor data family constructs a unique type, which is based on the given argument.
 It avoids partial application by effectively using the \type{Constructor} data family as a dictionary.
 An example variant type would be \type{V Compact [Int, Float, Bool]}, where \type{Compact} is the argument.
-The \type{Constructor} data family then constructs the actual \type{[variant] -> *} type based on the passed \type{Compact} argument.
+The \type{Constructor} data family then constructs the actual type with the kind \type{[variant] -> *}, based on the \type{Compact} type passed as argument.
  
 \newpage
 
@@ -943,7 +947,7 @@ While mapping primitive types to their corresponding natural number is trivial, 
 It is not possible to statically derive the bit size of the \type{Custom} type within the type family.
 For this the types of which \type{Custom} is composed of, or the structure of the type itself, must be apparent to the type family.
 A way to approach this is to use a kind more specific then \type{*} that is also explicit in the composition, such as the \type{Natural} kind but for all datatypes.
-While the approach is clinical, it would require all used types to be of that kind. 
+While the approach is clinical, it would involve drastic changes for an existing architecture.
 Another way is to enforce an implicit constraint by ensuring the type can be constructed with a particular GADT.
 The latter is used by Accelerate, where the \type{TupR} constructor ensures that the embedded type is composed of only primitives types and tuples.
 The function \type{eltR} enforces this by requiring the associated type \type{EltR a} to have a mapping to the \type{TupR} type\footnote{Note this can circumvented by merely returning a bottom type such as \type{undefined}, which will only be detected when using the value. }. 
@@ -968,18 +972,17 @@ All type-functions therefore operate on the embedded representation, the type as
 It is impossible to construct such type outside the \type{Elt} class.
 A solution is to automatically derive the \type{EltR} class for a set of types with a fixed representation, such as tuples. 
 Returning a type with a fixed representation means that all computed representations will inherently implement the \type{Elt} class. 
-Defining the \type{Elt} class for a specific representation of a variant is therefore made trivial.
 
 \newpage
 
 \subsubsection{Deduplication}
 
 While the tools are there to generically compute different memory representations, it is not trivial to create a single performant solution.
-Within this section a modular interface is proposed which allows for ergonomic switching between multiple representations.
+Capturing all possible solutions to a performant memory representation is made easier by creating an intermediate structure that only contains relevant information. 
 The most general intermediate structure of a composite datatype is; a collection where each field in the datatype is represented as their size in bits.
 It removes both hierarchy and type identity, which makes it is easier to reason about a specific layout of a datatype.
 The intermediate representation will preserve performance critical information about the way data can be retrieved by instructions.
-The conversion is analogous to the \type{CustomBitSize} type family, but the the promoted list type \type{[]} is used as the monoid instead.
+The conversion is analogous to the \type{CustomBitSize} type family, but the the promoted list type \type{[]} is used as monoid.
 
 \begin{figure}[hbt!]
     \hspace{1em}
@@ -991,7 +994,8 @@ The definition of these are similar to their value-level counterparts, but witho
 As such it possible to define a type-level function that creates a compact deduplicated union.
 As stated, the \type{IntermediateRep} function returns a list of natural numbers.
 The \type{Union} function recursively adds an element only if it is unique.
-The corresponding element is removed from the comparison list once it has been matched, which preserves each individual field within the variant.
+The corresponding element is removed from the comparison list once it has been matched.
+This ensures all fields of a datatype are included exactly once. 
 
 \begin{figure}[hbt!]
     \hspace{1em}
@@ -1014,12 +1018,13 @@ The derivation of such a compact layout is not particularly complex, as it is si
 Each step increasing the perceived performance cost of the deduplication and avoiding a local optimum solution by unifying large datatypes first. 
 The complexities of such layout lay within generically operating on it.
 The simplicity is only the case due to implicitly using parallel arrays, as it avoids having to incorporate padding.
+When padding is handled the approach can be extended to non-variant types as well, as it effectively is the simpler case of a variant type with only one variant.
 
 \newpage
 
 \subsection{Datatype-Generic programming}
 
-In the previous chapter we established a way to compute a wide-range of internal representations for a set of variants.
+In the previous chapter a way was established to compute a wide-range of internal representations for a variant type.
 It is not ergonomically viable to write insertion and extraction functions for all the different internal representations. 
 As users can create their own representations there is no closed system, so mapping between all possible datatypes must be handled.
 This can be achieved with datatype-generic programming, which parametrizes on the composition of a datatype\cite{datatype-generic-programming}. 
@@ -1084,7 +1089,7 @@ There is no way to extend functionality without having to define some sort of be
 \end{figure}
 
 The impact of the {\it expression problem} can be minimized through several methods. 
-Some argue that polymorphic variants fit within this category themselves, as it separates pattern matching with the underlying data\cite{polymorphic-variants-expression-problem}.
+Arguably polymorphic variants fit within this category themselves, as it separates pattern matching with the underlying data\cite{polymorphic-variants-expression-problem}.
 In our case we have chosen for the representations to be extensible, which requires behavior to be defined for all possible representations.
 Both constructing and deconstructing the union into a specific variant.
 The possible datatypes is an infinite domain, which can be made finite by considering that all composite types can always be reduced to primitive types.
@@ -1093,11 +1098,6 @@ This is sufficient to generically operate on multiple representations, as the se
 It requires access to the composition of a type, which is often not natively supported in programming languages.
 While Haskell does support datatype-generic programming, we do not operate directly on native Haskell types.
 An implementation through native Haskell types, which Accelerate currently uses for sum types, is restrictive.
-This is apparent when attempting to implement structurally typed sum types or more complex representations generically\cite{accelerate-sum-types}.
-The complexity is caused due to the \type{Elt} class requiring a direct mapping to the Haskell equivalent. 
-Each deduplication decision must also be represented on both the value-level and type-level, rather than just the type-level.
-The translation layer remains essential for embedded languages, but can be implemented with the help of a standalone implementation.
-Operating directly on embedded types results in a more targeted and adaptable implementation. 
 
 \begin{figure}[ht]
     \centering
@@ -1109,6 +1109,12 @@ Operating directly on embedded types results in a more targeted and adaptable im
         It can be used to implement the translation layer between surface and embedded representations.
     }
 \end{figure}
+
+This is apparent when attempting to implement structurally typed sum types or more complex representations generically\cite{accelerate-sum-types}.
+The complexity is caused due to the \type{Elt} class requiring a direct mapping to the Haskell equivalent. 
+Each deduplication decision must also be represented on both the value-level and type-level, rather than just the type-level.
+The translation layer remains essential for embedded languages, but can be implemented with the help of a standalone implementation.
+Operating directly on embedded types results in a more targeted and adaptable implementation. 
 
 \newpage
 
@@ -1146,6 +1152,9 @@ The \type{Retrieve} function recursively accumulates the further we traverse int
 The \type{Insert} function is slightly more involved, as it is recursive on the composed value.
 Normally this would just be the input expression, but we are operating on the structure and do not have access to the actual expression.
 Fortunately the \type{Retrieve} function is available to construct the expression to that point, which make the traversal function quite simple and compact.
+To summarize, the \type{traverse} function creates two functions for each field within a datatype. 
+One to insert a primitive type into the field, and one to extract the primitive type from the field.
+It can be used to recursively provide values, such as a bitmask, to construct a complete datatype. 
 
 \newpage
 
@@ -1156,20 +1165,20 @@ It is possible to create a mapping by traversing the other structure for each pr
 This is both redundant and highly complex when removing values from the available mappings.
 The intermediate representation of a list, also used for computing the type representation, only requires a single traversal for each structure.
 This requires an heterogeneous list with all the different primitive types.
-Extensional types allow a type variable to be hidden, and thus they can be stored in a singe list.
+Existential types allow a type variable to be hidden, and thus they can be stored in a singe list.
 
 \begin{figure}[hbt!]
     \hspace{1em}
     \includegraphics[scale=0.4]{CodeType20.png}
 \end{figure}
 
-Normally extensional types results in functions not being able to discriminate between the hidden types.
+Normally existential types results in functions not being able to discriminate between the hidden types.
 As the primitive types exist within a GADT, pattern matching on \type{Type v} will reveal the type to the type system.
 A structure can now be constructed or destructed by folding over such a list, but more importantly the fields can be compared between structures.
 
 \paragraph{Isomorphism}
 
-An undiscussed constraint is that the \type{construct} and \type{destruct} functions must be isomorphic from each other.
+The primary constraint is that the \type{construct} and \type{destruct} functions must be isomorphic from each other.
 Both must map primitive types to the same fields, otherwise we cannot retrieve the same type from the representation.
 A simple way to achieve this is by creating both within the same function, such that all mapping decisions are inherently isomorphic.
 This is trivial with access to the \type{Field} type, as we have access to functions that insert and retrieve the value.

@@ -1,49 +1,49 @@
-This is BibTeX, Version 0.99d (TeX Live 2022/dev/Debian)
+This is BibTeX, Version 0.99d (TeX Live 2020/Debian)
 Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: proposal.aux
 The style file: plain.bst
 Database file #1: refs.bib
 Warning--empty booktitle in polymorphic-variants-expression-problem
 Warning--empty booktitle in instruction-level-parallelism
-You've used 34 entries,
+You've used 37 entries,
             2118 wiz_defined-function locations,
-            694 strings with 10489 characters,
-and the built_in function-call counts, 12700 in all, are:
-= -- 1234
-> -- 618
+            704 strings with 10766 characters,
+and the built_in function-call counts, 13323 in all, are:
+= -- 1288
+> -- 645
 < -- 15
-+ -- 244
-- -- 206
-* -- 774
-:= -- 1979
-add.period$ -- 106
-call.type$ -- 34
-change.case$ -- 198
++ -- 255
+- -- 214
+* -- 796
+:= -- 2081
+add.period$ -- 112
+call.type$ -- 37
+change.case$ -- 209
 chr.to.int$ -- 0
-cite$ -- 36
-duplicate$ -- 547
-empty$ -- 1004
-format.name$ -- 206
-if$ -- 2813
+cite$ -- 39
+duplicate$ -- 568
+empty$ -- 1070
+format.name$ -- 214
+if$ -- 2949
 int.to.chr$ -- 0
-int.to.str$ -- 34
+int.to.str$ -- 37
 missing$ -- 24
-newline$ -- 166
-num.names$ -- 76
-pop$ -- 269
+newline$ -- 178
+num.names$ -- 82
+pop$ -- 297
 preamble$ -- 1
-purify$ -- 164
+purify$ -- 174
 quote$ -- 0
-skip$ -- 475
+skip$ -- 500
 stack$ -- 0
-substring$ -- 604
-swap$ -- 208
+substring$ -- 619
+swap$ -- 211
 text.length$ -- 15
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 136
+type$ -- 148
 warning$ -- 2
-while$ -- 106
-width$ -- 36
-write$ -- 370
+while$ -- 112
+width$ -- 39
+write$ -- 392
 (There were 2 warnings)

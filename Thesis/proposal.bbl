@@ -8,6 +8,15 @@ Daniel~Meister 0002, Jakub Boksansk{\'y}, Michael Guthe, and Jir{\'i} Bittner.
   and Games, San Francisco, CA, USA, September 15-17, 2020}, pages 13:1--13:9.
   ACM, 2020.
 
+\bibitem{ecs-bevy}
+Carter Anderson.
+\newblock \url{https://bevyengine.org/learn/book/getting-started/ecs/}.
+
+\bibitem{unity-ecs-patent}
+Joachim~Christoph Ante and Tim Johansson.
+\newblock Method and system for improved performance of a video game engine,
+  March 2020.
+
 \bibitem{clash}
 Christiaan Baaij, Matthijs Kooijman, Jan Kuper, Arjan Boeijink, and Marco
   Gerards.
@@ -144,6 +153,10 @@ Trevor~L. McDonell, Joshua~D. Meredith, and Gabriele Keller.
 \newblock In {\em Proceedings of the 15th ACM SIGPLAN International Haskell
   Symposium}, Haskell 2022, page 123–136, New York, NY, USA, 2022.
   Association for Computing Machinery.
+
+\bibitem{ecs-flecs}
+Sander Mertens.
+\newblock \url{https://github.com/amethyst/legion}.
 
 \bibitem{interleaved-SIMD}
 Dorit Nuzman, Ira Rosen, and Ayal Zaks.

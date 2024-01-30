@@ -1,49 +1,58 @@
-This is BibTeX, Version 0.99d (TeX Live 2020/Debian)
+This is BibTeX, Version 0.99d (TeX Live 2022/dev/Debian)
 Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: proposal.aux
-The style file: plain.bst
+The style file: abbrv.bst
 Database file #1: refs.bib
+Repeated entry---line 78 of file refs.bib
+ : @misc{ecs-apecs
+ :                ,
+I'm skipping whatever remains of this entry
+Repeated entry---line 100 of file refs.bib
+ : @misc{expression-problem
+ :                         ,
+I'm skipping whatever remains of this entry
+Warning--I didn't find a database entry for "memory"
 Warning--empty booktitle in polymorphic-variants-expression-problem
 Warning--empty booktitle in instruction-level-parallelism
-You've used 37 entries,
+You've used 36 entries,
             2118 wiz_defined-function locations,
-            704 strings with 10766 characters,
-and the built_in function-call counts, 13323 in all, are:
-= -- 1288
-> -- 645
-< -- 15
-+ -- 255
-- -- 214
-* -- 796
-:= -- 2081
-add.period$ -- 112
-call.type$ -- 37
-change.case$ -- 209
+            706 strings with 10627 characters,
+and the built_in function-call counts, 12804 in all, are:
+= -- 1255
+> -- 621
+< -- 14
++ -- 247
+- -- 207
+* -- 767
+:= -- 2038
+add.period$ -- 115
+call.type$ -- 36
+change.case$ -- 205
 chr.to.int$ -- 0
-cite$ -- 39
-duplicate$ -- 568
-empty$ -- 1070
-format.name$ -- 214
-if$ -- 2949
+cite$ -- 38
+duplicate$ -- 549
+empty$ -- 996
+format.name$ -- 207
+if$ -- 2812
 int.to.chr$ -- 0
-int.to.str$ -- 37
+int.to.str$ -- 36
 missing$ -- 24
-newline$ -- 178
-num.names$ -- 82
-pop$ -- 297
+newline$ -- 180
+num.names$ -- 78
+pop$ -- 273
 preamble$ -- 1
-purify$ -- 174
+purify$ -- 171
 quote$ -- 0
-skip$ -- 500
+skip$ -- 463
 stack$ -- 0
-substring$ -- 619
-swap$ -- 211
-text.length$ -- 15
+substring$ -- 574
+swap$ -- 195
+text.length$ -- 14
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 148
+type$ -- 144
 warning$ -- 2
-while$ -- 112
-width$ -- 39
-write$ -- 392
-(There were 2 warnings)
+while$ -- 106
+width$ -- 38
+write$ -- 398
+(There were 2 error messages)

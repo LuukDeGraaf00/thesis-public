@@ -1,9 +1,5 @@
 \begin{thebibliography}{10}
 
-\bibitem{ecs-bevy}
-C.~Anderson.
-\newblock \url{https://bevyengine.org/learn/book/getting-started/ecs/}.
-
 \bibitem{unity-ecs-patent}
 J.~C. Ante and T.~Johansson.
 \newblock Method and system for improved performance of a video game engine,
@@ -145,10 +141,6 @@ T.~L. McDonell, J.~D. Meredith, and G.~Keller.
 D.~Meister, J.~Boksansk{\'y}, M.~Guthe, and J.~Bittner.
 \newblock On ray reordering techniques for faster gpu ray tracing.
 \newblock {\em Symposium on Interactive 3D Graphics and Games}, 2020.
-
-\bibitem{ecs-flecs}
-S.~Mertens.
-\newblock \url{https://github.com/amethyst/legion}.
 
 \bibitem{interleaved-SIMD}
 D.~Nuzman, I.~Rosen, and A.~Zaks.

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2024.1.20)  30 JAN 2024 22:28
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2024.1.20)  30 JAN 2024 22:30
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -340,16 +340,22 @@ Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
 LaTeX Info: Redefining \ref on input line 55.
 LaTeX Info: Redefining \pageref on input line 55.
 LaTeX Info: Redefining \nameref on input line 55.
+ (./proposal.out) (./proposal.out)
 \@outlinefile=\write3
 \openout3 = `proposal.out'.
 
 \c@lstlisting=\count296
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: End \AtBeginDocument code.
-<./Images//uulogo.png, id=4, 324.7332pt x 128.1588pt>
+<./Images//uulogo.png, id=136, 324.7332pt x 128.1588pt>
  [1
 
-{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]
+{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}] (./proposal.toc
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 2.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <5> on input line 2.
+)
 \tf@toc=\write4
 \openout4 = `proposal.toc'.
 
@@ -358,51 +364,18 @@ pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has b
                    \relax 
 l.99 \newpage
               [1]
-
-LaTeX Warning: Citation `accelerate-sum-types' on page 2 undefined on input line 103.
-
-
-LaTeX Warning: Citation `futhark-sum-types' on page 2 undefined on input line 103.
-
-<./Images//CodeIntro1.png, id=24, 665.48625pt x 68.50594pt>
-<./Images//CodeC.png, id=25, 911.65594pt x 659.46375pt>
-[2]
-<./Images//CodeIntro2.png, id=34, 650.43pt x 125.71968pt>
-<./Images//CodeIntro3.png, id=35, 729.47531pt x 145.29282pt>
-<./Images//CodeIntro4.png, id=36, 578.91281pt x 176.15813pt>
+<./Images//CodeIntro1.png, id=193, 665.48625pt x 68.50594pt>
+<./Images//CodeC.png, id=194, 911.65594pt x 659.46375pt>
+ [2]
+<./Images//CodeIntro2.png, id=203, 650.43pt x 125.71968pt>
+<./Images//CodeIntro3.png, id=204, 729.47531pt x 145.29282pt>
+<./Images//CodeIntro4.png, id=205, 578.91281pt x 176.15813pt>
  [3] [4]
-
-LaTeX Warning: Citation `accelerate-sum-types' on page 5 undefined on input line 211.
-
-
-LaTeX Warning: Citation `futhark-sum-types' on page 5 undefined on input line 211.
-
-
-LaTeX Warning: Citation `accelerate-sum-types' on page 5 undefined on input line 212.
-
-
-LaTeX Warning: Citation `unity-ecs-patent' on page 5 undefined on input line 214.
-
 
 LaTeX Warning: Citation `ecs-flecs' on page 5 undefined on input line 214.
 
 
 LaTeX Warning: Citation `ecs-bevy' on page 5 undefined on input line 214.
-
-
-LaTeX Warning: Citation `associated-types' on page 5 undefined on input line 225.
-
-
-LaTeX Warning: Citation `llama' on page 5 undefined on input line 226.
-
-
-LaTeX Warning: Citation `generic-programming' on page 5 undefined on input line 228.
-
-
-LaTeX Warning: Citation `accelerate-sum-types' on page 5 undefined on input line 236.
-
-
-LaTeX Warning: Citation `futhark-sum-types' on page 5 undefined on input line 240.
 
 [5]
 
@@ -411,26 +384,13 @@ LaTeX Warning: Citation `memory' on page 6 undefined on input line 257.
 
 LaTeX Warning: Citation `memory' on page 6 undefined on input line 261.
 
-<./Images//Performance1.png, id=58, 2368.85pt x 963.6pt>
-
-LaTeX Warning: Citation `LLVM' on page 6 undefined on input line 280.
-
-
-LaTeX Warning: Citation `intermediate-representation' on page 6 undefined on input line 280.
-
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 281.
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <5> on input line 281.
+<./Images//Performance1.png, id=239, 2368.85pt x 963.6pt>
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <8> on input line 281.
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <6> on input line 281.
-<./Images//Performance2.png, id=60, 2419.0375pt x 1013.7875pt>
+<./Images//Performance2.png, id=243, 2419.0375pt x 1013.7875pt>
 [6]
-
-LaTeX Warning: Citation `register-allocation' on page 7 undefined on input line 304.
-
 
 LaTeX Warning: Citation `memory' on page 7 undefined on input line 323.
 
@@ -438,197 +398,78 @@ LaTeX Warning: Citation `memory' on page 7 undefined on input line 323.
 
 LaTeX Warning: Citation `memory' on page 8 undefined on input line 345.
 
-
-LaTeX Warning: Citation `cache-prefetching' on page 8 undefined on input line 354.
-
-
-LaTeX Warning: Citation `instruction-level-parallelism' on page 8 undefined on input line 357.
-
-<./Images//Performance3.png, id=82, 1616.0375pt x 1214.5375pt>
-
-LaTeX Warning: Citation `instruction-level-parallelism' on page 8 undefined on input line 369.
-
-
-LaTeX Warning: Citation `thread-level-parallelism' on page 8 undefined on input line 378.
-
-<./Images//Performance4.png, id=83, 2168.1pt x 1174.3875pt>
-<./Images//Performance5.png, id=84, 2057.6875pt x 1214.5375pt>
+<./Images//Performance3.png, id=269, 1616.0375pt x 1214.5375pt>
+<./Images//Performance4.png, id=272, 2168.1pt x 1174.3875pt>
+<./Images//Performance5.png, id=273, 2057.6875pt x 1214.5375pt>
 [8]
-
-LaTeX Warning: Citation `interleaved-SIMD' on page 9 undefined on input line 420.
-
-<./Images//Performance6.png, id=94, 5129.1625pt x 702.625pt>
-
-LaTeX Warning: Citation `cache-prefetching' on page 9 undefined on input line 437.
-
-[9]
-<./Images//Performance7.png, id=106, 3242.1125pt x 451.6875pt>
-
-
-LaTeX Warning: Citation `raytracing-reorder-ray' on page 10 undefined on input line 463.
-
-
-LaTeX Warning: Citation `instruction-level-parallelism' on page 10 undefined on input line 469.
-
-
-LaTeX Warning: Citation `assembly-optimizations' on page 10 undefined on input line 471.
-
-
-LaTeX Warning: Citation `assembly-optimizations' on page 10 undefined on input line 478.
-
-
-LaTeX Warning: Citation `automatic-vectorization' on page 10 undefined on input line 480.
-
-<./Images//Performance8.png, id=108, 2158.0625pt x 1435.3625pt>
-
-LaTeX Warning: Citation `threads-independent-scheduling' on page 10 undefined on input line 500.
-
-[10]
-
-LaTeX Warning: Citation `accelerate-sum-types' on page 11 undefined on input line 526.
-
-<./Images//CodeMemory1.png, id=117, 381.67593pt x 155.07938pt>
-<./Images//CodeMemory2.png, id=118, 383.18156pt x 158.09062pt>
-
-LaTeX Warning: Citation `abstraction-vectorization' on page 11 undefined on input line 557.
-
-
-LaTeX Warning: Citation `abstraction-vectorization' on page 11 undefined on input line 559.
-
-
-LaTeX Warning: Citation `accelerate-sum-types' on page 11 undefined on input line 568.
-
-[11]
-<./Images//TaggedUnion.png, id=127, 3021.2875pt x 1084.05pt>
+<./Images//Performance6.png, id=287, 5129.1625pt x 702.625pt>
+ [9]
+<./Images//Performance7.png, id=300, 3242.1125pt x 451.6875pt>
+<./Images//Performance8.png, id=307, 2158.0625pt x 1435.3625pt>
+ [10]
+<./Images//CodeMemory1.png, id=322, 381.67593pt x 155.07938pt>
+<./Images//CodeMemory2.png, id=323, 383.18156pt x 158.09062pt>
+ [11]
+<./Images//TaggedUnion.png, id=335, 3021.2875pt x 1084.05pt>
  [12]
-<./Images//HashTableECS.png, id=136, 2619.7875pt x 1023.825pt>
- [13]
-
-LaTeX Warning: Citation `destructive-update-array' on page 14 undefined on input line 668.
-
-
-LaTeX Warning: Citation `automatic-vectorization' on page 14 undefined on input line 674.
-
-
-LaTeX Warning: Citation `accelerate-independent-regions' on page 14 undefined on input line 678.
-
-[14]
-<./Images//ConceptualFramework.png, id=150, 4627.2875pt x 2017.5375pt>
+<./Images//HashTableECS.png, id=344, 2619.7875pt x 1023.825pt>
+ [13] [14]
+<./Images//ConceptualFramework.png, id=362, 4627.2875pt x 2017.5375pt>
  [15]
-
-LaTeX Warning: Citation `ecs-origin' on page 16 undefined on input line 735.
-
-<./Images//ECSexample.png, id=159, 2419.0375pt x 1314.9125pt>
-
-LaTeX Warning: Citation `ecs-apecs' on page 16 undefined on input line 771.
-
-[16]
-<./Images//InterfaceCode1Annotated.png, id=169, 3222.0375pt x 622.325pt>
-<./Images//CodeInterface2.png, id=170, 538.26094pt x 105.39375pt>
-<./Images//CodeInterface3.png, id=172, 633.11531pt x 207.02344pt>
+<./Images//ECSexample.png, id=369, 2419.0375pt x 1314.9125pt>
+ [16]
+<./Images//InterfaceCode1Annotated.png, id=381, 3222.0375pt x 622.325pt>
+<./Images//CodeInterface2.png, id=382, 538.26094pt x 105.39375pt>
+<./Images//CodeInterface3.png, id=384, 633.11531pt x 207.02344pt>
  [17]
-
-LaTeX Warning: Citation `llama' on page 18 undefined on input line 828.
-
-<./Images//CodeType1.png, id=187, 608.2725pt x 168.63pt>
-<./Images//CodeType2.png, id=188, 635.37375pt x 279.29344pt>
-<./Images//CodeType3.png, id=189, 776.14969pt x 40.65187pt>
-[18]
-
-LaTeX Warning: Citation `associated-types' on page 19 undefined on input line 881.
-
-<./Images//CodeType4.png, id=201, 432.11438pt x 135.50626pt>
+<./Images//CodeType1.png, id=399, 608.2725pt x 168.63pt>
+<./Images//CodeType2.png, id=400, 635.37375pt x 279.29344pt>
+<./Images//CodeType3.png, id=401, 776.14969pt x 40.65187pt>
+ [18]
+<./Images//CodeType4.png, id=412, 432.11438pt x 135.50626pt>
 
 Overfull \hbox (4.60512pt too wide) in paragraph at lines 890--895
 \OT1/cmr/m/n/10 stan-dalone con-cept. A [] has unique types as-so-ci-ated with each type, while a []
  []
 
-<./Images//CodeType5.png, id=202, 758.08218pt x 131.74219pt>
-<./Images//CodeType6.png, id=203, 951.555pt x 32.37094pt>
-<./Images//CodeType7.png, id=204, 1130.72438pt x 96.36pt>
-[19] [20]
-<./Images//CodeType8.png, id=220, 579.66562pt x 103.88812pt>
-<./Images//CodeType9.png, id=222, 687.31781pt x 269.50688pt>
-<./Images//CodeType10.png, id=223, 756.57657pt x 182.93344pt>
+<./Images//CodeType5.png, id=413, 758.08218pt x 131.74219pt>
+<./Images//CodeType6.png, id=414, 951.555pt x 32.37094pt>
+<./Images//CodeType7.png, id=415, 1130.72438pt x 96.36pt>
+[19]
+<./Images//CodeType8.png, id=425, 579.66562pt x 103.88812pt>
+<./Images//CodeType9.png, id=427, 687.31781pt x 269.50688pt>
+<./Images//CodeType10.png, id=428, 756.57657pt x 182.93344pt>
+ [20]
+<./Images//CodeType11.png, id=437, 798.73407pt x 114.4275pt>
+<./Images//CodeType12.png, id=438, 767.11594pt x 204.01219pt>
+<./Images//CodeType13.png, id=439, 573.64313pt x 83.5622pt>
  [21]
-<./Images//CodeType11.png, id=233, 798.73407pt x 114.4275pt>
-<./Images//CodeType12.png, id=234, 767.11594pt x 204.01219pt>
-<./Images//CodeType13.png, id=235, 573.64313pt x 83.5622pt>
+<./Images//CodeType14.png, id=448, 971.88094pt x 125.71968pt>
+<./Images//CodeType15.png, id=449, 973.38657pt x 220.57407pt>
  [22]
-
-LaTeX Warning: Citation `datatype-generic-programming' on page 23 undefined on input line 1030.
-
-<./Images//CodeType14.png, id=244, 971.88094pt x 125.71968pt>
-<./Images//CodeType15.png, id=245, 973.38657pt x 220.57407pt>
-[23]
-
-LaTeX Warning: Citation `expression-problem' on page 24 undefined on input line 1074.
-
-<./Images//CodeType16.png, id=254, 417.05812pt x 188.20313pt>
-<./Images//CodeType17.png, id=255, 447.92343pt x 192.72pt>
-
-LaTeX Warning: Citation `polymorphic-variants-expression-problem' on page 24 undefined on input line 1092.
-
-<./Images//framework.png, id=256, 2417.03pt x 726.715pt>
-
-LaTeX Warning: Citation `accelerate-sum-types' on page 24 undefined on input line 1113.
-
-[24]
-<./Images//CodeType18.png, id=265, 891.33pt x 25.59563pt>
-<./Images//CodeType19.png, id=266, 1026.08344pt x 256.70906pt>
+<./Images//CodeType16.png, id=459, 417.05812pt x 188.20313pt>
+<./Images//CodeType17.png, id=460, 447.92343pt x 192.72pt>
+<./Images//framework.png, id=462, 2417.03pt x 726.715pt>
+ [23]
+<./Images//CodeType18.png, id=472, 891.33pt x 25.59563pt>
+<./Images//CodeType19.png, id=473, 1026.08344pt x 256.70906pt>
+ [24]
+<./Images//CodeType20.png, id=482, 972.63374pt x 127.22531pt>
+<./Images//CodeType21.png, id=483, 992.20688pt x 255.95625pt>
  [25]
-<./Images//CodeType20.png, id=275, 972.63374pt x 127.22531pt>
-<./Images//CodeType21.png, id=276, 992.20688pt x 255.95625pt>
+<./Images//CodeType22.png, id=493, 900.36375pt x 60.97781pt>
+<./Images//CodeType23.png, id=496, 927.465pt x 58.71938pt>
+<./Images//CodeType24.png, id=498, 773.89125pt x 230.36063pt>
  [26]
-<./Images//CodeType22.png, id=286, 900.36375pt x 60.97781pt>
-
-
-LaTeX Warning: Citation `accelerate-performance' on page 27 undefined on input line 1228.
-
-
-LaTeX Warning: Citation `accelerate-llvm' on page 27 undefined on input line 1229.
-
-<./Images//CodeType23.png, id=287, 927.465pt x 58.71938pt>
-
-LaTeX Warning: Citation `accelerate-array-fusion' on page 27 undefined on input line 1239.
-
-<./Images//CodeType24.png, id=288, 773.89125pt x 230.36063pt>
-[27]
-<./Images//CodeType25.png, id=298, 773.89125pt x 191.9672pt>
-<./Images//CodeType26.png, id=299, 995.97093pt x 288.3272pt>
-
-
-LaTeX Warning: Citation `accelerate-pattern-matching' on page 28 undefined on input line 1296.
-
-[28]
-<./Images//CodeType27.png, id=309, 852.18375pt x 193.47281pt>
- [29] [30]
-<./Images//Discussion1.png, id=326, 572.89032pt x 29.35968pt>
-
-
-LaTeX Warning: Citation `clash' on page 31 undefined on input line 1446.
-
-
-LaTeX Warning: Citation `hydra' on page 31 undefined on input line 1447.
-
-
-LaTeX Warning: Citation `kansas-lava' on page 31 undefined on input line 1448.
-
-
-LaTeX Warning: Citation `forsyde' on page 31 undefined on input line 1449.
-
-
-LaTeX Warning: Citation `shallow-and-deep' on page 31 undefined on input line 1453.
-
-
-LaTeX Warning: Citation `accelerate-sum-types' on page 31 undefined on input line 1463.
-
-
-LaTeX Warning: Citation `accelerate-sum-types' on page 31 undefined on input line 1464.
-
-[31]
-<./Images//Discussion2.png, id=337, 583.42969pt x 141.52875pt>
- [32] [33]
+<./Images//CodeType25.png, id=509, 773.89125pt x 191.9672pt>
+<./Images//CodeType26.png, id=510, 995.97093pt x 288.3272pt>
+ [27]
+<./Images//CodeType27.png, id=521, 852.18375pt x 193.47281pt>
+ [28] [29]
+<./Images//Discussion1.png, id=535, 572.89032pt x 29.35968pt>
+ [30]
+<./Images//Discussion2.png, id=555, 583.42969pt x 141.52875pt>
+ [31] [32]
 *geometry* verbose mode - [ newgeometry ] result:
 * driver: pdftex
 * paper: <default>
@@ -661,42 +502,33 @@ LaTeX Warning: Citation `accelerate-sum-types' on page 31 undefined on input lin
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
- (./proposal.bbl [34
+ (./proposal.bbl [33
 
 ]
-Underfull \hbox (badness 6316) in paragraph at lines 161--165
+Underfull \hbox (badness 6316) in paragraph at lines 153--157
 []\OT1/cmr/m/n/10 Nvidia.  Nvidia tesla v100 gpu ar-chi-tec-ture.  Ac-cessed at []$\OT1/cmtt/m/n/10 https : / / docs . nvidia . com / cuda /
  []
 
-) [35] (./proposal.aux)
+) [34] (./proposal.aux)
 
 LaTeX Warning: There were undefined references.
 
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
-
-Package rerunfilecheck Warning: File `proposal.out' has changed.
-(rerunfilecheck)                Rerun to get outlines right
-(rerunfilecheck)                or use package `bookmark'.
-
-Package rerunfilecheck Info: Checksums for `proposal.out':
-(rerunfilecheck)             Before: <no file>
-(rerunfilecheck)             After:  C940293E7EA001CFD2A3DC9C199EF141;4314.
+Package rerunfilecheck Info: File `proposal.out' has not changed.
+(rerunfilecheck)             Checksum: C940293E7EA001CFD2A3DC9C199EF141;4314.
  ) 
 Here is how much of TeX's memory you used:
- 12956 strings out of 480247
- 214314 string characters out of 5896151
- 777383 words of memory out of 5000000
- 30504 multiletter control sequences out of 15000+600000
+ 12991 strings out of 480247
+ 214897 string characters out of 5896151
+ 776383 words of memory out of 5000000
+ 30536 multiletter control sequences out of 15000+600000
  476181 words of font info for 51 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  68i,9n,77p,860b,470s stack positions out of 5000i,500n,10000p,200000b,80000s
  </home/luukdegraaf00/.texlive2021/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1000.600pk></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx9.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmcsc10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsl10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti9.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb>
-Output written on proposal.pdf (36 pages, 358035 bytes).
+Output written on proposal.pdf (35 pages, 363736 bytes).
 PDF statistics:
- 530 PDF objects out of 1000 (max. 8388607)
- 399 compressed objects within 4 object streams
- 199 named destinations out of 1000 (max. 500000)
- 266 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 708 PDF objects out of 1000 (max. 8388607)
+ 576 compressed objects within 6 object streams
+ 196 named destinations out of 1000 (max. 500000)
+ 530 words of extra memory for PDF output out of 10000 (max. 10000000)
 

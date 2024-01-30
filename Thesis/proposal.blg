@@ -3,56 +3,50 @@ Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: proposal.aux
 The style file: abbrv.bst
 Database file #1: refs.bib
-Repeated entry---line 78 of file refs.bib
- : @misc{ecs-apecs
- :                ,
-I'm skipping whatever remains of this entry
-Repeated entry---line 100 of file refs.bib
- : @misc{expression-problem
- :                         ,
-I'm skipping whatever remains of this entry
+Warning--I didn't find a database entry for "ecs-flecs"
+Warning--I didn't find a database entry for "ecs-bevy"
 Warning--I didn't find a database entry for "memory"
 Warning--empty booktitle in polymorphic-variants-expression-problem
 Warning--empty booktitle in instruction-level-parallelism
-You've used 36 entries,
+You've used 34 entries,
             2118 wiz_defined-function locations,
-            706 strings with 10627 characters,
-and the built_in function-call counts, 12804 in all, are:
-= -- 1255
-> -- 621
+            702 strings with 10498 characters,
+and the built_in function-call counts, 12416 in all, are:
+= -- 1221
+> -- 607
 < -- 14
-+ -- 247
-- -- 207
-* -- 767
-:= -- 2038
-add.period$ -- 115
-call.type$ -- 36
-change.case$ -- 205
++ -- 241
+- -- 203
+* -- 757
+:= -- 1974
+add.period$ -- 111
+call.type$ -- 34
+change.case$ -- 199
 chr.to.int$ -- 0
-cite$ -- 38
-duplicate$ -- 549
-empty$ -- 996
-format.name$ -- 207
-if$ -- 2812
+cite$ -- 36
+duplicate$ -- 535
+empty$ -- 952
+format.name$ -- 203
+if$ -- 2726
 int.to.chr$ -- 0
-int.to.str$ -- 36
+int.to.str$ -- 34
 missing$ -- 24
-newline$ -- 180
-num.names$ -- 78
-pop$ -- 273
+newline$ -- 172
+num.names$ -- 74
+pop$ -- 255
 preamble$ -- 1
-purify$ -- 171
+purify$ -- 165
 quote$ -- 0
-skip$ -- 463
+skip$ -- 447
 stack$ -- 0
-substring$ -- 574
-swap$ -- 195
+substring$ -- 564
+swap$ -- 193
 text.length$ -- 14
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 144
+type$ -- 136
 warning$ -- 2
-while$ -- 106
-width$ -- 38
-write$ -- 398
-(There were 2 error messages)
+while$ -- 102
+width$ -- 36
+write$ -- 384
+(There were 5 warnings)

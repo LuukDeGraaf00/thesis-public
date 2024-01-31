@@ -112,6 +112,12 @@ interVariant2 (x, y, z) (T3 a b c) = A.fold Benchmark.min Miss (A.generate (I1 (
 benchmark :: Benchmark -> P.IO ()
 benchmark x = defaultMain [x]
 
+
+example :: P.IO ()
+example = do 
+  b (1000, 1000, 1000)
+  b (100000, 100000, 100000)
+
 b :: (Int, Int, Int) -> P.IO ()
 b r = benchmark $ bgroup "Devices" [total r CPU.run1 "CPU", total r GPU.run1 "GPU"]
 

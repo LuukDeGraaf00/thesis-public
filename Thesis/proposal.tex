@@ -2,7 +2,7 @@
 
 \usepackage[margin = 3cm]{geometry}
 \usepackage[table]{xcolor}
-\usepackage{graphicx}
+\usepackage[draft]{graphicx}
 \usepackage{hyperref}
 \usepackage{listings}
 \usepackage{color}
@@ -112,8 +112,8 @@
 
 \section{Introduction}
 
-Array languages such as APL, Accelerate\cite{accelerate} and Futhark\cite{futhark-sum-types} can operate on a higher abstraction level compared to general-purpose languages through collective operations. 
-The abstraction cam be used to implicitly execute instructions in parallel on all elements within an array. 
+Array languages such as APL\cite{apl}, Accelerate\cite{accelerate} and Futhark\cite{futhark-sum-types} can operate on a higher abstraction level compared to general-purpose languages through collective operations. 
+The abstraction can be used to implicitly execute instructions in parallel, on multiple elements within an array. 
 Data-parallel \type{map} and \type{fold} functions are sufficient to cover a wide range of high-performance applications.
 A naive intersection algorithm for a raytracer can therefore be defined incredibly concisely.
 
@@ -206,27 +206,24 @@ Concretely, the contributions of this thesis include:
     \item A collection of multiple variants that can be completely agnostic to its internal representation
 \end{itemize}
 
-\newpage
-
 \subsection{Related Work}
 
-First performance considerations must be understood, to capture the most relevant low-level optimizations.
-This induces the need for a flexible and type-safe interface around these optimizations, which has been achieved through type-level and datatype generic programming.
+First the performance considerations must be understood, to capture the most relevant low-level optimizations.
+This induces the need for a flexible and type-safe interface around these optimizations, which will be done through type-level and datatype generic programming.
 Relevance is established by an implementation in the data-parallel language Accelerate, which is deeply embedded within Haskell.
 
 \paragraph{Performance}
 
-Capturing low-level optimizations in high-level languages has been achieved by various methods; such as compiler optimizations, a Foreign Function Interface (FFI), compiler intrinsics or embedding domain-specific languages. 
-
-
-For variant types in particular it involves resorting to untyped code and bitwise operations, to gain control over the memory representation and (de)-construction.
+Capturing low-level optimizations in high-level languages can be done through various methods; such as compiler optimizations\cite{compiler-optimization}, a Foreign Function Interface\cite{ffi}, compiler intrinsics or embedded domain-specific languages\cite{accelerate-llvm}. 
+For data with multiple representations in a high-performance environment it often involves resorting to untyped code and bitwise operations, to gain control over the memory representation and (de)-construction.
 In data-parallel applications primitive types are distributed over multiple arrays to facilitate vectorization.
-It is not apparent what the representation of a tagged union should be, as they inherently break vectorization in most cases. 
+It is not apparent what the representation of a tagged union should be\cite{accelerate-sum-types}, as they inherently break vectorization in most cases. 
 The functional data-parallel languages Accelerate\cite{accelerate-sum-types} and Futhark\cite{futhark-sum-types} implicitly distribute primitive types in composite datatypes over multiple arrays.
 Both implementations have limited deduplication capabilities, but research has been done to integrate a memory efficient tagged union in Accelerate\cite{accelerate-sum-types}.
-Game-engines, which deal with many clusters of data, have a fundamentally different approach as they have widely adopted the Entity-Component-System (ECS) pattern. 
-Many implementations; such as Unity\cite{unity-ecs-patent}, Flecs\cite{ecs-flecs} and Bevy\cite{ecs-bevy}, incite a re-organization of the internal representation when a variant change occurs at runtime.
-A type-safe and performant implementation is notably hard due to having to statically resolve all interactions between the representations, which means meta-programming and untyped code are extremely prevalent. 
+Game-engines, which deal with many clusters of data, have a fundamentally different approach as they have widely adopted the Entity-Component-System (ECS) pattern\cite{ecs-origin}. 
+Many implementations; such as Unity\cite{unity-ecs-patent}, Flecs\cite{ecs-flecs} and Bevy\cite{ecs-bevy}, incite a collective re-organization of data when a variant change occurs at runtime.
+A type-safe and performant implementation is notably hard, as all interactions between the representations must be statically resolved.
+More generally, research on zero cost abstractions over memory representations are prevalent in C++ libraries such as LLAMA\cite{llama} and Alpaka\cite{alpaka}. 
 
 \paragraph{Interface}
 
@@ -235,23 +232,22 @@ Constructors can be local to an unique ADT (nominally typed) or exist as indepen
 Deconstructing is done by pattern matching, where functions natively branch on the current active variant.
 In Haskell sum types are nominally typed, which means variants are not standalone types and cannot exist safely outside the ADT.
 Structural sum types are often called extensible or open sum types, as they do not have to be explicitly declared before use.
-In OCaml these are natively supported as polymorphic variants, while Futhark is completely structurally typed and refers to them as sum types.
-Deriving an efficient internal representation for a user-defined datatype can be done statically by type-indexing types\cite{associated-types}, which are called {\it traits} in c++.
-Some libraries also create a low-level abstractions which allows for custom memory representations\cite{llama} or employ meta-programming to be flexible in the memory representation.
-Datatype-generic functions, which parametrize on the structure of a datatype, can be used to create mappings between these computed representations.
+In OCaml these are natively supported as polymorphic variants\cite{polymorphic-variants}, while Futhark is completely structurally typed and refers to them as sum types\cite{futhark-sum-types}.
+Deriving a memory representation for user-defined datatype can be done statically through type-indexed types\cite{type-indexed}\cite{associated-types}.
+In C++ these are called {\it traits}\cite{c++traits} and in Haskell {\it type families}\cite{type-families}. 
+As stated earlier, some C++ libraries also attempt to create zero cost abstractions around memory representations\cite{llama}\cite{alpaka}.
+Datatype-generic programming\cite{datatype-generic-programming}, which parametrizes on the composition of a datatype, can be used to create mappings between the derived representations.
 Both concepts are used in highly generic libraries for a wide-range of applications\cite{generic-programming}. 
 
 \paragraph{Implementation}
 
-Variant types are rare in array languages, likely due to the infrequency of non-uniform data in data-parallel applications and the required low-level control in the instances they are needed.
-In functional languages such as Accelerate and Futhark they arguably only exist to complete the ADT archetype.
-Some implementation details are therefore primarily centered around these two languages.
+Variant types are rare in array languages, likely due to a combination of the infrequency of non-uniform data in data-parallel applications and the required low-level control in the instances they are needed.
+The functional array languages Accelerate and Futhark have only recently gotten support for sum types\cite{accelerate-sum-types}\cite{futhark-sum-types}.
 Accelerate is a data-parallel array language deeply embedded within Haskell, where sum types are currently represented as a non-compact tagged union.
-Research has been done on a compact tagged union representation for parallel arrays, which has been named a {\it Recursive Tagged Union}\cite{accelerate-sum-types}.
-The representation uses a unified tag for nested sum types, which optimizes memory usage at the cost of tag (de-)construction but has not yet been implemented. 
-This paper fundamentally distinct itself by looking beyond the sum type and implementing an extendable and modular interface for types with multiple variants, rather than a single concrete layout. 
-Futhark is a functional structurally typed data-parallel array language, where only identical primitive types are deduplicated.
-The research pertains primarily on including structural sum types to the Futhark compiler\cite{futhark-sum-types}.
+Research has been done on a compact tagged union representation for parallel arrays in particular, which has been named a {\it Recursive Tagged Union}\cite{accelerate-sum-types}.
+The representation uses a unified tag for nested sum types, which optimizes memory usage at the cost of tag (de-)construction but has not yet been integrated within Accelerate. 
+Futhark is a functional structurally typed data-parallel array language, where the sum types only deduplicate identical primitive types.
+The research pertains primarily to including structural sum types to the Futhark compiler\cite{futhark-sum-types}, rather than performance.
 
 \newpage
 

@@ -13,7 +13,7 @@ J.~C. Ante and T.~Johansson.
 
 \bibitem{clash}
 C.~Baaij, M.~Kooijman, J.~Kuper, A.~Boeijink, and M.~Gerards.
-\newblock C?ash: Structural descriptions of synchronous hardware using haskell.
+\newblock Clash: Structural descriptions of synchronous hardware using haskell.
 \newblock In {\em 2010 13th Euromicro Conference on Digital System Design:
   Architectures, Methods and Tools}, pages 714--721, 2010.
 
@@ -28,6 +28,11 @@ J.-L. Baer and T.-F. Chen.
 J.~Carpay.
 \newblock apecs: Fast entity-component-system library for game programming.
 \newblock Accessed at \url{https://hackage.haskell.org/package/apecs}.
+
+\bibitem{compiler-optimization}
+S.~Carr, K.~S. McKinley, and C.-W. Tseng.
+\newblock Compiler optimizations for improving data locality.
+\newblock In {\em ASPLOS VI}, 1994.
 
 \bibitem{register-allocation}
 G.~J. Chaitin, M.~A. Auslander, A.~K. Chandra, J.~Cocke, M.~E. Hopkins, and
@@ -53,6 +58,17 @@ D.~Chisnall.
 \newblock The challenge of cross-language interoperability.
 \newblock {\em Commun. ACM}, 56(12):50–56, dec 2013.
 
+\bibitem{ffi}
+R.~Clifton-Everest, T.~L. McDonell, M.~M.~T. Chakravarty, and G.~Keller.
+\newblock {Embedding Foreign Code}.
+\newblock In {\em PADL '14: The 16th International Symposium on Practical
+  Aspects of Declarative Languages}, LNCS. Springer-Verlag, Jan. 2014.
+
+\bibitem{memory}
+U.~Drepper.
+\newblock What every programmer should know about memory.
+\newblock 2007.
+
 \bibitem{automatic-vectorization}
 J.~G. Feng, Y.~P. He, and Q.~M. Tao.
 \newblock Evaluation of compilers’ capability of automatic vectorization
@@ -68,6 +84,11 @@ M.~Fleuren.
 A.~Fog.
 \newblock Optimizing subroutines in assembly language: An optimization guide
   for x86 platforms, 2008.
+
+\bibitem{polymorphic-variants}
+J.~Garrigue.
+\newblock Programming with polymorphic variants.
+\newblock 10 1998.
 
 \bibitem{polymorphic-variants-expression-problem}
 J.~Garrigue.
@@ -91,6 +112,16 @@ A.~Gill, T.~Bull, G.~Kimmell, E.~Perrins, E.~Komp, and B.~Werling.
 B.~M. Gruber, G.~Amadio, J.~Blomer, A.~Matthes, R.~Widera, and M.~Bussmann.
 \newblock Llama: The low‐level abstraction for memory access.
 \newblock {\em Software: Practice and Experience}, 53(1):115–141, Mar. 2022.
+
+\bibitem{type-indexed}
+R.~Hinze, J.~Jeuring, and A.~Löh.
+\newblock Type-indexed data types.
+\newblock pages 148--174, 06 2002.
+
+\bibitem{apl}
+K.~E. Iverson.
+\newblock {\em A programming language}.
+\newblock John Wiley \& Sons, Inc., USA, 1962.
 
 \bibitem{abstraction-vectorization}
 S.~Jubertie, I.~Masliah, and J.~Falcou.
@@ -156,6 +187,11 @@ D.~Meister, J.~Boksansk{\'y}, M.~Guthe, and J.~Bittner.
 S.~Mertens.
 \newblock \url{https://github.com/amethyst/legion}.
 
+\bibitem{c++traits}
+N.~C. Myers.
+\newblock {Traits: a new and useful template technique}.
+\newblock {\em C++ Report}, June 1995.
+
 \bibitem{interleaved-SIMD}
 D.~Nuzman, I.~Rosen, and A.~Zaks.
 \newblock Auto-vectorization of interleaved data for simd.
@@ -203,6 +239,11 @@ M.~Schlansker, B.~R. Rau, S.~A. Mahlke, V.~Kathail, R.~Johnson, S.~Anik, and
   hardware complexity.
 \newblock 1997.
 
+\bibitem{type-families}
+T.~Schrijvers, M.~Sulzmann, and S.~Peyton~Jones.
+\newblock Towards open type functions for haskell.
+\newblock 01 2007.
+
 \bibitem{shallow-and-deep}
 J.~Svenningsson and E.~Axelsson.
 \newblock Combining deep and shallow embedding of domain-specific languages.
@@ -225,5 +266,12 @@ B.~Wijgers.
 \newblock Investigating the performance of the implementations of embedded
   languages in haskell.
 \newblock Master's thesis, Utrecht University, 2022.
+
+\bibitem{alpaka}
+E.~Zenker, B.~Worpitz, R.~Widera, A.~Huebl, G.~Juckeland, A.~Kn{\"u}pfer, W.~E.
+  Nagel, and M.~Bussmann.
+\newblock Alpaka--an abstraction library for parallel kernel acceleration.
+\newblock In {\em 2016 IEEE International Parallel and Distributed Processing
+  Symposium Workshops (IPDPSW)}, pages 631--640. IEEE, 2016.
 
 \end{thebibliography}

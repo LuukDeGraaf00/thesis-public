@@ -134,7 +134,7 @@ type SizeInBits a = CustomBitSize (EltR a)
 type family CustomBitSize (a :: *) :: Nat where
     CustomBitSize (a, b) = CustomBitSize a + CustomBitSize b 
     CustomBitSize ()     = 0                   
-    CustomBitSize a      = CustomBitSize a
+    CustomBitSize a      = BitSize a
 
 -----------------------------------------------------------------------------------------------
 
@@ -287,5 +287,23 @@ intersect (Con2 triangle) = triangleIntersect triangle
 
 --------------------------------------------------------------------
 
+data Product (constructor :: * -> *) (type :: *)
 
+
+-----------------------------------------------------------------------
+
+data TagR a where
+    TagRtag    :: TAG -> TagR a -> TagR (TAG, a)
+    TagRunit   :: TagR ()
+    TagRsingle :: a -> TagR a
+    TagRpair   :: TagR a -> TagR b -> TagR (a, b)
+
+
+
+---------------------------------------------------------------------------
+
+map :: (Variant f as -> Variant f bs) -> Collection f as -> Collection f bs
+
+map :: (Variant as -> Variant bs) -> Collection cs -> Collection (Union cs as)
+map = undefined
 

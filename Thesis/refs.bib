@@ -1,38 +1,35 @@
 @misc{threads-independent-scheduling,
     Author = {Nvidia},
-    Title = {NVIDIA TESLA V100 GPU ARCHITECTURE},
-    Site = {\url{https://docs.nvidia.com/cuda/volta-tuning-guide/index.html}}
+    Title  = {NVIDIA TESLA V100 GPU ARCHITECTURE},
+    Note   = {Accessed at \url{https://docs.nvidia.com/cuda/volta-tuning-guide/index.html}}
 }
 
-@misc{accelerate-sum-types,
+@mastersthesis{accelerate-sum-types,
     Author = {Rick van Hoef},
-    Title = {Accelerating Sum Types},
-    Year = {2022}
+    Title  = {Accelerating Sum Types},
+    Year   = {2022},
+    School = {Utrecht University}
 }
 
-@misc{accelerate-independent-regions,
+@mastersthesis{accelerate-independent-regions,
     Author = {Martijn Fleuren},
-    Title = {Independently Computed Regions in a Data Parallel Array Language},
-    Year = {2020}
+    Title  = {Independently Computed Regions in a Data Parallel Array Language},
+    Year   = {2020},
+    School = {Utrecht University}
 }
 
-@misc{accelerate-performance,
+@mastersthesis{accelerate-performance,
     Author = {Bart Wijgers},
-    Title = {Investigating the Performance of the Implementations of Embedded Languages in Haskell},
-    Year = {2022}
+    Title  = {Investigating the Performance of the Implementations of Embedded Languages in Haskell},
+    Year   = {2022},
+    School = {Utrecht University}
 }
 
 @misc{futhark-sum-types,
     Author = {Robert Schenck},
-    Title = {Sum types in Futhark},
-    Year = {2019}
-}
-
-@misc{memory,
-  title={What Every Programmer Should Know About Memory},
-  author={Ulrich Drepper},
-  year={2007},
-  url={https://api.semanticscholar.org/CorpusID:6440708}
+    Title  = {Sum types in Futhark},
+    Year   = {2019},
+    School = {University of Copenhagen}
 }
 
 @misc{assembly-optimizations,
@@ -42,52 +39,40 @@
 	publisher	= {Copenhagen University College of Engineering}
 }
 
-
 @misc{ecs-origin,
     author  = {Adam Martin},
     title   = {Entity Systems are the future of MMOG development},
     year    = {2007},
-    site    = {\url{https://t-machine.org/index.php/2007/09/03/entity-systems-are-the-future-of-mmog-development-part-1/}}
+    note    = {Accessed at \url{https://t-machine.org/index.php/2007/09/03/entity-systems-are-the-future-of-mmog-development-part-1/}}
 }
 
 @misc{unity-ecs-patent,
     title     = "Method and system for improved performance of a video game engine",
     number    = "10599560",
-    author    = "Ante, Joachim Christoph and Johansson, Tim",
+    author    = {Joachim Christoph Ante and Tim Johansson},
     year      = "2020",
     month     = "March",
-    url       = "https://patents.google.com/patent/US10599560B2/en?q=(US10599560B2)&oq=US10599560B2"
+    note      = {Accessed at \url{https://patents.google.com/patent/US10599560B2/en?q=(US10599560B2)&oq=US10599560B2}}
 }
 
 @misc{ecs-apecs,
-    author = {Jonas Carpay},
-    title = {apecs: Fast Entity-Component-System library for game programming},
-    howpublished = {\url{https://hackage.haskell.org/package/apecs}}
+    author       = {Jonas Carpay},
+    title        = {apecs: Fast Entity-Component-System library for game programming},
+    note         = {Accessed at \url{https://hackage.haskell.org/package/apecs}}
 }
 
 @misc{ecs-specs,
-    author = {Amethyst Foundation},
-    title = {The Specs Book},
-    howpublished = {\url{https://specs.amethyst.rs/docs/tutorials/}}
-}
-
-@misc{ecs-flecs,
-    author       = {Sander Mertens},
-    howpublished = {\url{https://github.com/amethyst/legion}}
-}
-
-@misc{ecs-bevy,
-    author       = {Carter Anderson},
-    howpublished = {\url{https://bevyengine.org/learn/book/getting-started/ecs/}}
+    author          = {Amethyst Foundation},
+    title           = {The Specs Book},
+    note            = {Accessed at \url{https://specs.amethyst.rs/docs/tutorials/}}
 }
 
 @misc{expression-problem,
-    author = {Philip Wadler},
-    title = {The Expression Problem},
-    year = 1998,
-    note = {Accessed at \url{https://homepages.inf.ed.ac.uk/wadler/papers/expression/expression.txt}}
+    author          = {Philip Wadler},
+    title           = {The Expression Problem},
+    year            = 1998,
+    note            = {Accessed at \url{https://homepages.inf.ed.ac.uk/wadler/papers/expression/expression.txt}}
 }
-
 
 @article{register-allocation,
     author  = {G. J. Chaitin and M. A. Auslander and A. K. Chandra and J. Cocke and M. E. Hopkins and P. W. Markstein},
@@ -195,10 +180,10 @@
 }
 
 @inproceedings{instruction-level-parallelism,
-  title={Achieving high levels of instruction-level parallelism with reduced hardware complexity},
-  author={Mike Schlansker and B. Ramakrishna Rau and Scott A. Mahlke and Vinod Kathail and Richard Johnson and Sadun Anik and Santosh G. Abraham},
-  year={1997},
-  url={https://api.semanticscholar.org/CorpusID:16033302}
+  title     ={Achieving high levels of instruction-level parallelism with reduced hardware complexity},
+  author    ={Mike Schlansker and B. Ramakrishna Rau and Scott A. Mahlke and Vinod Kathail and Richard Johnson and Sadun Anik and Santosh G. Abraham},
+  year      ={1997},
+  url       ={https://api.semanticscholar.org/CorpusID:16033302}
 }
 
 @article{thread-level-parallelism,    
@@ -231,15 +216,12 @@
     series = {PLDI '06}
 }
 
-@inproceedings{raytracing-reorder-ray,
-    title       = "On Ray Reordering Techniques for Faster GPU Ray Tracing",
-    author      = "Daniel Meister 0002 and Jakub Boksansk{\'y} and Michael Guthe and Jir{\'i} Bittner",
-    booktitle   = "I3D '20: Symposium on Interactive 3D Graphics and Games, San Francisco, CA, USA, September 15-17, 2020",
-    publisher   = "ACM",
-    year        = "2020",
-    editor      = "Dan Casas and Eric Haines and Sheldon Andrews and Natalya Tatarchuk and Zdravko Velinov",
-    ISBN        = "978-1-4503-7589-4",
-    pages       = "13:1--13:9",
+@article{raytracing-reorder-ray,
+    title   ={On Ray Reordering Techniques for Faster GPU Ray Tracing},
+    author  ={Daniel Meister and Jakub Boksansk{\'y} and Michael Guthe and Jiř{\'i} Bittner},
+    journal ={Symposium on Interactive 3D Graphics and Games},
+    year    ={2020},
+    url     ={https://api.semanticscholar.org/CorpusID:218489608}
 }
 
 @article{automatic-vectorization,
@@ -415,8 +397,9 @@
 }
 
 @inproceedings{polymorphic-variants-expression-problem,
-    title={Code reuse through polymorphic variants},
-    author={Jacques Garrigue},
-    year={2000},
-    url={https://api.semanticscholar.org/CorpusID:60104645}
+    title     = {Code reuse through polymorphic variants},
+    author    = {Jacques Garrigue},
+    year      = {2000},   
+    publisher = {Presented at FOSE-2000},
+    url       = {https://api.semanticscholar.org/CorpusID:60104645}
 }

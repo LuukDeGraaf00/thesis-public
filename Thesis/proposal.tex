@@ -1304,7 +1304,7 @@ Stated more generally it is not possible to represent choice elements within a d
 Manual control flow is possible but Accelerate circumvents this restriction by explicitly defining all choice elements within a datatype.
 When encountering a datatype with multiple choices, the function is repeatedly evaluated on a dummy type which contains the corresponding choice element.
 Each deconstructor can therefore match only on the dummy type with the corresponding tag, which mean all possible branches can be obtained.
-This is possible as \type{pattern synonyms} do not have to be isomorphic and the stub type is ignored within the Accelerate compiler.
+This is possible as pattern synonyms do not have to be isomorphic and the stub type is ignored within the Accelerate compiler.
 As pattern matching cannot be overloaded in Haskell, the \type{match} operator is used to generate all choice elements recursively\cite{accelerate-pattern-matching}.
 
 \newpage
@@ -1430,7 +1430,7 @@ In summary, the framework but more specifically the deduplication algorithm appe
 
 In this paper some fundamental choices have been made without extensive argumentation.
 This chapter is used to highlight these choices and provide further reasoning for the choices that have been made.
-It also highlights some limitations of the framework and ways these can be resolved.
+It also highlights some limitations of the framework and ways these potentially can be resolved.
 
 \subsection{Non-variant types}
 
@@ -1440,10 +1440,11 @@ Rather than deduplication, different padding strategies can be used to create mu
 The datatype-generic programming must be adapted to facilitate padding, which has already been previously discussed.
 Ergonomic switching between representations can be achieved with a similar higher-kinded type constructor as \type{Variant}.
 
-\begin{verbatim}
-    data Product (constructor :: * -> *) (type :: *)
-\end{verbatim}
-
+\begin{figure}[hbt!]
+    \hspace{1em}
+    \includegraphics[scale=0.4]{Discussion1.png}
+\end{figure}
+\vspace{-1em}
 
 \subsection{Embedded Domain-Specific Language}
 
@@ -1498,13 +1499,10 @@ Since tags are statically determined for each type individually, nested pattern 
 Currently the datatype \type{TagR} is used, where \type{Just (Just a)} is represented as \type{TagRtag 1 (TagRtag 1 (TagRsingle a))}. 
 Pattern matching on the first \type{Just} would remove one layer, and the rest is propagated along.
 
-\begin{verbatim}
-    data TagR a where
-        TagRtag    :: TAG -> TagR a -> TagR (TAG, a)
-        TagRunit   :: TagR ()
-        TagRsingle :: ScalarType a -> TagR a
-        TagRpair   :: TagR a -> TagR b -> TagR (a, b)
-\end{verbatim}
+\begin{figure}[hbt!]
+    \hspace{1em}
+    \includegraphics[scale=0.4]{Discussion2.png}
+\end{figure}
 
 An important detail is that these tags are generated statically, for all possible permutations.
 In a type with deduplicated fields the {\it nested} datatype is not necessarily available, as it might be constructed through different fields.
@@ -1564,7 +1562,6 @@ An implementation was realized in Accelerate, an embedded domain-specific data-p
 Concretely, the low-level control of the second research question has been obtained through polymorphic variant types that are flexible in their memory representation.
 It creates the foundation for answering the first research question, where low-level control has been established through type-level and datatype-generic programming. 
 
-
 \subsection{Future Work}
 
 Within this thesis a notable focus was the performance of predictable non-uniformity, which is data that is not dependant on a previous computation.
@@ -1575,7 +1572,9 @@ It can be categorized together with other applications that can potentially acce
 
 \newpage
 
-\bibliographystyle{plain}
+\newgeometry{margin = 2cm}
+
+\bibliographystyle{abbrv}
 \bibliography{refs}
 
 \end{document}

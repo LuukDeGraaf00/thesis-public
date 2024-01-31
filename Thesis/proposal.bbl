@@ -1,5 +1,9 @@
 \begin{thebibliography}{10}
 
+\bibitem{ecs-bevy}
+C.~Anderson.
+\newblock \url{https://bevyengine.org/learn/book/getting-started/ecs/}.
+
 \bibitem{unity-ecs-patent}
 J.~C. Ante and T.~Johansson.
 \newblock Method and system for improved performance of a video game engine,
@@ -37,6 +41,12 @@ M.~M.~T. Chakravarty, G.~Keller, S.~P. Jones, and S.~Marlow.
 \newblock In {\em Proceedings of the 32nd ACM SIGPLAN-SIGACT Symposium on
   Principles of Programming Languages}, POPL '05, page 1–13, New York, NY,
   USA, 2005. Association for Computing Machinery.
+
+\bibitem{accelerate}
+M.~M.~T. Chakravarty, G.~Keller, S.~Lee, T.~L. McDonell, and V.~Grover.
+\newblock {Accelerating Haskell array codes with multicore GPUs}.
+\newblock In {\em DAMP '11: The 6th workshop on Declarative Aspects of
+  Multicore Programming}. ACM, Jan. 2011.
 
 \bibitem{intermediate-representation}
 D.~Chisnall.
@@ -142,6 +152,10 @@ D.~Meister, J.~Boksansk{\'y}, M.~Guthe, and J.~Bittner.
 \newblock On ray reordering techniques for faster gpu ray tracing.
 \newblock {\em Symposium on Interactive 3D Graphics and Games}, 2020.
 
+\bibitem{ecs-flecs}
+S.~Mertens.
+\newblock \url{https://github.com/amethyst/legion}.
+
 \bibitem{interleaved-SIMD}
 D.~Nuzman, I.~Rosen, and A.~Zaks.
 \newblock Auto-vectorization of interleaved data for simd.
@@ -179,7 +193,8 @@ I.~Sander and A.~Jantsch.
 
 \bibitem{futhark-sum-types}
 R.~Schenck.
-\newblock Sum types in futhark, 2019.
+\newblock Sum types in futhark.
+\newblock Master's thesis, University of Copenhagen, 2019.
 
 \bibitem{instruction-level-parallelism}
 M.~Schlansker, B.~R. Rau, S.~A. Mahlke, V.~Kathail, R.~Johnson, S.~Anik, and

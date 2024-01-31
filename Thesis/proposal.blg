@@ -1,52 +1,50 @@
-This is BibTeX, Version 0.99d (TeX Live 2022/dev/Debian)
+This is BibTeX, Version 0.99d (TeX Live 2020/Debian)
 Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: proposal.aux
 The style file: abbrv.bst
 Database file #1: refs.bib
-Warning--I didn't find a database entry for "ecs-flecs"
-Warning--I didn't find a database entry for "ecs-bevy"
 Warning--I didn't find a database entry for "memory"
 Warning--empty booktitle in polymorphic-variants-expression-problem
 Warning--empty booktitle in instruction-level-parallelism
-You've used 34 entries,
+You've used 37 entries,
             2118 wiz_defined-function locations,
-            702 strings with 10498 characters,
-and the built_in function-call counts, 12416 in all, are:
-= -- 1221
-> -- 607
+            710 strings with 10865 characters,
+and the built_in function-call counts, 13174 in all, are:
+= -- 1289
+> -- 649
 < -- 14
-+ -- 241
-- -- 203
-* -- 757
-:= -- 1974
-add.period$ -- 111
-call.type$ -- 34
-change.case$ -- 199
++ -- 258
+- -- 217
+* -- 797
+:= -- 2108
+add.period$ -- 120
+call.type$ -- 37
+change.case$ -- 213
 chr.to.int$ -- 0
-cite$ -- 36
-duplicate$ -- 535
-empty$ -- 952
-format.name$ -- 203
-if$ -- 2726
+cite$ -- 39
+duplicate$ -- 564
+empty$ -- 1016
+format.name$ -- 217
+if$ -- 2882
 int.to.chr$ -- 0
-int.to.str$ -- 34
-missing$ -- 24
-newline$ -- 172
-num.names$ -- 74
-pop$ -- 255
+int.to.str$ -- 37
+missing$ -- 25
+newline$ -- 186
+num.names$ -- 80
+pop$ -- 284
 preamble$ -- 1
-purify$ -- 165
+purify$ -- 178
 quote$ -- 0
-skip$ -- 447
+skip$ -- 465
 stack$ -- 0
-substring$ -- 564
-swap$ -- 193
+substring$ -- 579
+swap$ -- 196
 text.length$ -- 14
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 136
+type$ -- 148
 warning$ -- 2
-while$ -- 102
-width$ -- 36
-write$ -- 384
-(There were 5 warnings)
+while$ -- 108
+width$ -- 39
+write$ -- 412
+(There were 3 warnings)

@@ -112,8 +112,8 @@
 
 \section{Introduction}
 
-Array languages such as APL, Accelerate\cite{accelerate-sum-types} and Futhark\cite{futhark-sum-types} can operate on a higher abstraction level compared to general-purpose languages through collective operations. 
-This is used to implicitly execute instructions in parallel on elements within array. 
+Array languages such as APL, Accelerate\cite{accelerate} and Futhark\cite{futhark-sum-types} can operate on a higher abstraction level compared to general-purpose languages through collective operations. 
+The abstraction cam be used to implicitly execute instructions in parallel on all elements within an array. 
 Data-parallel \type{map} and \type{fold} functions are sufficient to cover a wide range of high-performance applications.
 A naive intersection algorithm for a raytracer can therefore be defined incredibly concisely.
 
@@ -211,13 +211,15 @@ Concretely, the contributions of this thesis include:
 \subsection{Related Work}
 
 First performance considerations must be understood, to capture the most relevant low-level optimizations.
-This induces the need for a flexible and type-safe interface, which has been achieved through type-level and datatype generic programming.
+This induces the need for a flexible and type-safe interface around these optimizations, which has been achieved through type-level and datatype generic programming.
 Relevance is established by an implementation in the data-parallel language Accelerate, which is deeply embedded within Haskell.
 
 \paragraph{Performance}
 
-Capturing low-level optimizations in high-level languages has been achieved by methods such as relying on compiler optimizations, a Foreign Function Interface (FFI) or compiler intrinsics. 
-For variant types specifically the problem is not the expressiveness, as it can be achieved through untyped code, but the ability to abstract over it.   
+Capturing low-level optimizations in high-level languages has been achieved by various methods; such as compiler optimizations, a Foreign Function Interface (FFI), compiler intrinsics or embedding domain-specific languages. 
+
+
+For variant types in particular it involves resorting to untyped code and bitwise operations, to gain control over the memory representation and (de)-construction.
 In data-parallel applications primitive types are distributed over multiple arrays to facilitate vectorization.
 It is not apparent what the representation of a tagged union should be, as they inherently break vectorization in most cases. 
 The functional data-parallel languages Accelerate\cite{accelerate-sum-types} and Futhark\cite{futhark-sum-types} implicitly distribute primitive types in composite datatypes over multiple arrays.

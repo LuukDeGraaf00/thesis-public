@@ -212,7 +212,7 @@ First the performance considerations must be understood, to capture the most rel
 This induces the need for a flexible and type-safe interface around these optimizations, which will be done through type-level and datatype generic programming.
 Relevance is established by an implementation in the data-parallel language Accelerate, which is deeply embedded within Haskell.
 
-\paragraph{Performance}
+\paragraph{Background}
 
 Capturing low-level optimizations in high-level languages can be done through various methods; such as compiler optimizations\cite{compiler-optimization}, a Foreign Function Interface\cite{ffi}, compiler intrinsics or embedded domain-specific languages\cite{accelerate-llvm}. 
 For data with multiple representations in a high-performance environment it often involves resorting to untyped code and bitwise operations, to gain control over the memory representation and (de)-construction of the variant type.

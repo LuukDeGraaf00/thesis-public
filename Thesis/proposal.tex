@@ -2,7 +2,7 @@
 
 \usepackage[margin = 3cm]{geometry}
 \usepackage[table]{xcolor}
-\usepackage{graphicx}
+\usepackage[draft]{graphicx}
 \usepackage{hyperref}
 \usepackage{listings}
 \usepackage{color}
@@ -206,7 +206,7 @@ Concretely, the contributions of this thesis include:
     \item A collection of multiple variants that can be completely agnostic to its internal representation
 \end{itemize}
 
-\subsection{Related Work}
+\subsection{Related Work} \label{related-work}
 
 First the performance considerations must be understood, to capture the most relevant low-level optimizations.
 This induces the need for a flexible and type-safe interface around these optimizations, which will be done through type-level and datatype generic programming.
@@ -513,7 +513,7 @@ This means diverging execution flows are not necessarily problematic when it onl
 
 \newpage
 
-\subsection{Data structures}
+\subsection{Data structures} \label{data-structures}
 
 A fundamental aspect of computing is data structures, which is a constant overhead for all computations.
 For collective operations arrays are essential; as they have a constant access time, are contiguously allocated and access can be parallelized.
@@ -527,7 +527,7 @@ Variants can be represented on an individual basis (element-wise) or collectivel
 Usage and implementations of these approaches are explored in this chapter. 
 Within this chapter the assumption is made that parallel arrays are used, as they align with the intention to vectorize operations. 
 
-\subsubsection{Element-wise}
+\subsubsection{Element-wise}\label{element-wise}
 
 For each individual element the choice of variant is represented, which introduces branching and in the general case will break vectorization.
 As variants are not grouped, functions cannot iterate on a specific variant without iterating on the complete array.
@@ -584,7 +584,6 @@ A consideration for this approach is that it is not apparent how to deduplicate 
 Is it acceptable to pack a byte and short within an integer, or should the individuality of each datatype be preserved.
 The individuality of a primitive type is essential for parallel arrays, as it allows for efficient vectorization.
 
-
 \begin{figure}[ht]
     \centering
     \includegraphics[scale=0.1]{TaggedUnion.png}
@@ -592,7 +591,7 @@ The individuality of a primitive type is essential for parallel arrays, as it al
     { 
         Example of an union type that can either be an integer or a byte and a short.
         The dotted lines within a layout represent a parallel array.
-        The first layout is compact, while the other layouts preserve the individuality of atleast one primitive type.
+        The first layout is compact, while the other layouts preserve the individuality of at least one primitive type.
         Performance of each layout would depend on which fields are accessed by what instructions.
     }
 \end{figure}
@@ -703,40 +702,42 @@ Rather than organizing based on the variant, it can be beneficial to organize ar
 \section{Interface}
 
 A preliminary conclusion of the previous chapter can be that a performant internal representation cannot be deducted from a mere theoretical framework.
-There are considerations for the computational efficiency and memory efficiency, but also practical considerations related to how the data is organized and accessed by which operations.
+There are considerations for the computational efficiency and memory efficiency, but also practical considerations related to which data is frequently accessed by what operations.
 Can the operations on the data be vectorized, or do the operations require a lot of random-access.
-The specific device and which hardware accelerated instructions it supports can also influence the effectiveness of certain memory representations.
-The concept of organizing the program structure around concrete data transformations is called data-oriented design.
+The device on which the code is run and which hardware accelerated instructions it supports can also influence the effectiveness of a concrete memory representations.
+The concept of organizing the program structure around concrete data transformations is referred to as {\it data-oriented design}.
 With this in mind it is important for high performance oriented applications to be flexible in the internal representation of their datatypes, as there is not a concrete optimal solution for all situations.
 In this case flexibility entails that no architecture changes will be required for changing the internal representation of a datatype.
-This is especially important for variant types, due the previously discussed numerous amount of suitable data structures for variant types.
-In this chapter an interface is discussed which can capture all these data structures in a type-preserving matter and as a zero-cost-abstraction. 
-In the first section requirements are discussed and the way these are generally captured in other applications.
-The second and third section apply type-level programming and datatype-generic programming respectively to incorporate the discussed method.
+It is especially important for variant types, due to the previously discussed numerous amount of suitable data structures available for variant types.
+In this chapter an interface is discussed which can capture all these different data structures in a type preserving matter without sacrificing performance. 
+In the first section preliminaries are discussed and the way these are generally handled in other applications.
+The second and third section discuss type-level programming and datatype-generic programming respectively to materialize the interface.
 
 \subsection{Conceptual Framework}
 
-As discussed in the data structures section, there are two primary categorizations for collections of variant types.
-Variants of a particular type can broadly speaking be stored either by element or by variant.
-There are several considerations for making a data structure that is agnostic to if an element-wise or a variant-wise way is used.
-A variant-wise collection can operate on a subset of variants, while an element-wise collection is forced to discover the identity of all variants by iterating on the complete collection.
-To avoid redundant iterations for variant-wise collections, a function must be able to be defined on a specific subset of all variants when necessary.
-For element-wise collection the amount of variants must be finite, the type must be identifiable and no large discrepancies should exist between the size of each variant.
+As discussed in section \ref{data-structures}, there are two primary categorizations for collections of variant types.
+Variants of a particular type can be stored either on an element-basis or a variant-basis.
+There are several considerations for designing a data structure that is agnostic to whether an element-wise or a variant-wise data structure is used.
+A variant-wise collection can operate on a subset of variants, while an element-wise collection is forced to discover the identity while iterating.
+To avoid redundant iterations for variant-wise collections, a function must be able to be defined on a specific subset of all variants.
+For element-wise collections the amount of variants must be finite, the type must be identifiable and no large discrepancies should exist between the size of each variant.
 
 \begin{figure}[ht]
     \centering
     \includegraphics[scale=0.06]{ConceptualFramework.png}
     \caption
     {
-        Example where an operation is applied on a single variant.
-        A non-exhaustive function can skip a significant amount of work when using a variant-wise collection, while this requires a complete iteration for an element-wise collection. 
+        Example where a function is applied on a single variant.
+        A non-exhaustive function can skip a significant amount of work when using a variant-wise collection, while this requires a complete traversal for an element-wise collection. 
+        Note that the identity remains the same in both cases (green and blue).
     }
 \end{figure}
 
-The previously mentioned Entity-Component-System (ECS) allows for functions to be defined on a subset of variants, and is commonly associated with data-oriented design.
-The first section explains the ECS pattern and identifies the core principles around the interface it uses for variant-wise collections.
+The previously mentioned Entity-Component-System (ECS), in section \ref{related-work} and \ref{element-wise}, allow functions to be defined on a subset of variants.
+It is commonly associated with data-oriented design, in particular within the field of game-engines.
+The first section explains the ECS pattern and identifies the core principles around variant-wise collections.
 For element-wise collections sum types can be used to safely discriminate between multiple variants by enforcing pattern matching.
-The second section is dedicated to sum types and their role in creating an internal representation that is agnostic to whether it is a variant-wise or element-wise collection.  
+The second section is dedicated to sum types and their role in establishing a type-safe interface.  
 
 \newpage
 
@@ -744,28 +745,28 @@ The second section is dedicated to sum types and their role in creating an inter
 
 The ECS pattern is arguably a reaction to the prevalence of object-oriented languages within game engines.
 The premise is to organizes game-logic within functions rather than data, where the relation between data remains flexible\cite{ecs-origin}.
-In contrast to inheritance, where relations are statically determined and game-logic is embedded within an predetermined hierarchy.
+In contrast to inheritance, where relations are statically determined and game-logic is embedded within a predetermined hierarchy.
 The pattern is often combined with data-oriented design and is used to implicitly exploit data-parallelism in general purpose languages.
 It exist on a similar abstraction-level as array languages, by using collective operations. 
-While there exist many implementations of the pattern in many different languages, the principles remain similar.  
+While there exist many implementations of the pattern in many languages, the principles remain similar.  
 
 \paragraph{Components}
 A component is the smallest addressable type within the pattern.
-Example of components are \type{Position} and \type{Velocity}, which when combined would represent movement.
-Components are generally value types to avoid race conditions and are stored in parallel arrays for vectorization.
+The canonical example of components are \type{Position} and \type{Velocity}, which when composed represent movement.
+Components are generally value types to avoid race conditions.
 Some implementations allow for a (readonly) reference component which shares it data along multiple instances.
-A shared \type{Mesh} component would prevent excessive geometry to be stored, which is beneficial for cache efficiency.
+A shared \type{Mesh} component would prevent excessive geometry data to be stored, which is beneficial for cache efficiency.
 
 \paragraph{Entity}
-An entity is idiomatically a set of components, but as discussed earlier effectively an identifier of the concrete data.
+An entity is idiomatically a set of components, but as discussed in section \ref{element-wise} an identifier of the concrete data.
 A movable entity would have both the \type{Position} and \type{Velocity} component, while an immovable entity would only have the \type{Position} component.
 Adding and removing components is done at runtime and there is no predetermined relation between any of the components.   
-Any immovable entity can be made movable by attaching the \type{Velocity} component at runtime.
+Any immovable entity can be made movable at any time by attaching the \type{Velocity} component at runtime.
 
 \paragraph{Systems}
 A system operates on all entities that match a specific set of components.
-The \type{Movement} system will operate on all movable entities, irrespective of any other components attached to it.
-Systems are effectively global functions, which operate only on specific variants that contain certain components. 
+The \type{Movement} system will operate on all movable entities, irrespective of other components attached to it.
+Systems are effectively global functions, which operate only on variants that contain the required components. 
 It allows for a variant-wise collection of entities, which most ECS implementations use to optimize the performance of individual systems.
 
 \begin{figure}[ht]
@@ -774,15 +775,17 @@ It allows for a variant-wise collection of entities, which most ECS implementati
     \caption
     { 
         The movement and render systems both have two components as a dependency and only operate on variants that contain their specific components.
-        The underlying representation has a parallel array for each unique combination, but some implementations connect specific parallel arrays to maximize data-parallelism of a specific operation. 
+        The underlying representation uses a parallel array for each unique combination, but some implementations group parallel arrays together to maximize data-parallelism of an individual system. 
     }
 \end{figure}
 
-The ECS design pattern is arguably inherently imperative, as structural changes to entities are done imperatively.
+The ECS design pattern is arguably inherently imperative, due the way structural changes are handled.
 Apecs, an ECS library in Haskell, achieves this imperative style through monads\cite{ecs-apecs}.
-The ECS pattern makes element-wise collections infeasible, as there is no feasible way to restrict the possible amount of structural changes.
-This is inherit to the pattern, as any component can be attached to any entity.
-An element-wise collection would require a statically definable form of mutually exclusivity.
+The ECS pattern makes element-wise collections often infeasible, as there is no way to restrict the possible amount of structural changes.
+This is inherit to the pattern, as any component can be attached to any entity in a global environment.
+Some implementations, such as Unity\cite{unity-ecs-patent}, allow components to opt-in to be disabled.
+Systems ignore disable components, but preserve the variant-wise collections.  
+A performant element-wise collection would ideally have a statically definable scope and a form of mutual exclusivity.
 
 \newpage
 

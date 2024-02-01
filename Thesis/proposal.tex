@@ -2,7 +2,7 @@
 
 \usepackage[margin = 3cm]{geometry}
 \usepackage[table]{xcolor}
-\usepackage[draft]{graphicx}
+\usepackage{graphicx}
 \usepackage{hyperref}
 \usepackage{listings}
 \usepackage{color}
@@ -74,7 +74,7 @@
         Data-parallelism uses the uniformity between multiple data elements to accelerate the process of operating on large collections of data.
         Variant types constrain the ability to operate uniformly, which therefore limit data-parallelism opportunities in the general case.
         In the situations where non-uniformity is inherit to the algorithm low-level optimizations are used to mitigate the heterogeneity.
-        In this paper a higher abstraction level variant type is explored which can capture the low-level control required to implement low-level optimizations in data-parallel languages.
+        In this paper a higher abstraction level variant type is explored, which can capture the low-level control required to implement low-level optimizations in data-parallel languages.
         A polymorphic variant type is used to represent variance on the type-level, which can be used by data structures to adapt to the variance.
         Type-level programming is used to derive memory efficient representations for user-defined variant types.
         Custom memory representations are supported through datatype-generic programming, which automates the (de)-construction of variant types.
@@ -189,7 +189,7 @@ The \type{min} function uses the value directly while other functions must patte
 Within the context of raytracing this other function might spawn an extension ray that simulates the ray bouncing of a surface.
 Pattern matching on the \type{1e30f} value will limit data-parallelism for all subsequent extension rays.
 A solution can be to unconditionally execute like with the \type{min} function or eliminate all rays that failed for each iterative step. 
-The latter can now be represented as an internal reorganization in the proposed implementation, as it does not change the identity of the collection but merely the layout and thus no architectural changes are required.
+The latter can now be represented as an internal reorganization in the proposed implementation, as it does not change the identity of the collection but merely the layout and thus no architectural changes are required to support such an optimization.
 To summarize, the research questions answered in this thesis are:
 
 \begin{itemize}
@@ -215,13 +215,13 @@ Relevance is established by an implementation in the data-parallel language Acce
 \paragraph{Performance}
 
 Capturing low-level optimizations in high-level languages can be done through various methods; such as compiler optimizations\cite{compiler-optimization}, a Foreign Function Interface\cite{ffi}, compiler intrinsics or embedded domain-specific languages\cite{accelerate-llvm}. 
-For data with multiple representations in a high-performance environment it often involves resorting to untyped code and bitwise operations, to gain control over the memory representation and (de)-construction.
+For data with multiple representations in a high-performance environment it often involves resorting to untyped code and bitwise operations, to gain control over the memory representation and (de)-construction of the variant type.
 In data-parallel applications primitive types are distributed over multiple arrays to facilitate vectorization.
 It is not apparent what the representation of a tagged union should be\cite{accelerate-sum-types}, as they inherently break vectorization in most cases. 
 The functional data-parallel languages Accelerate\cite{accelerate-sum-types} and Futhark\cite{futhark-sum-types} implicitly distribute primitive types in composite datatypes over multiple arrays.
 Both implementations have limited deduplication capabilities, but research has been done to integrate a memory efficient tagged union in Accelerate\cite{accelerate-sum-types}.
 Game-engines, which deal with many clusters of data, have a fundamentally different approach as they have widely adopted the Entity-Component-System (ECS) pattern\cite{ecs-origin}. 
-Many implementations; such as Unity\cite{unity-ecs-patent}, Flecs\cite{ecs-flecs} and Bevy\cite{ecs-bevy}, incite a collective re-organization of data when a variant change occurs at runtime.
+Many implementations; such as Unity\cite{unity-ecs-patent}, Flecs\cite{ecs-flecs} and Bevy\cite{ecs-bevy}, incite a collective reorganization of data when a variant change occurs at runtime.
 A type-safe and performant implementation is notably hard, as all interactions between the representations must be statically resolved.
 More generally, research on zero cost abstractions over memory representations are prevalent in C++ libraries such as LLAMA\cite{llama} and Alpaka\cite{alpaka}. 
 
@@ -234,7 +234,7 @@ In Haskell sum types are nominally typed, which means variants are not standalon
 Structural sum types are often called extensible or open sum types, as they do not have to be explicitly declared before use.
 In OCaml these are natively supported as polymorphic variants\cite{polymorphic-variants}, while Futhark is completely structurally typed and refers to them as sum types\cite{futhark-sum-types}.
 Deriving a memory representation for user-defined datatype can be done statically through type-indexed types\cite{type-indexed}\cite{associated-types}.
-In C++ these are called {\it traits}\cite{c++traits} and in Haskell {\it type families}\cite{type-families}. 
+In C++ these are called {\it traits}\cite{c++traits} and in Haskell these are called {\it type families}\cite{type-families}. 
 As stated earlier, some C++ libraries also attempt to create zero cost abstractions around memory representations\cite{llama}\cite{alpaka}.
 Datatype-generic programming\cite{datatype-generic-programming}, which parametrizes on the composition of a datatype, can be used to create mappings between the derived representations.
 Both concepts are used in highly generic libraries for a wide-range of applications\cite{generic-programming}. 
@@ -245,7 +245,7 @@ Variant types are rare in array languages, likely due to a combination of the in
 The functional array languages Accelerate and Futhark have only recently gotten support for sum types\cite{accelerate-sum-types}\cite{futhark-sum-types}.
 Accelerate is a data-parallel array language deeply embedded within Haskell, where sum types are currently represented as a non-compact tagged union.
 Research has been done on a compact tagged union representation for parallel arrays in particular, which has been named a {\it Recursive Tagged Union}\cite{accelerate-sum-types}.
-The representation uses a unified tag for nested sum types, which optimizes memory usage at the cost of tag (de-)construction but has not yet been integrated within Accelerate. 
+The representation uses a unified tag for nested sum types, which optimizes memory usage at the cost of tag (de)construction but has not yet been integrated within Accelerate. 
 Futhark is a functional structurally typed data-parallel array language, where the sum types only deduplicate identical primitive types.
 The research pertains primarily to including structural sum types to the Futhark compiler\cite{futhark-sum-types}, rather than performance.
 
@@ -468,9 +468,10 @@ Due to the way caches operate with contiguous blocks, spatial locality of data c
     }
 \end{figure}
 
-A way to contextualize this is by partitioning an array into multiple segments, where each segment is repeatedly iterated on and therefore cache blocks will be reused (tiling).
+A way to contextualize this is by considering multiple iterations on an array.
+Partitioning the array and iterating on a single segment at a time means cache blocks will be reused (tiling).
 Cache coherence can be further improved by also accounting for shared resources, by grouping elements that use the same resource in their instruction sequence. 
-This technique is explored in raytracing\cite{raytracing-reorder-ray}, where rays are sorted to exploit the fact that spatially adjacent rays likely traverse the bounding-volume-hierarchy similarly.
+This technique is explored in raytracing\cite{raytracing-reorder-ray}, where rays are sorted to exploit the fact that spatially adjacent rays likely traverse the acceleration structure similarly.
 Avoiding redundant cache blocks is also important for multi-core processors, as it reduces the need for data to exist in multiple caches at the same time and minimizes cache reloads.
 
 \paragraph{Branching}
@@ -492,12 +493,12 @@ It is also limited to instructions that cannot fail or overflow, as unconditiona
     \end{minipage}%
     \begin{minipage}{.5\textwidth}
         \centering
-        \includegraphics[scale=0.10]{Performance8.png}
+        \includegraphics[scale=0.09]{Performance8.png}
         \captionsetup{margin=0.5cm}
         \captionsetup{format=plain}
         \caption
         { 
-            Updated instruction-level pipeline when B is dependant on the result of A.
+            Updated instruction-level pipeline where B is dependant on the result of A.
         }
     \end{minipage}
 \end{figure}
@@ -505,7 +506,7 @@ It is also limited to instructions that cannot fail or overflow, as unconditiona
 \vspace{-0.5em}
 
 Specialized processors where an instruction sequence is distributed over many cores are limited to executing all branches unconditionally.
-This is minimized through the use of Streaming Multiprocessors (SM), which contains several cores and fetch their own instructions.
+This is minimized through the use of Streaming Multiprocessors (SM), which contain several cores and fetch their own instructions.
 Streaming Multiprocessors operate and schedule warps, which often contain 32 threads.
 When divergence between these threads occur ({\it branch divergence}) the instructions will in the general case be executed in lockstep\cite{threads-independent-scheduling}.
 This means diverging execution flows are not necessarily problematic when it only occurs between different Streaming Multiprocessors, as branches that are not executed can be skipped entirely.
@@ -530,7 +531,7 @@ Within this chapter the assumption is made that parallel arrays are used, as the
 
 For each individual element the choice of variant is represented, which introduces branching and in the general case will break vectorization.
 As variants are not grouped, functions cannot iterate on a specific variant without iterating on the complete array.
-The main advantage is that a variant change can be done independent of other elements, and thus can be parallelized.
+The main advantage is that a variant change can be done independently of other elements, and thus can be parallelized.
 A practical consideration is that each element in an array must be structurally the same, that is they occupy the same memory space.
 This is a limitation which enforces that each index can determine the location of an element. 
 For parallel arrays this restriction intuitively applies for all arrays individually\cite{accelerate-sum-types}.
@@ -558,7 +559,7 @@ While computational efficient, the alternative of {\it packing} types together c
     {
         As \type{data} has a size of 4 bytes, padding the \type{id} to 4 bytes enforces that \type{data} is naturally aligned for the instructions that access it.
         In the case \type{data} is stored before \type{id}, the \type{data} type will not always be naturally aligned when stored within an array.   
-        It would require padding the complete struct to a multiple of the largest field, which in this case would be 8 bytes.
+        It would require padding the complete struct to a multiple of the largest field, which in this case would be 8 bytes regardless.
     }
 \end{figure}
 
@@ -571,7 +572,7 @@ Many C++ libraries utilize {\it class templates} to achieve this\cite{abstractio
 \paragraph{Tagged Union}
 
 Multiple variants can be represented by a fixed size data component with multiple interpretations, so called {\it union}.
-A tag is used to identify the currently active interpretation of the union. 
+A tag can be used to identify the currently active interpretation of the union. 
 A naive implementation creates a new field for all fields within the variants, which means the memory usage is cumulative for each variant within the union. 
 A compact tagged union overlaps fields of variants, as only one interpretation can be valid at a time.
 The process of overlapping fields is generally referred to as {\it deduplication}.
@@ -591,8 +592,8 @@ The individuality of a primitive type is essential for parallel arrays, as it al
     { 
         Example of an union type that can either be an integer or a byte and a short.
         The dotted lines within a layout represent a parallel array.
-        The first layout is compact, while the other layouts preserve the individuality of a type.
-        Performance of each layout depends on which fields are accessed by what instructions.
+        The first layout is compact, while the other layouts preserve the individuality of atleast one primitive type.
+        Performance of each layout would depend on which fields are accessed by what instructions.
     }
 \end{figure}
 
@@ -600,7 +601,7 @@ General-purpose languages avoid this discussion by overlapping the complete vari
 As stated previously, this would prevent vectorization as fields are no longer contiguous. 
 Strictly speaking it can be considered less problematic for tagged unions as there already exists branching on the tag which breaks vectorization, but this does not necessarily always hold.
 A form of unconditional execution or compatibility with existing architecture might make a tagged union spread over multiple arrays preferable.
-It also makes it possible to enforce natural alignment, as an alternative to padding.
+Parallel arrays also make it also possible to enforce natural alignment, as an alternative to padding.
 
 \paragraph{Tagged Pointer}
 
@@ -622,8 +623,8 @@ The concept can be illustrated through a hash table data structure, where a key 
 Any collective operation on the hash table can be vectorized by disregarding the hashing operations and using the internal array directly, as computations are inherently independent and order is irrelevant.   
 The indirection is not inherently problematic, merely the use of indirection to denote the identity of an variant.
 In essence, a form of indirection that is not used by the collective operations. 
-The entity-component-system (ECS) is a coding pattern that utilizes this concept to efficiently represent collections of multiple variants.
-Represented as a single heterogeneous collection which internally consists of several variant-wise collections. 
+The entity-component-system (ECS) is a coding pattern that sometimes utilizes this concept to efficiently represent collections of multiple variants.
+Represented as a single heterogeneous collection, while internally it consists of several variant-wise collections. 
 
 \begin{figure}[ht]
     \centering
@@ -632,7 +633,7 @@ Represented as a single heterogeneous collection which internally consists of se
     { 
         Each entry within the surface array can uniquely identify the variant and index through the hashing function.
         The relative costly operating of using the hashing function can generally be avoided, by operating on the variants directly.
-        It allows the collection to appear as a heterogenous collection, while being able to vectorize collective operations.
+        It allows the collection to appear as a heterogenous collection, while still being able to vectorize collective operations.
     }
 \end{figure}
 
@@ -680,8 +681,8 @@ Both allow operations to be vectorized, but there exist several other considerat
     \item[automatic]
     Most compilers support automatic vectorization of iterations with flexible bounds, where the final leftover iteration is not vectorized.  
     This overhead can be a significant when the loop is extensively unrolled.
-    It is minimized through epilogue vectorization, which (re-)applies loop vectorization to the remaining scalar code.
-    In practice data must be aligned along specific boundaries to be vectorized, which is challenging for (dynamic) regions within an array and not always analyzed by compilers\cite{automatic-vectorization}.
+    It is minimized through epilogue vectorization, which (re)applies loop vectorization to the remaining scalar code.
+    In practice data must be aligned along specific boundaries to be vectorized, which is challenging for dynamic regions within an array and not always analyzed by compilers\cite{automatic-vectorization}.
 
     \item [operable]
     An undiscussed benefit of parallel arrays is that fields can be operated on independent of other fields, as they are completely distinct arrays.
@@ -701,7 +702,7 @@ Rather than organizing based on the variant, it can be beneficial to organize ar
 
 \section{Interface}
 
-A preliminary conclusion of the previous chapter can be that a performant internal representation cannot be deducted from a theoretical framework.
+A preliminary conclusion of the previous chapter can be that a performant internal representation cannot be deducted from a mere theoretical framework.
 There are considerations for the computational efficiency and memory efficiency, but also practical considerations related to how the data is organized and accessed by which operations.
 Can the operations on the data be vectorized, or do the operations require a lot of random-access.
 The specific device and which hardware accelerated instructions it supports can also influence the effectiveness of certain memory representations.

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2024.1.20)  1 FEB 2024 00:17
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2024.1.20)  1 FEB 2024 12:11
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -348,9 +348,13 @@ LaTeX Info: Redefining \nameref on input line 55.
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: End \AtBeginDocument code.
 <./Images//uulogo.png, id=136, 324.7332pt x 128.1588pt>
+File: ./Images//uulogo.png Graphic file (type png)
+<use ./Images//uulogo.png>
+Package pdftex.def Info: ./Images//uulogo.png  used on input line 60.
+(pdftex.def)             Requested size: 324.7324pt x 128.15848pt.
  [1
 
-{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}] (./proposal.toc
+{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map} <./Images//uulogo.png>] (./proposal.toc
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <7> on input line 2.
 LaTeX Font Info:    External font `cmex10' loaded for size
@@ -365,91 +369,299 @@ pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has b
 l.111 \newpage
                [1]
 <./Images//CodeIntro1.png, id=195, 665.48625pt x 68.50594pt>
+File: ./Images//CodeIntro1.png Graphic file (type png)
+<use ./Images//CodeIntro1.png>
+Package pdftex.def Info: ./Images//CodeIntro1.png  used on input line 122.
+(pdftex.def)             Requested size: 299.46603pt x 30.82738pt.
 <./Images//CodeC.png, id=196, 911.65594pt x 659.46375pt>
- [2]
-<./Images//CodeIntro2.png, id=206, 650.43pt x 125.71968pt>
-<./Images//CodeIntro3.png, id=207, 729.47531pt x 145.29282pt>
-<./Images//CodeIntro4.png, id=208, 578.91281pt x 176.15813pt>
- [3] [4] [5]
-<./Images//Performance1.png, id=275, 2368.85pt x 963.6pt>
+File: ./Images//CodeC.png Graphic file (type png)
+<use ./Images//CodeC.png>
+Package pdftex.def Info: ./Images//CodeC.png  used on input line 132.
+(pdftex.def)             Requested size: 410.24138pt x 296.75594pt.
+ [2 <./Images//CodeIntro1.png> <./Images//CodeC.png>]
+<./Images//CodeIntro2.png, id=209, 650.43pt x 125.71968pt>
+File: ./Images//CodeIntro2.png Graphic file (type png)
+<use ./Images//CodeIntro2.png>
+Package pdftex.def Info: ./Images//CodeIntro2.png  used on input line 148.
+(pdftex.def)             Requested size: 260.16739pt x 50.28697pt.
+<./Images//CodeIntro3.png, id=210, 729.47531pt x 145.29282pt>
+File: ./Images//CodeIntro3.png Graphic file (type png)
+<use ./Images//CodeIntro3.png>
+Package pdftex.def Info: ./Images//CodeIntro3.png  used on input line 158.
+(pdftex.def)             Requested size: 328.26085pt x 65.38115pt.
+<./Images//CodeIntro4.png, id=211, 578.91281pt x 176.15813pt>
+File: ./Images//CodeIntro4.png Graphic file (type png)
+<use ./Images//CodeIntro4.png>
+Package pdftex.def Info: ./Images//CodeIntro4.png  used on input line 173.
+(pdftex.def)             Requested size: 260.50835pt x 79.27042pt.
+ [3 <./Images//CodeIntro2.png> <./Images//CodeIntro3.png> <./Images//CodeIntro4.png>] [4] [5]
+<./Images//Performance1.png, id=281, 2368.85pt x 963.6pt>
+File: ./Images//Performance1.png Graphic file (type png)
+<use ./Images//Performance1.png>
+Package pdftex.def Info: ./Images//Performance1.png  used on input line 275.
+(pdftex.def)             Requested size: 236.89888pt x 96.36565pt.
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <8> on input line 291.
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <6> on input line 291.
-<./Images//Performance2.png, id=279, 2419.0375pt x 1013.7875pt>
- [6] [7]
-<./Images//Performance3.png, id=308, 1616.0375pt x 1214.5375pt>
-<./Images//Performance4.png, id=311, 2168.1pt x 1174.3875pt>
-<./Images//Performance5.png, id=312, 2057.6875pt x 1214.5375pt>
- [8]
-<./Images//Performance6.png, id=326, 5129.1625pt x 702.625pt>
- [9]
-<./Images//Performance7.png, id=340, 3242.1125pt x 451.6875pt>
-<./Images//Performance8.png, id=347, 2158.0625pt x 1435.3625pt>
- [10]
-<./Images//CodeMemory1.png, id=362, 381.67593pt x 155.07938pt>
-<./Images//CodeMemory2.png, id=363, 383.18156pt x 158.09062pt>
- [11]
-<./Images//TaggedUnion.png, id=374, 3021.2875pt x 1084.05pt>
- [12]
-<./Images//HashTableECS.png, id=383, 2619.7875pt x 1023.825pt>
- [13] [14]
-<./Images//ConceptualFramework.png, id=401, 4627.2875pt x 2017.5375pt>
- [15]
-<./Images//ECSexample.png, id=408, 2419.0375pt x 1314.9125pt>
- [16]
-<./Images//InterfaceCode1Annotated.png, id=419, 3222.0375pt x 622.325pt>
-<./Images//CodeInterface2.png, id=420, 538.26094pt x 105.39375pt>
-<./Images//CodeInterface3.png, id=422, 633.11531pt x 207.02344pt>
- [17]
-<./Images//CodeType1.png, id=437, 608.2725pt x 168.63pt>
-<./Images//CodeType2.png, id=438, 635.37375pt x 279.29344pt>
-<./Images//CodeType3.png, id=439, 776.14969pt x 40.65187pt>
- [18]
-<./Images//CodeType4.png, id=450, 432.11438pt x 135.50626pt>
+<./Images//Performance2.png, id=285, 2419.0375pt x 1013.7875pt>
+File: ./Images//Performance2.png Graphic file (type png)
+<use ./Images//Performance2.png>
+Package pdftex.def Info: ./Images//Performance2.png  used on input line 299.
+(pdftex.def)             Requested size: 241.91792pt x 101.38469pt.
+ [6 <./Images//Performance1.png>] [7 <./Images//Performance2.png>]
+<./Images//Performance3.png, id=316, 1616.0375pt x 1214.5375pt>
+File: ./Images//Performance3.png Graphic file (type png)
+<use ./Images//Performance3.png>
+Package pdftex.def Info: ./Images//Performance3.png  used on input line 371.
+(pdftex.def)             Requested size: 129.28564pt x 97.16498pt.
+<./Images//Performance4.png, id=319, 2168.1pt x 1174.3875pt>
+File: ./Images//Performance4.png Graphic file (type png)
+<use ./Images//Performance4.png>
+Package pdftex.def Info: ./Images//Performance4.png  used on input line 394.
+(pdftex.def)             Requested size: 195.12057pt x 105.6903pt.
+<./Images//Performance5.png, id=320, 2057.6875pt x 1214.5375pt>
+File: ./Images//Performance5.png Graphic file (type png)
+<use ./Images//Performance5.png>
+Package pdftex.def Info: ./Images//Performance5.png  used on input line 404.
+(pdftex.def)             Requested size: 185.18388pt x 109.30365pt.
+ [8 <./Images//Performance3.png> <./Images//Performance4.png> <./Images//Performance5.png>]
+<./Images//Performance6.png, id=337, 5129.1625pt x 702.625pt>
+File: ./Images//Performance6.png Graphic file (type png)
+<use ./Images//Performance6.png>
+Package pdftex.def Info: ./Images//Performance6.png  used on input line 436.
+(pdftex.def)             Requested size: 420.59406pt x 57.61562pt.
+ [9 <./Images//Performance6.png>]
+<./Images//Performance7.png, id=352, 3242.1125pt x 451.6875pt>
+File: ./Images//Performance7.png Graphic file (type png)
+<use ./Images//Performance7.png>
+Package pdftex.def Info: ./Images//Performance7.png  used on input line 462.
+(pdftex.def)             Requested size: 389.03671pt x 54.20015pt.
+<./Images//Performance8.png, id=359, 2158.0625pt x 1435.3625pt>
+File: ./Images//Performance8.png Graphic file (type png)
+<use ./Images//Performance8.png>
+Package pdftex.def Info: ./Images//Performance8.png  used on input line 496.
+(pdftex.def)             Requested size: 194.21724pt x 129.17705pt.
+ [10 <./Images//Performance7.png> <./Images//Performance8.png>]
+<./Images//CodeMemory1.png, id=376, 381.67593pt x 155.07938pt>
+File: ./Images//CodeMemory1.png Graphic file (type png)
+<use ./Images//CodeMemory1.png>
+Package pdftex.def Info: ./Images//CodeMemory1.png  used on input line 551.
+(pdftex.def)             Requested size: 190.8375pt x 77.53949pt.
+<./Images//CodeMemory2.png, id=377, 383.18156pt x 158.09062pt>
+File: ./Images//CodeMemory2.png Graphic file (type png)
+<use ./Images//CodeMemory2.png>
+Package pdftex.def Info: ./Images//CodeMemory2.png  used on input line 557.
+(pdftex.def)             Requested size: 191.5903pt x 79.0451pt.
+ [11 <./Images//CodeMemory1.png> <./Images//CodeMemory2.png>]
+<./Images//TaggedUnion.png, id=390, 3021.2875pt x 1084.05pt>
+File: ./Images//TaggedUnion.png Graphic file (type png)
+<use ./Images//TaggedUnion.png>
+Package pdftex.def Info: ./Images//TaggedUnion.png  used on input line 590.
+(pdftex.def)             Requested size: 302.14645pt x 108.41135pt.
+ [12 <./Images//TaggedUnion.png>]
+<./Images//HashTableECS.png, id=400, 2619.7875pt x 1023.825pt>
+File: ./Images//HashTableECS.png Graphic file (type png)
+<use ./Images//HashTableECS.png>
+Package pdftex.def Info: ./Images//HashTableECS.png  used on input line 631.
+(pdftex.def)             Requested size: 261.9941pt x 102.38849pt.
+ [13 <./Images//HashTableECS.png>] [14]
+<./Images//ConceptualFramework.png, id=419, 4627.2875pt x 2017.5375pt>
+File: ./Images//ConceptualFramework.png Graphic file (type png)
+<use ./Images//ConceptualFramework.png>
+Package pdftex.def Info: ./Images//ConceptualFramework.png  used on input line 728.
+(pdftex.def)             Requested size: 277.62527pt x 121.04703pt.
+ [15 <./Images//ConceptualFramework.png>]
+<./Images//ECSexample.png, id=427, 2419.0375pt x 1314.9125pt>
+File: ./Images//ECSexample.png Graphic file (type png)
+<use ./Images//ECSexample.png>
+Package pdftex.def Info: ./Images//ECSexample.png  used on input line 773.
+(pdftex.def)             Requested size: 241.91792pt x 131.49895pt.
+ [16 <./Images//ECSexample.png>]
+<./Images//InterfaceCode1Annotated.png, id=439, 3222.0375pt x 622.325pt>
+File: ./Images//InterfaceCode1Annotated.png Graphic file (type png)
+<use ./Images//InterfaceCode1Annotated.png>
+Package pdftex.def Info: ./Images//InterfaceCode1Annotated.png  used on input line 798.
+(pdftex.def)             Requested size: 161.11131pt x 31.11807pt.
+<./Images//CodeInterface2.png, id=440, 538.26094pt x 105.39375pt>
+File: ./Images//CodeInterface2.png Graphic file (type png)
+<use ./Images//CodeInterface2.png>
+Package pdftex.def Info: ./Images//CodeInterface2.png  used on input line 807.
+(pdftex.def)             Requested size: 215.30055pt x 42.15674pt.
+<./Images//CodeInterface3.png, id=442, 633.11531pt x 207.02344pt>
+File: ./Images//CodeInterface3.png Graphic file (type png)
+<use ./Images//CodeInterface3.png>
+Package pdftex.def Info: ./Images//CodeInterface3.png  used on input line 820.
+(pdftex.def)             Requested size: 253.24162pt x 82.80789pt.
+ [17 <./Images//InterfaceCode1Annotated.png> <./Images//CodeInterface2.png> <./Images//CodeInterface3.png>]
+<./Images//CodeType1.png, id=460, 608.2725pt x 168.63pt>
+File: ./Images//CodeType1.png Graphic file (type png)
+<use ./Images//CodeType1.png>
+Package pdftex.def Info: ./Images//CodeType1.png  used on input line 853.
+(pdftex.def)             Requested size: 231.14595pt x 64.08006pt.
+<./Images//CodeType2.png, id=461, 635.37375pt x 279.29344pt>
+File: ./Images//CodeType2.png Graphic file (type png)
+<use ./Images//CodeType2.png>
+Package pdftex.def Info: ./Images//CodeType2.png  used on input line 866.
+(pdftex.def)             Requested size: 241.44453pt x 106.1326pt.
+<./Images//CodeType3.png, id=462, 776.14969pt x 40.65187pt>
+File: ./Images//CodeType3.png Graphic file (type png)
+<use ./Images//CodeType3.png>
+Package pdftex.def Info: ./Images//CodeType3.png  used on input line 880.
+(pdftex.def)             Requested size: 294.93994pt x 15.44786pt.
+ [18 <./Images//CodeType1.png> <./Images//CodeType2.png> <./Images//CodeType3.png>]
+<./Images//CodeType4.png, id=476, 432.11438pt x 135.50626pt>
+File: ./Images//CodeType4.png Graphic file (type png)
+<use ./Images//CodeType4.png>
+Package pdftex.def Info: ./Images//CodeType4.png  used on input line 898.
+(pdftex.def)             Requested size: 164.20515pt x 51.4929pt.
 
-Overfull \hbox (4.60512pt too wide) in paragraph at lines 900--905
+Overfull \hbox (4.60512pt too wide) in paragraph at lines 901--906
 \OT1/cmr/m/n/10 stan-dalone con-cept. A [] has unique types as-so-ci-ated with each type, while a []
  []
 
-<./Images//CodeType5.png, id=451, 758.08218pt x 131.74219pt>
-<./Images//CodeType6.png, id=452, 951.555pt x 32.37094pt>
-<./Images//CodeType7.png, id=453, 1130.72438pt x 96.36pt>
-[19]
-<./Images//CodeType8.png, id=463, 579.66562pt x 103.88812pt>
-<./Images//CodeType9.png, id=465, 687.31781pt x 269.50688pt>
-<./Images//CodeType10.png, id=466, 756.57657pt x 182.93344pt>
- [20]
-<./Images//CodeType11.png, id=476, 798.73407pt x 114.4275pt>
-<./Images//CodeType12.png, id=477, 767.11594pt x 204.01219pt>
-<./Images//CodeType13.png, id=478, 573.64313pt x 83.5622pt>
- [21]
-<./Images//CodeType14.png, id=487, 971.88094pt x 125.71968pt>
-<./Images//CodeType15.png, id=488, 973.38657pt x 220.57407pt>
- [22]
-<./Images//CodeType16.png, id=496, 417.05812pt x 188.20313pt>
-<./Images//CodeType17.png, id=497, 447.92343pt x 192.72pt>
-<./Images//framework.png, id=499, 2417.03pt x 726.715pt>
- [23]
-<./Images//CodeType18.png, id=509, 891.33pt x 25.59563pt>
-<./Images//CodeType19.png, id=510, 1026.08344pt x 256.70906pt>
- [24]
-<./Images//CodeType20.png, id=519, 972.63374pt x 127.22531pt>
-<./Images//CodeType21.png, id=520, 992.20688pt x 255.95625pt>
- [25]
-<./Images//CodeType22.png, id=530, 900.36375pt x 60.97781pt>
-<./Images//CodeType23.png, id=533, 927.465pt x 58.71938pt>
-<./Images//CodeType24.png, id=535, 773.89125pt x 230.36063pt>
- [26]
-<./Images//CodeType25.png, id=545, 773.89125pt x 191.9672pt>
-<./Images//CodeType26.png, id=546, 995.97093pt x 288.3272pt>
- [27]
-<./Images//CodeType27.png, id=557, 852.18375pt x 193.47281pt>
- [28] [29]
-<./Images//Discussion1.png, id=571, 572.89032pt x 29.35968pt>
- [30]
-<./Images//Discussion2.png, id=591, 583.42969pt x 141.52875pt>
- [31] [32]
+<./Images//CodeType5.png, id=477, 758.08218pt x 131.74219pt>
+File: ./Images//CodeType5.png Graphic file (type png)
+<use ./Images//CodeType5.png>
+Package pdftex.def Info: ./Images//CodeType5.png  used on input line 909.
+(pdftex.def)             Requested size: 288.07422pt x 50.06255pt.
+<./Images//CodeType6.png, id=478, 951.555pt x 32.37094pt>
+File: ./Images//CodeType6.png Graphic file (type png)
+<use ./Images//CodeType6.png>
+Package pdftex.def Info: ./Images//CodeType6.png  used on input line 926.
+(pdftex.def)             Requested size: 361.59465pt x 12.30107pt.
+<./Images//CodeType7.png, id=479, 1130.72438pt x 96.36pt>
+File: ./Images//CodeType7.png Graphic file (type png)
+<use ./Images//CodeType7.png>
+Package pdftex.def Info: ./Images//CodeType7.png  used on input line 936.
+(pdftex.def)             Requested size: 429.67973pt x 36.61716pt.
+[19 <./Images//CodeType4.png> <./Images//CodeType5.png> <./Images//CodeType6.png> <./Images//CodeType7.png>]
+<./Images//CodeType8.png, id=494, 579.66562pt x 103.88812pt>
+File: ./Images//CodeType8.png Graphic file (type png)
+<use ./Images//CodeType8.png>
+Package pdftex.def Info: ./Images//CodeType8.png  used on input line 955.
+(pdftex.def)             Requested size: 220.27522pt x 39.47789pt.
+<./Images//CodeType9.png, id=496, 687.31781pt x 269.50688pt>
+File: ./Images//CodeType9.png Graphic file (type png)
+<use ./Images//CodeType9.png>
+Package pdftex.def Info: ./Images//CodeType9.png  used on input line 969.
+(pdftex.def)             Requested size: 261.18347pt x 102.41367pt.
+<./Images//CodeType10.png, id=497, 756.57657pt x 182.93344pt>
+File: ./Images//CodeType10.png Graphic file (type png)
+<use ./Images//CodeType10.png>
+Package pdftex.def Info: ./Images//CodeType10.png  used on input line 978.
+(pdftex.def)             Requested size: 287.50208pt x 69.51543pt.
+ [20 <./Images//CodeType8.png> <./Images//CodeType9.png> <./Images//CodeType10.png>]
+<./Images//CodeType11.png, id=509, 798.73407pt x 114.4275pt>
+File: ./Images//CodeType11.png Graphic file (type png)
+<use ./Images//CodeType11.png>
+Package pdftex.def Info: ./Images//CodeType11.png  used on input line 1000.
+(pdftex.def)             Requested size: 335.46602pt x 48.05922pt.
+<./Images//CodeType12.png, id=510, 767.11594pt x 204.01219pt>
+File: ./Images//CodeType12.png Graphic file (type png)
+<use ./Images//CodeType12.png>
+Package pdftex.def Info: ./Images//CodeType12.png  used on input line 1013.
+(pdftex.def)             Requested size: 322.1865pt x 85.68452pt.
+<./Images//CodeType13.png, id=511, 573.64313pt x 83.5622pt>
+File: ./Images//CodeType13.png Graphic file (type png)
+<use ./Images//CodeType13.png>
+Package pdftex.def Info: ./Images//CodeType13.png  used on input line 1025.
+(pdftex.def)             Requested size: 240.92847pt x 35.09587pt.
+ [21 <./Images//CodeType11.png> <./Images//CodeType12.png> <./Images//CodeType13.png>]
+<./Images//CodeType14.png, id=523, 971.88094pt x 125.71968pt>
+File: ./Images//CodeType14.png Graphic file (type png)
+<use ./Images//CodeType14.png>
+Package pdftex.def Info: ./Images//CodeType14.png  used on input line 1060.
+(pdftex.def)             Requested size: 388.74548pt x 50.28697pt.
+<./Images//CodeType15.png, id=524, 973.38657pt x 220.57407pt>
+File: ./Images//CodeType15.png Graphic file (type png)
+<use ./Images//CodeType15.png>
+Package pdftex.def Info: ./Images//CodeType15.png  used on input line 1074.
+(pdftex.def)             Requested size: 389.34773pt x 88.22806pt.
+ [22 <./Images//CodeType14.png> <./Images//CodeType15.png>]
+<./Images//CodeType16.png, id=534, 417.05812pt x 188.20313pt>
+File: ./Images//CodeType16.png Graphic file (type png)
+<use ./Images//CodeType16.png>
+Package pdftex.def Info: ./Images//CodeType16.png  used on input line 1094.
+(pdftex.def)             Requested size: 166.82028pt x 75.2799pt.
+<./Images//CodeType17.png, id=535, 447.92343pt x 192.72pt>
+File: ./Images//CodeType17.png Graphic file (type png)
+<use ./Images//CodeType17.png>
+Package pdftex.def Info: ./Images//CodeType17.png  used on input line 1098.
+(pdftex.def)             Requested size: 179.1662pt x 77.08662pt.
+<./Images//framework.png, id=537, 2417.03pt x 726.715pt>
+File: ./Images//framework.png Graphic file (type png)
+<use ./Images//framework.png>
+Package pdftex.def Info: ./Images//framework.png  used on input line 1115.
+(pdftex.def)             Requested size: 362.53886pt x 109.00253pt.
+ [23 <./Images//CodeType16.png> <./Images//CodeType17.png> <./Images//framework.png>]
+<./Images//CodeType18.png, id=550, 891.33pt x 25.59563pt>
+File: ./Images//CodeType18.png Graphic file (type png)
+<use ./Images//CodeType18.png>
+Package pdftex.def Info: ./Images//CodeType18.png  used on input line 1148.
+(pdftex.def)             Requested size: 356.52568pt x 10.23805pt.
+<./Images//CodeType19.png, id=551, 1026.08344pt x 256.70906pt>
+File: ./Images//CodeType19.png Graphic file (type png)
+<use ./Images//CodeType19.png>
+Package pdftex.def Info: ./Images//CodeType19.png  used on input line 1159.
+(pdftex.def)             Requested size: 410.4261pt x 102.6818pt.
+ [24 <./Images//CodeType18.png> <./Images//CodeType19.png>]
+<./Images//CodeType20.png, id=562, 972.63374pt x 127.22531pt>
+File: ./Images//CodeType20.png Graphic file (type png)
+<use ./Images//CodeType20.png>
+Package pdftex.def Info: ./Images//CodeType20.png  used on input line 1183.
+(pdftex.def)             Requested size: 389.0466pt x 50.8892pt.
+<./Images//CodeType21.png, id=563, 992.20688pt x 255.95625pt>
+File: ./Images//CodeType21.png Graphic file (type png)
+<use ./Images//CodeType21.png>
+Package pdftex.def Info: ./Images//CodeType21.png  used on input line 1199.
+(pdftex.def)             Requested size: 396.87572pt x 102.38068pt.
+ [25 <./Images//CodeType20.png> <./Images//CodeType21.png>]
+<./Images//CodeType22.png, id=575, 900.36375pt x 60.97781pt>
+File: ./Images//CodeType22.png Graphic file (type png)
+<use ./Images//CodeType22.png>
+Package pdftex.def Info: ./Images//CodeType22.png  used on input line 1226.
+(pdftex.def)             Requested size: 360.13911pt x 24.39069pt.
+<./Images//CodeType23.png, id=578, 927.465pt x 58.71938pt>
+File: ./Images//CodeType23.png Graphic file (type png)
+<use ./Images//CodeType23.png>
+Package pdftex.def Info: ./Images//CodeType23.png  used on input line 1245.
+(pdftex.def)             Requested size: 370.97943pt x 23.48732pt.
+<./Images//CodeType24.png, id=580, 773.89125pt x 230.36063pt>
+File: ./Images//CodeType24.png Graphic file (type png)
+<use ./Images//CodeType24.png>
+Package pdftex.def Info: ./Images//CodeType24.png  used on input line 1261.
+(pdftex.def)             Requested size: 309.55101pt x 92.14261pt.
+ [26 <./Images//CodeType22.png> <./Images//CodeType23.png> <./Images//CodeType24.png>]
+<./Images//CodeType25.png, id=593, 773.89125pt x 191.9672pt>
+File: ./Images//CodeType25.png Graphic file (type png)
+<use ./Images//CodeType25.png>
+Package pdftex.def Info: ./Images//CodeType25.png  used on input line 1277.
+(pdftex.def)             Requested size: 309.55101pt x 76.7855pt.
+<./Images//CodeType26.png, id=594, 995.97093pt x 288.3272pt>
+File: ./Images//CodeType26.png Graphic file (type png)
+<use ./Images//CodeType26.png>
+Package pdftex.def Info: ./Images//CodeType26.png  used on input line 1289.
+(pdftex.def)             Requested size: 398.38132pt x 115.32883pt.
+ [27 <./Images//CodeType25.png> <./Images//CodeType26.png>]
+<./Images//CodeType27.png, id=607, 852.18375pt x 193.47281pt>
+File: ./Images//CodeType27.png Graphic file (type png)
+<use ./Images//CodeType27.png>
+Package pdftex.def Info: ./Images//CodeType27.png  used on input line 1322.
+(pdftex.def)             Requested size: 340.86745pt x 77.38774pt.
+ [28 <./Images//CodeType27.png>] [29]
+<./Images//Discussion1.png, id=622, 572.89032pt x 29.35968pt>
+File: ./Images//Discussion1.png Graphic file (type png)
+<use ./Images//Discussion1.png>
+Package pdftex.def Info: ./Images//Discussion1.png  used on input line 1444.
+(pdftex.def)             Requested size: 229.15207pt x 11.74365pt.
+ [30 <./Images//Discussion1.png>]
+<./Images//Discussion2.png, id=643, 583.42969pt x 141.52875pt>
+File: ./Images//Discussion2.png Graphic file (type png)
+<use ./Images//Discussion2.png>
+Package pdftex.def Info: ./Images//Discussion2.png  used on input line 1503.
+(pdftex.def)             Requested size: 233.36774pt x 56.61049pt.
+ [31 <./Images//Discussion2.png>] [32]
 *geometry* verbose mode - [ newgeometry ] result:
 * driver: pdftex
 * paper: <default>
@@ -494,18 +706,18 @@ Package rerunfilecheck Info: File `proposal.out' has not changed.
 (rerunfilecheck)             Checksum: C940293E7EA001CFD2A3DC9C199EF141;4314.
  ) 
 Here is how much of TeX's memory you used:
- 13019 strings out of 480247
- 215257 string characters out of 5896151
- 777383 words of memory out of 5000000
- 30550 multiletter control sequences out of 15000+600000
+ 13072 strings out of 480247
+ 216775 string characters out of 5896151
+ 776361 words of memory out of 5000000
+ 30603 multiletter control sequences out of 15000+600000
  476528 words of font info for 52 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 68i,9n,77p,860b,470s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 68i,9n,77p,871b,470s stack positions out of 5000i,500n,10000p,200000b,80000s
  </home/luukdegraaf00/.texlive2021/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1000.600pk></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx9.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmcsc10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsl10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti9.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb>
-Output written on proposal.pdf (36 pages, 374976 bytes).
+Output written on proposal.pdf (36 pages, 2317476 bytes).
 PDF statistics:
- 757 PDF objects out of 1000 (max. 8388607)
- 621 compressed objects within 7 object streams
+ 810 PDF objects out of 1000 (max. 8388607)
+ 622 compressed objects within 7 object streams
  209 named destinations out of 1000 (max. 500000)
  530 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -108,6 +108,13 @@ A.~Gill, T.~Bull, G.~Kimmell, E.~Perrins, E.~Komp, and B.~Werling.
 \newblock In M.~T. Morazán and S.-B. Scholz, editors, {\em IFL}, volume 6041
   of {\em Lecture Notes in Computer Science}, pages 18--35. Springer, 2009.
 
+\bibitem{SAC}
+C.~Grelck and S.-B. Scholz.
+\newblock Sac: A functional array language for efficient multithreaded
+  execution.
+\newblock {\em International Journal of Parallel Programming}, 34:383--427, 08
+  2006.
+
 \bibitem{llama}
 B.~M. Gruber, G.~Amadio, J.~Blomer, A.~Matthes, R.~Widera, and M.~Bussmann.
 \newblock Llama: The low‐level abstraction for memory access.

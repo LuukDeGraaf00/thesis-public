@@ -1,4 +1,4 @@
-This is BibTeX, Version 0.99d (TeX Live 2020/Debian)
+This is BibTeX, Version 0.99d (TeX Live 2022/dev/Debian)
 Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: proposal.aux
 The style file: abbrv.bst
@@ -9,45 +9,45 @@ Warning--empty booktitle in polymorphic-variants-expression-problem
 Warning--empty booktitle in type-indexed
 Warning--empty booktitle in instruction-level-parallelism
 Warning--empty journal in type-families
-You've used 46 entries,
+You've used 47 entries,
             2118 wiz_defined-function locations,
-            755 strings with 12090 characters,
-and the built_in function-call counts, 16105 in all, are:
-= -- 1558
-> -- 797
+            763 strings with 12259 characters,
+and the built_in function-call counts, 16425 in all, are:
+= -- 1590
+> -- 810
 < -- 16
-+ -- 318
-- -- 267
-* -- 976
-:= -- 2589
-add.period$ -- 149
-call.type$ -- 46
-change.case$ -- 264
++ -- 323
+- -- 271
+* -- 1000
+:= -- 2643
+add.period$ -- 152
+call.type$ -- 47
+change.case$ -- 269
 chr.to.int$ -- 0
-cite$ -- 52
-duplicate$ -- 695
-empty$ -- 1260
-format.name$ -- 267
-if$ -- 3508
+cite$ -- 53
+duplicate$ -- 706
+empty$ -- 1286
+format.name$ -- 271
+if$ -- 3575
 int.to.chr$ -- 0
-int.to.str$ -- 46
-missing$ -- 35
-newline$ -- 231
-num.names$ -- 98
-pop$ -- 363
+int.to.str$ -- 47
+missing$ -- 36
+newline$ -- 236
+num.names$ -- 100
+pop$ -- 366
 preamble$ -- 1
-purify$ -- 221
+purify$ -- 225
 quote$ -- 0
-skip$ -- 551
+skip$ -- 559
 stack$ -- 0
-substring$ -- 685
-swap$ -- 225
+substring$ -- 711
+swap$ -- 226
 text.length$ -- 16
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 182
+type$ -- 186
 warning$ -- 6
-while$ -- 131
-width$ -- 48
-write$ -- 504
+while$ -- 134
+width$ -- 49
+write$ -- 515
 (There were 6 warnings)

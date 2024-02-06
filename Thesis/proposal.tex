@@ -747,12 +747,13 @@ Section \ref{adt} is dedicated to sum types and their role in establishing a typ
 The ECS pattern arguably originated in the context of object-oriented languages being predominant in game engines.
 The premise is to organize game-logic around functions, where the relation between data remains flexible\cite{ecs-origin}.
 It is in contrast with inheritance, where relations are statically determined.
+An overview of the pattern:
 
 \begin{itemize}
     \item [Entity]
     A set of components, where the composition is defined at runtime.
     As such there is no predetermined relation between any of the components.  
-    As example, an entity can gain momentum at any time by attaching a \type{Velocity} component.
+    As example, an entity can gain momentum at any time by attaching the \type{Velocity} component.
     \item [Component]
     An user-defined datatype within the pattern, such as \type{Velocity}.
     In the general case components are stored in parallel arrays to exploit data-parallelism opportunities.
@@ -761,10 +762,10 @@ It is in contrast with inheritance, where relations are statically determined.
     A \type{Movement} system operates on all entities that contain the \type{Velocity} component, irrespective of other components that might be attached to the entity.
 \end{itemize}
 
-The ECS pattern exists on a similar abstraction-level as array languages, through the use collective operations.
-To reiterate on section \ref{element-wise}, an entity is implemented as a unique identifier.
-Rather than using the identifier to find the associated components, collective operations operate directly on the components.
-It allows for a variant-wise collection, which most ECS implementations use to optimize the performance of individual systems.
+The ECS pattern exists on a similar abstraction-level as array languages, through the use of collective operations.
+To reiterate on section \ref{element-wise}, an entity is often implemented as a unique identifier.
+Rather than using this identifier to find the associated components, collective operations operate directly on the data components.
+It allows for a variant-wise collection as internal representation, but with the functionality of a heterogeneous collection.
 As such the pattern is often combined with data-oriented design and can be used to implicitly exploit data-parallelism in general purpose languages.
 
 
@@ -775,6 +776,7 @@ As such the pattern is often combined with data-oriented design and can be used 
     { 
         The movement and render systems both have two components as a dependency and only operate on variants that contain their specific components.
         The example uses a parallel array for each unique combination, so called {\it archetype}.
+        Some ECS implementations, such as Bevy\cite{ecs-bevy}, use sparse arrays to speed up the process of adding and removing components at the cost of fragmentation.
     }
 \end{figure}
 
@@ -795,19 +797,31 @@ This brings us to {\it Algebraic Data Types}.
 
 \subsubsection{Algebraic Data Type}\label{adt}
 
-Functional languages handle tagged unions safely through algebraic data types (ADTs).
-Intuitively a product type is the combination of datatypes, while a sum type is the alternation between datatypes.
+Functional languages handle tagged unions safely through sum types, which is a construct in an Algebraic Data Type (ADT).
+An ADT is a compositional type that categorizes its different compositions with: product, sum and recursive type constructors.
+
+\begin{itemize}
+    \item [Product] The composition of datatypes, where datatypes coexist.  
+    \item [Sum] The alternation between datatypes, where datatypes are mutually exclusive.
+    \item [Recursive] The self referencing datatype, where a datatype is composed of itself.
+\end{itemize}
+
+When considering tagged unions, recursive datatypes are infeasible due to their unpredictable and unconstrained size.
+This is why only product and sum types are considered.
 It is often useful to discriminate between multiple variations of a sum type, which is done through a data constructor.
 An example is the \type{Maybe a} type, which represents an optional value. 
+It can either be \type{Nothing} or the optional value wrapped in the \type{Just} data constructor.
 
 \begin{figure}[ht]
     \hspace{1em}
     \includegraphics[scale=0.05]{InterfaceCode1Annotated.png}
 \end{figure}
 
-Deconstructing an algebraic data type is done by pattern matching on the data constructor.
-The pattern match can exhaustively match on all variants, as all data constructors are known at compile-time.
+Deconstructing an ADT is done by pattern matching on the data constructor.
+The pattern matcher can exhaustively match on all variants, as all data constructors are known at compile-time.
+It enforces type-safety by ensuring all variants are considered, rather than putting the responsibility on the programmer.
 It can be seen as a native control-flow mechanism that ensures only the operations on the active variant are performed.
+An example of a function that pattern matches is \type{fmap}, which applies a function to the optional value.
 
 \begin{figure}[ht]
     \hspace{1em}
@@ -815,28 +829,66 @@ It can be seen as a native control-flow mechanism that ensures only the operatio
     \hypertarget{fig:fmap}{}
 \end{figure}
 
-In Haskell, algebraic data types are distinguishable by name and therefore explicitly declared.
-This means data constructors are local to the declared type and pattern matching happens within the same type.
+The \type{fmap} function considers two cases, the \type{Just} data constructor and the \type{Nothing} data constructor.
+The pattern matcher ensures that the branch of the active variant is chosen, which in the case of \type{Just} would result in the function being applied to the value.
+In Haskell, ADTs are distinguishable by name and therefore explicitly declared.
+It means data constructors are local to the declared type and pattern matching happens within the same type.
+In the context of our intention to create a flexible interface this is problematic for several reasons.
+A practical reason is that the ADT must be explicitly declared, which requires meta-programming for a generic implementation.
+In addition, on the type-level it is not apparent which variants exist in a particular ADT.
+This makes it hard for data structures to adapt to a particular variant type.
+It also complicates optimizing variant types that overlap in the variants they contain, as data constructors are local to their type and therefore not necessarily equal.
+Consequently, defining a function on a subset of variants is also infeasible.
+A solution, which can adapt well to section \ref{ecs}, requires mutually exclusivity to exist on the type-level.
+
+\newpage
+
+\subsubsection{Proposed Solution}
+
+Before discussing the case of sum types, it is easier to start with the case of product types.
+A common application of product types are tuples.
+The tuple \type{(Bool, Float)} is considered to be equal to any other tuple with the type \type{(Bool, Float)}.
+It operates differently from explicitly declared datatypes, which distinguish themselves through their name.
+A way to compartmentalize the difference is by considering that a tuple is a polymorphic datatype.
+It is therefore also possible to define our own \type{Tuple a b} type, which is only syntactically distinct from a tuple.
+A benefit of tuples is that we can define generic functions that take the composition of the tuple in account.
+An example is the \type{fst} function, which extracts the first operand of a tuple. 
+The concept can be extend to sum types.
+In Haskell, the polymorphic \type{Either a b} datatype is either \type{Left a} or \type{Right b}.
+The mutual exclusive relationship is captured in a single generic datatype.
+Rather than nesting the \type{Either} datatype, ergonomically it is much easier when the arity of the datatype is flexible.
+OCaml calls these {\it polymorphic variants}\footnote{OCaml also implements nominally typed sum types, so called {\it variants}.}, while other functional languages generally refer to them as extensible or open sum types.
+The operands of the sum type are represented on the type-level, which can be used to solve the previously discussed limitations of nominal sum types in section \ref{adt}.
+
+\paragraph{Motivation}
+To make it more concrete, the previously discussed \type{fmap} function is used to demonstrate the flexibility that polymorphic variants provide.
 The type signature of the \type{fmap} function provides no information on a potential structural change.
 It is possible to return \type{Nothing} for both cases\footnote{\type{Just b} is not possible as it can only be inferred through \type{Just a} and the \type{a -> b} function.}.
-A function that takes \type{Just a} and returns \type{Just b} would ensure that the {\it collective identity} can be preserved in a collective operation, irrespective of the concrete data transformation.
+From a performance perspective, it means the result of the function will always require a tag.
+
+\begin{figure}[ht]
+    \hspace{1em}
+    \includegraphics[scale=0.4]{CodeInterface2.png}
+    \hypertarget{fig:fmap}{}
+\end{figure}
+
+
+A function that takes \type{Just a} and returns \type{Just b} would ensure that the {\it collective identity} can be preserved.
+A variant-wise collection of optional values can therefore prevent the tag and preserve its variant-wise collection.
 This exact definition is not possible, as \type{Just a} is a data constructor under the \type{Maybe a} with the type \type{a -> Maybe a}.
-To remain performant, a variant type should be precise.
+As discussed in section \ref{ecs}, it requires a function to be definable on a subset of variants.
 In some cases, such as a safe division function, the introduced uncertainty would be inherit to the function.  
+The following figure uses the polymorphic variant constructor \type{a || b}, with the standalone \type{Just a} and \type{Nothing} types.
 
 \begin{figure}[ht]
     \hspace{1em}
     \includegraphics[scale=0.4]{CodeInterface3.png}
 \end{figure}
 
-Concretely, \type{Maybe a} is now an alias for the mutually exclusive relationship between \type{Just a} or \type{Nothing}, rather than an unique and standalone type. 
-OCaml calls these {\it polymorphic variants}\footnote{OCaml also implements nominally typed sum types, so called {\it variants}.}, while other functional languages generally refer to them as extensible or open sum types.
-A way to compartmentalize the difference is by considering that \type{||} is now a type constructor that takes two datatypes.
-The variants are now apparent to the type system, which can be used to generically adapt data structures to the concrete variants in a variant type. 
-The flexibility polymorphic variant types provide align with the intention to create a modular system that can be agnostic to the internal representation.
-A motivating example is that a collection of \type{Maybe a} can be an element-wise collection or two variant-wise collections of \type{Just a} and \type{Nothing}\footnote{As \type{Nothing} does not hold data, a size descriptor is sufficient.}.
+Concretely, \type{Maybe a} is now an alias for the mutually exclusive relationship between \type{Just a} or \type{Nothing}.
+A motivating example is that a collection of \type{Maybe a} can now be an element-wise collection or two variant-wise collections of \type{Just a} and \type{Nothing}\footnote{As \type{Nothing} does not hold data, a size descriptor is sufficient.}.
 While the former involves branching for \type{fmap}, the latter can ignore the \type{Nothing} collection and vectorize the \type{fmap} function.
-The original \type{\hyperlink{fig:fmap}{fmap}} definition would force the result of the collective operation to be an element-wise collection.
+An implementation of polymorphic variants will be discussed in the upcoming sections.
 
 \newpage
 

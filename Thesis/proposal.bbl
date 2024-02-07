@@ -194,6 +194,12 @@ D.~Meister, J.~Boksansk{\'y}, M.~Guthe, and J.~Bittner.
 S.~Mertens.
 \newblock \url{https://github.com/amethyst/legion}.
 
+\bibitem{triangle}
+T.~M\"{o}ller and B.~Trumbore.
+\newblock Fast, minimum storage ray/triangle intersection.
+\newblock In {\em ACM SIGGRAPH 2005 Courses}, SIGGRAPH '05, page 7–es, New
+  York, NY, USA, 2005. Association for Computing Machinery.
+
 \bibitem{c++traits}
 N.~C. Myers.
 \newblock {Traits: a new and useful template technique}.

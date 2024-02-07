@@ -35,31 +35,33 @@
 \contentsline {subsubsection}{\numberline {3.2.5}Deduplication}{22}{subsubsection.3.2.5}%
 \contentsline {subsection}{\numberline {3.3}Datatype-Generic programming}{23}{subsection.3.3}%
 \contentsline {subsubsection}{\numberline {3.3.1}Verifying}{23}{subsubsection.3.3.1}%
-\contentsline {subsubsection}{\numberline {3.3.2}Theory}{24}{subsubsection.3.3.2}%
+\contentsline {subsubsection}{\numberline {3.3.2}Foundations}{24}{subsubsection.3.3.2}%
 \contentsline {subsubsection}{\numberline {3.3.3}Framework}{25}{subsubsection.3.3.3}%
 \contentsline {paragraph}{Traversing}{25}{section*.56}%
 \contentsline {paragraph}{Intermediate}{26}{section*.59}%
 \contentsline {paragraph}{Isomorphism}{26}{section*.61}%
 \contentsline {paragraph}{Steps}{26}{section*.63}%
 \contentsline {section}{\numberline {4}Implementation}{27}{section.4}%
-\contentsline {subsection}{\numberline {4.1}Accelerate}{27}{subsection.4.1}%
-\contentsline {paragraph}{Pattern Synonymns}{28}{section*.67}%
-\contentsline {paragraph}{Pattern Matching}{28}{section*.70}%
+\contentsline {subsection}{\numberline {4.1}Algebraic Data Types in Accelerate}{27}{subsection.4.1}%
+\contentsline {paragraph}{Fusion}{27}{section*.66}%
+\contentsline {paragraph}{ADT}{27}{section*.67}%
+\contentsline {paragraph}{Pattern Matching}{28}{section*.68}%
+\contentsline {paragraph}{Pattern Synonymns}{28}{section*.69}%
 \contentsline {subsection}{\numberline {4.2}Result}{29}{subsection.4.2}%
-\contentsline {paragraph}{Memory Representation}{29}{section*.72}%
-\contentsline {paragraph}{(De)constructor}{29}{section*.73}%
-\contentsline {paragraph}{Collection}{29}{section*.74}%
+\contentsline {paragraph}{Memory Representation}{29}{section*.73}%
+\contentsline {paragraph}{(De)constructor}{29}{section*.74}%
+\contentsline {paragraph}{Collection}{29}{section*.75}%
 \contentsline {subsection}{\numberline {4.3}Benchmarks}{30}{subsection.4.3}%
-\contentsline {paragraph}{Nearest}{30}{section*.75}%
+\contentsline {paragraph}{Nearest}{30}{section*.76}%
 \contentsline {section}{\numberline {5}Discussion}{31}{section.5}%
 \contentsline {subsection}{\numberline {5.1}Non-variant types}{31}{subsection.5.1}%
 \contentsline {subsection}{\numberline {5.2}Embedded Domain-Specific Language}{31}{subsection.5.2}%
 \contentsline {subsection}{\numberline {5.3}Datatype-generic programming in Haskell}{31}{subsection.5.3}%
 \contentsline {subsection}{\numberline {5.4}Limitations}{32}{subsection.5.4}%
-\contentsline {paragraph}{Surface type}{32}{section*.77}%
-\contentsline {paragraph}{Nested pattern matching}{32}{section*.78}%
-\contentsline {paragraph}{Unified tag}{32}{section*.80}%
-\contentsline {paragraph}{Struct}{32}{section*.81}%
-\contentsline {paragraph}{Compilation Speed}{32}{section*.82}%
+\contentsline {paragraph}{Surface type}{32}{section*.78}%
+\contentsline {paragraph}{Nested pattern matching}{32}{section*.79}%
+\contentsline {paragraph}{Unified tag}{32}{section*.81}%
+\contentsline {paragraph}{Struct}{32}{section*.82}%
+\contentsline {paragraph}{Compilation Speed}{32}{section*.83}%
 \contentsline {section}{\numberline {6}Conclusion}{33}{section.6}%
 \contentsline {subsection}{\numberline {6.1}Future Work}{33}{subsection.6.1}%

@@ -69,7 +69,7 @@ An implementation is provided in the data-parallel language Accelerate, which de
 The research questions answered in this
 thesis are:
 - How to obtain low-level control that is applicable for high performance computing, while preserving the higher-abstraction surface representation?
-- What is the conceptualization of a higher-abstraction variant type, which can exercise the obtained low-level control within in a data-parallel environment?
+- What is the conceptualization of a higher-abstraction variant type, which can exercise the obtained low-level control within a data-parallel environment?
 
 Concretely, the contributions of this thesis include:
 - An extendable deduplication algorithm for the memory representation of a variant type.
